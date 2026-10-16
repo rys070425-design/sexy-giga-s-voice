@@ -50,4 +50,3 @@ For English listeners: select English under Speech, select your caption language
 [English quick start and Korean label guide](quickstart-en.md)
 
 음성 인식은 **Whisper large-v3-turbo / faster-whisper**, 번역은 **NLLB-200 distilled 600M CPU int8**입니다. 유료 API 없이 PC에서 실행하며 NLLB는 **CC-BY-NC-4.0 비상업용**입니다. 개인 사용은 무료지만 상업용 무제한 라이선스는 아닙니다. [모델 출처와 라이선스](third-party.md)를 확인하세요.
-

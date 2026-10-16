@@ -12,6 +12,7 @@ from PySide6.QtCore import QObject, Signal
 from speech_quality import SAMPLE_RATE, FRAME, Segmenter, AudioClip, decoder_options, transcript_parts
 from speaker_labels import SpeakerTimeline, group_words
 from live_captions import LatestSlot, CaptionUpdate
+from audio_sources import SourceTracker
 
 
 class VoiceService(QObject):
@@ -25,6 +26,7 @@ class VoiceService(QObject):
     def __init__(self, timeline=None):
         super().__init__()
         self.timeline = timeline if timeline is not None else SpeakerTimeline()
+        self.sources = SourceTracker()
         self.stop_event = threading.Event()
         self.ready = threading.Event()
         self.translator_ready = threading.Event()
@@ -51,7 +53,7 @@ class VoiceService(QObject):
         if self.running:
             return
         self.running = True
-        self._workers_remaining = 3
+        self._workers_remaining = 4
         self.stop_event = threading.Event()
         self.ready = threading.Event()
         self.translator_ready = threading.Event()
@@ -66,7 +68,8 @@ class VoiceService(QObject):
         self.threads = [threading.Thread(target=fn, args=(current_stop,), daemon=True, name=name)
                         for fn, name in [(self._capture, 'audio-capture'),
                                          (self._recognize, 'speech-recognition'),
-                                         (self._translate, 'local-translation')]]
+                                         (self._translate, 'local-translation'),
+                                         (self._source_monitor, 'audio-source-labels')]]
         for thread in self.threads:
             thread.start()
 
@@ -189,8 +192,10 @@ class VoiceService(QObject):
                     groups = [(label, text)] if text else []
                 for index, (label, text) in enumerate(groups):
                     update = CaptionUpdate(clip.sequence, clip.revision + index, text,
-                                           text if info.language == 'ko' else '',
-                                           info.language, label, clip.final)
+                                           text if info.language == self.profile.get('target_language','ko') else '',
+                                           info.language, label, clip.final, False,
+                                           self.sources.resolve(clip.start+clip.overlap,clip.start+len(clip.audio)/SAMPLE_RATE),
+                                           self.profile.get('target_language','ko'))
                     self.live_caption.emit(update)
                     if clip.final:
                         self._enqueue(self.text_q, update, '번역')
@@ -206,6 +211,23 @@ class VoiceService(QObject):
     def _capture_alive(self):
         return bool(self.threads and self.threads[0].is_alive())
 
+    def _source_monitor(self,current_stop):
+        probe=None
+        try:
+            from audio_sources import WindowsAudioProbe
+            while not current_stop.is_set():
+                try:
+                    if probe is None:probe=WindowsAudioProbe(self.profile.get('audio_id',''))
+                    self.sources.record(probe.scan())
+                except Exception:
+                    self.sources.record([])
+                    if current_stop.wait(1.):break
+                current_stop.wait(.2)
+        finally:
+            try:
+                if probe is not None:probe.close()
+            finally:self._worker_finished(current_stop)
+
     def _translate(self, current_stop):
         try:
             from core import expand_terms, HOME, normalized_phrase, read_phrase_memory
@@ -213,11 +235,12 @@ class VoiceService(QObject):
             from local_translation import LocalTranslator, game_phrase_translation
             translator = LocalTranslator()
             language = self.profile.get('language', 'auto')
+            target_language=self.profile.get('target_language','ko')
             source = 'en' if language == 'auto' else ('pt' if language == 'pb' else language)
-            if source != 'ko' and (source, 'ko') in translator.packages:
+            if source != target_language and (source, target_language) in translator.packages:
                 # Load the native translator in parallel with Whisper startup,
                 # rather than delaying the first actual foreign sentence.
-                translator.translate('', source, 'ko')
+                translator.translate('', source, target_language)
             self.translator_ready.set()
             phrase_memory = read_phrase_memory(HOME / 'phrase_memory.json')
             terms = {}
@@ -238,15 +261,15 @@ class VoiceService(QObject):
                     terms[source_lang] = combine_terms(self.dictionary, source_lang, HOME)
                 expanded = expand_terms(transcript, terms[source_lang])
                 remembered = phrase_memory.get(source_lang + ':' + normalized_phrase(transcript),
-                             phrase_memory.get('auto:' + normalized_phrase(transcript)))
+                             phrase_memory.get('auto:' + normalized_phrase(transcript))) if target_language=='ko' else None
                 context = self.profile.get('translation_context',
                           'game' if '디스코드' in self.profile.get('name', '') else 'general')
-                curated = game_phrase_translation(transcript, source_lang) if context == 'game' else None
+                curated = game_phrase_translation(transcript, source_lang) if context == 'game' and target_language=='ko' else None
                 if remembered is not None:
                     translated = remembered
                 elif curated is not None:
                     translated = curated
-                elif source_lang == 'ko':
+                elif source_lang == target_language:
                     translated = transcript
                 elif (source_lang, expanded) in translations:
                     translated = translations[source_lang, expanded]
@@ -254,13 +277,13 @@ class VoiceService(QObject):
                 else:
                     try:
                         translated = translator.translate(expanded,
-                                      'pt' if source_lang == 'pb' else source_lang, 'ko')
+                                      'pt' if source_lang == 'pb' else source_lang, target_language)
                         translations[source_lang, expanded] = translated
                         while len(translations) > 128:
                             translations.popitem(last=False)
                     except Exception as exc:
                         translated = '[번역 불가] ' + transcript
-                        self.status.emit('번역 실패 (' + source_lang + '→ko): ' + str(exc)[:180])
+                        self.status.emit('번역 실패 (' + source_lang + '→'+target_language+'): ' + str(exc)[:180])
                 # Draft work is bounded to one latest item. A completed old
                 # draft must never overwrite its final sentence.
                 if update.final or update.sequence > self.finalized_sequence:

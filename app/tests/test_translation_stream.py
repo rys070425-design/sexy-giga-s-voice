@@ -7,6 +7,19 @@ from live_captions import CaptionUpdate
 
 
 class TranslationStreamTests(unittest.TestCase):
+    def test_english_captions_do_not_use_saved_korean_or_game_translation(self):
+        class Translator:
+            packages={}
+            def translate(self,*args):raise AssertionError('English captions need no translation model')
+        service=VoiceService();service.profile={'language':'en','target_language':'en','translation_context':'game'}
+        service.dictionary={};service._workers_remaining=1;service.asr_done.set()
+        service.text_q.put(CaptionUpdate(0,100,'I need healing.','','en','시험',True))
+        captions=[];service.attributed_caption.connect(lambda *p:captions.append(p))
+        with tempfile.TemporaryDirectory() as directory:
+            with patch('core.HOME',Path(directory)),patch('local_translation.LocalTranslator',return_value=Translator()),patch('core.read_phrase_memory',return_value={'en:i need healing.':'잘못된 한국어'}):
+                service._translate(service.stop_event)
+        self.assertEqual(captions[0][1],'I need healing.')
+
     def test_cache_does_not_drop_repeated_spoken_calls(self):
         class Translator:
             packages={}

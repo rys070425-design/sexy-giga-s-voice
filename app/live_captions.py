@@ -28,6 +28,8 @@ class CaptionUpdate:
     speaker: str
     final: bool = False
     complete: bool = False
+    source: str = ''
+    target_language: str = 'ko'
 
 
 class DisplayOrder:

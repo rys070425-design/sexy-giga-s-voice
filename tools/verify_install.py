@@ -31,26 +31,36 @@ main.init_files=lambda:core.init_files(testhome)
 main.MainWindow.update_plan_state=lambda self:None
 main.MainWindow._refresh_sources=lambda self:self.source.addItem('시험 출력 장치','')
 window=main.MainWindow()
+window.tab_discord.auto_follow.setChecked(False)
 window.show();app.processEvents()
 assert window.tabs.count()==7
 for i in range(7):window.navigation.setCurrentRow(i);app.processEvents();assert window.tabs.currentIndex()==i
 window.navigation.setCurrentRow(0)
 from live_captions import CaptionUpdate
 window.on_live_caption(CaptionUpdate(1,60,'test draft','','en','시험 화자'))
-assert window.live_text.isVisible()
-assert 'test draft' in window.overlay.label.text()
+assert not window.live_text.isVisible(),'Untranslated foreign draft should not flash'
 window.on_live_caption(CaptionUpdate(1,60,'test draft','초안','en','시험 화자',False,True))
 assert window.overlay.label.text()=='초안'
 window.on_live_caption(CaptionUpdate(1,100,'final words','','en','시험 화자',True))
 assert window.overlay.label.text()=='초안','Existing translation flickered back to original'
-assert window.overlay.original_label.text()=='final words'
 assert window.history.toPlainText()==''
 window.on_live_caption(CaptionUpdate(1,100,'final words','확정 문장','en','시험 화자',True,True))
+window.presentation.changed_at-=1;window.advance_captions()
 assert window.history.toPlainText().count('확정 문장')==1
-assert not window.live_text.isVisible()
+assert window.live_text.isVisible()
 window.on_live_caption(CaptionUpdate(2,60,'new draft','','en','새 화자'))
+assert window.overlay.label.text()=='확정 문장'
+window.on_live_caption(CaptionUpdate(2,60,'new draft','새 문장','en','화자 미확인',False,True,'YouTube'))
+window.presentation.changed_at-=1;window.advance_captions()
 window.on_live_caption(CaptionUpdate(1,100,'old words','늦은 이전 번역','en','이전 화자',True,True))
-assert window.overlay.label.text()=='new draft'
+assert window.overlay.label.text()=='새 문장'
+assert '확정 문장' in window.overlay.previous_label.text()
+assert window.overlay.speaker_label.text()=='YouTube'
+assert '인식 중' not in window.live_text.text() and '화자 미확인' not in window.live_text.text()
+assert '107' in window.overlay.surface.styleSheet()
+window.background_opacity.setValue(20)
+assert '51' in window.overlay.surface.styleSheet()
+window.background_opacity.setValue(42)
 assert window.history.toPlainText().count('늦은 이전 번역')==1
 assert window.live_text.isVisible()
 window.live_language.setCurrentIndex(window.live_language.findData('ko'))
@@ -115,6 +125,35 @@ window.newSocket = new WebSocket('ws://127.0.0.1:6464/?v=1');
 window.newSocket.fire('open');window.testSocket.fire('close');
 '''+SNAPSHOT_SCRIPT)
 assert snapshot['connected'],'Old socket invalidated a newer connection'
+from discord_widget import AUTO_CHANNEL_SCRIPT
+run_js('''window.commands=[];window.rpc={connected:true,authenticated:true,
+request:(cmd,args)=>{window.commands.push(cmd);return Promise.resolve({id:'234567890123456789',guild_id:'123456789012345678',type:2});}};
+'''+AUTO_CHANNEL_SCRIPT+SNAPSHOT_SCRIPT)
+snapshot=run_js(SNAPSHOT_SCRIPT)
+assert snapshot['selected']['channel']=='234567890123456789'
+assert snapshot['selected']['guild']=='123456789012345678'
+loaded_channels=[]
+original_connect=tab.connect_widget
+tab.connect_widget=lambda:loaded_channels.append(tab.url.text())
+tab.auto_follow.blockSignals(True);tab.auto_follow.setChecked(True);tab.auto_follow.blockSignals(False)
+tab._received(json.dumps(snapshot),tab._generation)
+assert loaded_channels==['https://streamkit.discord.com/overlay/voice/123456789012345678/234567890123456789']
+tab.connect_widget=original_connect
+tab.auto_follow.blockSignals(True);tab.auto_follow.setChecked(False);tab.auto_follow.blockSignals(False)
+extension=(root/'browser_source_extension'/'background.js').read_text(encoding='utf-8')
+run_js('''
+const event={addListener:()=>{}};
+window.chrome={storage:{local:{get:async()=>({key:'TEST_PAIRING_KEY_NOT_REAL',enabled:true})}},
+tabs:{query:async()=>[{url:'https://www.youtube.com/watch?v=PRIVATE_QUERY',audible:true},{url:'https://example.com/path',audible:true},{url:'https://muted.example/',mutedInfo:{muted:true}},{url:'https://private.example/',incognito:true}],onUpdated:event,onRemoved:event,onReplaced:event},
+alarms:{onAlarm:event,create:()=>{}},runtime:{onInstalled:event,onStartup:event,onMessage:event}};
+window.fetch=async(url,args)=>{window.bridgePayload=JSON.parse(args.body);return {ok:true};};
+'''+extension+'''report().then(result=>{window.reportDone=result.ok;});JSON.stringify({started:true});''')
+until=time.monotonic()+3
+while time.monotonic()<until:
+    payload=run_js('JSON.stringify({done:window.reportDone,payload:window.bridgePayload});')
+    if payload.get('done'):break
+assert payload['payload']['hosts']==['www.youtube.com','example.com']
+assert 'PRIVATE_QUERY' not in json.dumps(payload)
 started=[]
 original_start=window.start_service
 window.start_service=lambda:started.append(True)

@@ -10,16 +10,17 @@ from pathlib import Path
 import json
 import sys
 import threading
+import secrets
 import webbrowser
 import urllib.request
 from datetime import datetime
 
-from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtGui import QFont, QIcon
+from PySide6.QtCore import Qt, QTimer, Signal, QUrl
+from PySide6.QtGui import QFont, QIcon, QFontMetrics, QDesktopServices, QColor
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFormLayout,
     QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QMainWindow,
     QMessageBox, QPushButton, QPlainTextEdit, QSpinBox, QTabWidget, QFileDialog,
-    QVBoxLayout, QWidget, QInputDialog, QListWidget, QFrame, QScrollArea, QStyle, QTextEdit)
+    QVBoxLayout, QWidget, QInputDialog, QListWidget, QFrame, QScrollArea, QStyle, QTextEdit, QSlider, QDialog, QGraphicsDropShadowEffect)
 from PySide6.QtGui import QTextCursor
 
 from core import (HOME, DEFAULT_PROFILES, init_files, merge_glossary,
@@ -27,6 +28,8 @@ from core import (HOME, DEFAULT_PROFILES, init_files, merge_glossary,
                   read_json, update_due, valid_remote_dictionary, write_json)
 from engine import VoiceService
 from live_captions import DisplayOrder
+from caption_presentation import ReadableCaptions, CaptionCard, clean_caption_label, wrap_measured
+from source_bridge import BrowserSourceBridge
 from gpu_tab import GpuSetupTab
 from discord_widget import DiscordSpeakerTab
 from chatgpt_plan import PlanAccount, AccountError, improve_translation, build_review_prompt
@@ -66,13 +69,14 @@ class TranscriptView(QTextEdit):
 
     def append_caption(self, speaker, translated, original, stamp, language):
         self.moveCursor(QTextCursor.End)
+        original_html=('<p style="color:#96a5ba;font-size:12px;margin-bottom:20px;">'+html.escape(original)+'</p>') if original.strip()!=translated.strip() else ''
         self.insertHtml(
             '<p style="margin-top:18px;margin-bottom:5px;">'
             '<span style="color:#8fe3c9;font-weight:600;">' + html.escape(speaker) + '</span>'
             '<span style="color:#8999af;font-size:11px;"> &nbsp; ' + html.escape(stamp) +
             ' · ' + html.escape(language.upper()) + '</span></p>'
             '<p style="color:#f0f3fa;font-size:16px;margin-top:5px;margin-bottom:7px;">' + html.escape(translated) + '</p>'
-            '<p style="color:#96a5ba;font-size:12px;margin-bottom:20px;">' + html.escape(original) + '</p><br>')
+            + original_html + '<br>')
         self.ensureCursorVisible()
 
 
@@ -84,7 +88,7 @@ class SubtitleOverlay(QWidget):
         self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.box = QVBoxLayout(self)
         self.box.setContentsMargins(12, 12, 12, 12)
-        surface = QFrame()
+        surface = self.surface = QFrame()
         surface.setObjectName('subtitleSurface')
         surface.setStyleSheet('QFrame#subtitleSurface {background: rgba(12,18,27,230); border: 1px solid rgba(120,160,175,100); border-radius: 14px;} QLabel {background: transparent; border: none;}')
         caption_layout = QVBoxLayout(surface)
@@ -96,9 +100,14 @@ class SubtitleOverlay(QWidget):
         self.speaker_label.setStyleSheet('color: #8ce8cb;')
         self.speaker_label.setAlignment(Qt.AlignCenter)
         caption_layout.addWidget(self.speaker_label)
+        self.previous_label = QLabel('')
+        self.previous_label.setTextFormat(Qt.PlainText)
+        self.previous_label.setAlignment(Qt.AlignCenter)
+        self.previous_label.setStyleSheet('color: #c5d1df;')
+        caption_layout.addWidget(self.previous_label)
         self.label = QLabel("")
         self.label.setTextFormat(Qt.PlainText)
-        self.label.setWordWrap(True)
+        self.label.setWordWrap(False)
         self.label.setAlignment(Qt.AlignCenter)
         self.label.setStyleSheet('color: #f4f6fc;')
         caption_layout.addWidget(self.label)
@@ -109,6 +118,10 @@ class SubtitleOverlay(QWidget):
         self.original_label.setAlignment(Qt.AlignCenter)
         self.original_label.setStyleSheet('color: #aebdce;')
         caption_layout.addWidget(self.original_label)
+        for text_label in (self.previous_label,self.label,self.speaker_label):
+            shadow=QGraphicsDropShadowEffect(text_label)
+            shadow.setBlurRadius(8);shadow.setOffset(0,1);shadow.setColor(QColor(0,0,0,220))
+            text_label.setGraphicsEffect(shadow)
         self.box.addWidget(surface)
         self.resize(960, 145)
         self.timer = QTimer(self)
@@ -116,24 +129,49 @@ class SubtitleOverlay(QWidget):
         self.timer.timeout.connect(self.hide)
 
     def show_caption(self, original, translated, profile, speaker="화자 미확인"):
+        label=speaker if speaker and speaker!='화자 미확인' else (profile.get('source_label') or '오디오')
+        card=CaptionCard(-1,translated,original,label,True)
+        self.show_readable(card,None,profile)
+
+    def show_readable(self, card, previous, profile):
         if not profile.get("overlay", True):
             self.hide()
             return
         font = int(profile.get("font", 26))
         self.label.setFont(QFont("Malgun Gothic", font, QFont.DemiBold))
-        self.speaker_label.setText(speaker)
-        self.label.setText(translated)
-        if profile.get("show_original"):
-            self.original_label.setText(original)
+        self.previous_label.setFont(QFont("Malgun Gothic", font))
+        opacity=max(15,min(80,int(profile.get('background_opacity',42))))
+        self.surface.setStyleSheet('QFrame#subtitleSurface {background: rgba(12,18,27,'+str(round(opacity*2.55))+'); border: 1px solid rgba(160,190,205,45); border-radius: 14px;} QLabel {background: transparent;border: none;}')
+        self.speaker_label.setText(card.label)
+        screen = QApplication.primaryScreen()
+        if screen:self.setFixedWidth(min(1000,int(screen.availableGeometry().width()*.80)))
+        metrics=QFontMetrics(self.label.font())
+        lines=wrap_measured(card.text,max(80,self.width()-80),metrics.horizontalAdvance)
+        if len(lines)>=2:
+            older,current=lines[-2:]
+        else:
+            current=lines[0] if lines else ''
+            old_lines=wrap_measured(previous.text,max(80,self.width()-80),metrics.horizontalAdvance) if previous else []
+            older=old_lines[-1] if old_lines else ''
+            if previous and previous.label!=card.label:
+                prefix=previous.label+' · '
+                old_lines=wrap_measured(previous.text,max(40,self.width()-80-metrics.horizontalAdvance(prefix)),metrics.horizontalAdvance)
+                older=prefix+(old_lines[-1] if old_lines else '')
+        self.previous_label.setText(older)
+        self.previous_label.setFixedHeight(metrics.height()+4)
+        self.label.setText(current)
+        self.label.setFixedHeight(metrics.height()+4)
+        show_original=bool(profile.get('show_original') and card.original.strip()!=card.text.strip())
+        if show_original:
+            self.original_label.setText(card.original)
             self.original_label.show()
         else:
             self.original_label.hide()
-        screen = QApplication.primaryScreen()
         if screen:
             g = screen.availableGeometry()
             self.setFixedWidth(min(1000, int(g.width() * .80)))
-            height = self.label.heightForWidth(self.width() - 70) + 80
-            if profile.get('show_original'):
+            height = (metrics.height()+4)*2 + 82
+            if show_original:
                 height += self.original_label.heightForWidth(self.width() - 70) + 7
             self.setFixedHeight(min(int(g.height() * .45), max(130, height)))
             x = g.x() + (g.width() - self.width()) // 2
@@ -163,6 +201,15 @@ class MainWindow(QMainWindow):
         self.service.live_caption.connect(self.on_live_caption)
         self.display_order = DisplayOrder()
         self.last_live_translation = None
+        self.presentation=ReadableCaptions()
+        self.caption_timer=QTimer(self)
+        self.caption_timer.setInterval(80)
+        self.caption_timer.timeout.connect(self.advance_captions)
+        if not isinstance(self.cfg.get('browser_pairing_key'),str) or len(self.cfg['browser_pairing_key'])<20:
+            self.cfg['browser_pairing_key']=secrets.token_urlsafe(32)
+            write_json(HOME/'settings.json',self.cfg)
+        self.browser_bridge=BrowserSourceBridge(self.service.sources,self.cfg['browser_pairing_key'])
+        self.browser_bridge.start()
         self.service.status.connect(self.on_status)
         self.service.error.connect(self.on_error)
         self.service.stopped.connect(self.on_stopped)
@@ -181,7 +228,7 @@ class MainWindow(QMainWindow):
         self.reviewed_translation = ""
         self.review_pin = False  # do not overwrite the phrase under review
         self.plan_result.connect(self.on_plan_result)
-        self.setWindowTitle("Universal Voice KR v0.6.1 · 실시간 자막 · Discord 닉네임 연결")
+        self.setWindowTitle("Universal Voice KR v0.7 · 읽기 편한 실시간 자막")
         self.resize(1180, 820)
         self.setMinimumSize(1000, 740)
         self._build_ui()
@@ -230,7 +277,7 @@ class MainWindow(QMainWindow):
         local_note = QLabel('내 PC에서 음성 처리\n대화는 자동 저장되지 않아요')
         local_note.setObjectName('sideNote')
         side.addWidget(local_note)
-        version = QLabel('VERSION 0.6.1')
+        version = QLabel('VERSION 0.7')
         version.setObjectName('version')
         side.addWidget(version)
         outer.addWidget(sidebar)
@@ -323,6 +370,10 @@ class MainWindow(QMainWindow):
         sources.addWidget(refresh)
         sb.addLayout(sources)
         sb.addWidget(QLabel('Discord에서 사용하는 출력 장치를 선택하세요. 내 마이크는 수집하지 않습니다.'))
+        self.source_label=QLineEdit()
+        self.source_label.setPlaceholderText('출처 이름 · 비워 두면 자동 / 직접 입력 예: YouTube')
+        self.source_label.setMaxLength(60)
+        sb.addLayout(row(self.source_label,self._button('웹사이트 이름 연결',self.browser_source_setup)))
         self.cb_exclude_own_mic = QCheckBox("내 마이크 제외")
         self.cb_exclude_own_mic.setChecked(True)
         self.cb_exclude_own_mic.setEnabled(False)
@@ -340,6 +391,8 @@ class MainWindow(QMainWindow):
         self.live_language.setToolTip('짧은 말의 정확도와 속도를 높이려면 주로 말하는 언어를 선택하세요. 변경은 다음 자막 시작부터 적용됩니다.')
         profiles.addWidget(self.live_language, 1)
         l.addLayout(profiles)
+        self.target_language=combo([('한국어 번역','ko'),('English captions · 영어 자막','en')])
+        l.addLayout(row(QLabel('표시 언어 / Captions'),self.target_language))
         self.btn_start = self._button("자막 시작", self.start_service)
         self.btn_start.setObjectName('primaryButton')
         self.btn_start.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
@@ -410,6 +463,12 @@ class MainWindow(QMainWindow):
         self.language.setToolTip('한 언어로 대화할 때는 해당 언어를 직접 선택하면 짧은 발화의 언어 오인식을 줄일 수 있습니다.')
         self.font_size = QSpinBox()
         self.font_size.setRange(14, 44)
+        self.background_opacity=QSlider(Qt.Horizontal)
+        self.background_opacity.setRange(15,80)
+        self.opacity_value=QLabel()
+        self.background_opacity.valueChanged.connect(lambda value:self.opacity_value.setText(str(value)+'%'))
+        self.background_opacity.setValue(42)
+        self.background_opacity.valueChanged.connect(self.update_caption_opacity)
         self.position = combo([("아래", "bottom"), ("가운데", "middle"), ("위", "top")])
         self.cb_overlay = QCheckBox("게임 화면 위 자막 표시 (전체 화면 창 모드 권장)")
         self.cb_original = QCheckBox("원문도 함께 표시")
@@ -429,6 +488,9 @@ class MainWindow(QMainWindow):
         form.addRow("목소리 민감도", self.vad)
         form.addRow("인식 정밀도", self.beam)
         form.addRow("자막 글씨 크기", self.font_size)
+        opacity_row=QWidget();opacity_layout=QHBoxLayout(opacity_row);opacity_layout.setContentsMargins(0,0,0,0)
+        opacity_layout.addWidget(self.background_opacity,1);opacity_layout.addWidget(self.opacity_value)
+        form.addRow('자막 배경 진하기',opacity_row)
         form.addRow("자막 위치", self.position)
         form.addRow(self.cb_overlay)
         form.addRow(self.cb_original)
@@ -680,6 +742,9 @@ class MainWindow(QMainWindow):
     def _load_profile(self):
         p = self.cfg["profiles"][self.profile_idx]
         self.profile_name.setText(p.get("name", "프로필"))
+        self.source_label.setText(p.get('source_label',''))
+        self.target_language.setCurrentIndex(max(0,self.target_language.findData(p.get('target_language','ko'))))
+        self.background_opacity.setValue(int(p.get('background_opacity',42)))
         self.asr_hotwords.setText(p.get('asr_hotwords', ''))
         for widget, value in [(self.model, p.get("model", "large-v3-turbo")),
                               (self.device, p.get("device", "auto")),
@@ -715,6 +780,9 @@ class MainWindow(QMainWindow):
                   "overlay": self.cb_overlay.isChecked(), "show_original": self.cb_original.isChecked(),
                   "live_preview": self.cb_live.isChecked(),
                   "asr_hotwords": self.asr_hotwords.text().strip(),
+                  "source_label":self.source_label.text().strip(),
+                  "background_opacity":self.background_opacity.value(),
+                  "target_language":self.target_language.currentData(),
                   "game_exes": [x.strip() for x in self.exe_names.text().split(",") if x.strip()],
                   "audio_id": self.source.currentData() or "",
                   "glossary_group": self.profile_terms.currentData() or "global"})
@@ -788,6 +856,8 @@ class MainWindow(QMainWindow):
         p = self.cfg["profiles"][self.profile_idx]
         self.display_order = DisplayOrder()
         self.last_live_translation = None
+        self.presentation=ReadableCaptions()
+        self.caption_timer.start()
         self.live_text.hide()
         dic = merge_glossary(self.terms, p.get("glossary_group", "global"))
         self.service.start(p, dic)
@@ -810,6 +880,7 @@ class MainWindow(QMainWindow):
         self.btn_stop.setEnabled(False)
 
     def on_stopped(self):
+        self.caption_timer.stop()
         self.btn_start.setEnabled(True)
         self.btn_stop.setEnabled(False)
         self.overlay.hide()
@@ -840,30 +911,46 @@ class MainWindow(QMainWindow):
         self.connection_badge.setText('●  확인 필요')
 
     def on_live_caption(self, update):
-        visible = self.display_order.accept(update)
-        if visible:
-            translated = update.translated
-            previous = self.last_live_translation
-            retained = bool(not translated and previous and previous.sequence == update.sequence
-                            and previous.language == update.language)
-            if retained:
-                translated = previous.translated
-            elif translated:
-                self.last_live_translation = update
-            pending = not update.final or not update.complete
-            suffix = ' · 인식 중' if not update.final else (' · 번역 중' if not translated else '')
-            shown = translated or update.original
-            self.live_text.setText(update.speaker + suffix + '\n' + shown)
-            self.live_text.setVisible(pending)
-            profile = self.cfg['profiles'][self.profile_idx]
-            if retained and previous.original != update.original:
-                profile = dict(profile, show_original=True)
-            self.overlay.show_caption(update.original, shown, profile, update.speaker + suffix)
-            if self.service.running:
-                self.overlay.timer.stop()
+        profile=self.cfg['profiles'][self.profile_idx]
+        label=clean_caption_label(update.speaker,update.source,profile.get('source_label',''))
+        if self.presentation.offer(update,label):self.render_captions()
+        if not self.closing:self.caption_timer.start()
         if update.final and update.complete:
             self.on_caption(update.original, update.translated, update.language,
-                            update.speaker, show_overlay=False)
+                            label, show_overlay=False)
+
+    def advance_captions(self):
+        if self.presentation.advance():self.render_captions()
+
+    def update_caption_opacity(self,value):
+        self.cfg['profiles'][self.profile_idx]['background_opacity']=value
+        if self.presentation.current:self.render_captions()
+
+    def render_captions(self):
+        current,previous=self.presentation.current,self.presentation.previous
+        if current is None:return
+        lines=[current.label]
+        if previous:lines.append(previous.text)
+        lines.append(current.text)
+        self.live_text.setText('\n'.join(lines));self.live_text.show()
+        self.overlay.show_readable(current,previous,self.cfg['profiles'][self.profile_idx])
+        if self.service.running:self.overlay.timer.stop()
+
+    def browser_source_setup(self):
+        dialog=QDialog(self);dialog.setWindowTitle('웹사이트 이름 자동 표시');dialog.resize(550,340)
+        layout=QVBoxLayout(dialog)
+        text=QLabel('Chrome·Edge에서 소리가 나는 탭의 사이트 이름을 연결합니다.\n\n'
+                    '1. 아래 버튼으로 확장 폴더를 엽니다.\n'
+                    '2. 브라우저의 확장 관리에서 개발자 모드를 켜고\n   압축 해제된 확장 로드로 이 폴더를 선택합니다.\n'
+                    '3. 확장 아이콘을 눌러 아래 연결 코드를 입력합니다.\n\n'
+                    '재생 중인 탭의 도메인만 PC에 전달합니다. 대화나 페이지 내용은 보내지 않습니다.')
+        text.setWordWrap(True);layout.addWidget(text)
+        code=QLineEdit(self.cfg['browser_pairing_key']);code.setReadOnly(True);layout.addWidget(code)
+        folder=Path(__file__).with_name('browser_source_extension')
+        layout.addLayout(row(self._button('확장 폴더 열기',lambda:QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))),
+                             self._button('연결 코드 복사',lambda:QApplication.clipboard().setText(code.text()))))
+        if self.browser_bridge.error:layout.addWidget(QLabel(self.browser_bridge.error))
+        dialog.exec()
 
     def on_caption(self, original, translated, language, speaker="화자 미확인", show_overlay=True):
         self.last_caption = (original, translated, language)
@@ -1119,6 +1206,8 @@ class MainWindow(QMainWindow):
             event.ignore()
             return
         self.tab_discord.disconnect_widget()
+        self.caption_timer.stop()
+        self.browser_bridge.close()
         self.stop_service()
         self.overlay.hide()
         super().closeEvent(event)

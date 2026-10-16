@@ -1,0 +1,11 @@
+{
+  "manifest_version":3,
+  "name":"Universal Voice KR · 웹사이트 이름",
+  "version":"0.7.0",
+  "description":"소리가 나는 탭의 사이트 이름만 PC의 Universal Voice KR에 연결합니다.",
+  "minimum_chrome_version":"120",
+  "permissions":["tabs","storage","alarms"],
+  "host_permissions":["http://127.0.0.1:43861/*"],
+  "background":{"service_worker":"background.js"},
+  "action":{"default_title":"웹사이트 이름 연결","default_popup":"popup.html"}
+}

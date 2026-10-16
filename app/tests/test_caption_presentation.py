@@ -1,0 +1,60 @@
+import unittest
+from caption_presentation import ReadableCaptions,clean_caption_label,wrap_measured
+from live_captions import CaptionUpdate
+
+def update(seq,rev,text,final=False,language='ko'):
+    return CaptionUpdate(seq,rev,text,text if language=='ko' else '',language,'화자 미확인',final,final)
+
+class PresentationTests(unittest.TestCase):
+    def test_english_captions_can_show_without_korean_translation(self):
+        model=ReadableCaptions()
+        event=CaptionUpdate(0,25,'Hello there','','en','화자 미확인',target_language='en')
+        self.assertTrue(model.offer(event,'YouTube',0))
+        self.assertEqual(model.current.text,'Hello there')
+    def test_first_translation_has_no_extra_delay(self):
+        model=ReadableCaptions()
+        self.assertTrue(model.offer(update(0,25,'안녕하세요'),'YouTube',0))
+        self.assertEqual(model.current.text,'안녕하세요')
+    def test_fast_revisions_are_coalesced(self):
+        model=ReadableCaptions()
+        model.offer(update(0,25,'처음'),'YouTube',0)
+        self.assertFalse(model.offer(update(0,45,'처음 말'),'YouTube',.2))
+        self.assertFalse(model.offer(update(0,65,'처음 말 뒤에'),'YouTube',.4))
+        self.assertEqual(model.current.text,'처음')
+        self.assertTrue(model.advance(.8))
+        self.assertEqual(model.current.text,'처음 말 뒤에')
+    def test_foreign_raw_does_not_replace_translation(self):
+        model=ReadableCaptions()
+        model.offer(update(0,25,'번역문'),'YouTube',0)
+        self.assertFalse(model.offer(update(0,45,'foreign',language='en'),'YouTube',1))
+        self.assertEqual(model.current.text,'번역문')
+    def test_duplicate_text_does_not_redraw(self):
+        model=ReadableCaptions();model.offer(update(0,25,'같은 말'),'YouTube',0)
+        self.assertFalse(model.offer(update(0,45,'같은 말'),'YouTube',1))
+    def test_previous_sentence_stays_when_speech_is_fast(self):
+        model=ReadableCaptions()
+        model.offer(update(0,25,'첫 문장',True),'YouTube',0)
+        model.offer(update(1,25,'둘째 문장'),'YouTube',1)
+        self.assertEqual(model.previous.text,'첫 문장')
+        model.offer(update(2,25,'셋째 문장'),'YouTube',2)
+        self.assertEqual(model.previous.text,'첫 문장')
+        self.assertEqual(model.current.text,'셋째 문장')
+    def test_final_is_not_delayed_forever(self):
+        model=ReadableCaptions();model.offer(update(0,25,'길게 잘못 들은 문장입니다'),'YouTube',0)
+        model.offer(update(0,45,'완전히 다른 확정 결과',True),'YouTube',.2)
+        self.assertTrue(model.advance(.8))
+        self.assertTrue(model.current.final)
+    def test_old_translation_cannot_rewind(self):
+        model=ReadableCaptions();model.offer(update(2,45,'최근'),'YouTube',0)
+        self.assertFalse(model.offer(update(1,90,'과거',True),'YouTube',2))
+        self.assertEqual(model.current.text,'최근')
+    def test_clean_labels_have_no_unknown_status(self):
+        self.assertEqual(clean_caption_label('화자 미확인','YouTube'),'YouTube')
+        self.assertEqual(clean_caption_label('민수','Discord'),'Discord · 민수')
+        self.assertEqual(clean_caption_label('민수','YouTube'),'YouTube')
+        self.assertEqual(clean_caption_label('화자 미확인'),'오디오')
+        self.assertEqual(clean_caption_label('민수','Discord','example.com'),'example.com')
+    def test_wrap_does_not_elide_content(self):
+        lines=wrap_measured('가나다라마바사아자차',4,len)
+        self.assertEqual(''.join(lines),'가나다라마바사아자차')
+        self.assertTrue(all(len(line)<=4 for line in lines))

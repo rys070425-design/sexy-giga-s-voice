@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from collections import Counter
 from PySide6.QtCore import QTimer, QUrl, Qt, Signal
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QGroupBox
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QGroupBox, QCheckBox
 from speaker_labels import validate_widget_url, widget_connection_status
 
 CONNECTION_SCRIPT = r"""(() => {
@@ -56,9 +56,37 @@ CONNECTION_SCRIPT = r"""(() => {
 })();
 """
 
+AUTO_CHANNEL_SCRIPT = r"""(() => {
+  const rpc=window.rpc;
+  if (!rpc) return;
+  if (!rpc.connected) { rpc.connect(); return; }
+  if (!rpc.authenticated) return;
+  const state=window.__uvkrSelectedChannel ||= {pending:false,last:0,guild:'',channel:'',empty:false,error:null};
+  const now=Date.now();
+  if (state.pending && now-state.last<5000) return;
+  if (now-state.last<1000) return;
+  state.pending=true;state.last=now;state.serial=(state.serial||0)+1;
+  const serial=state.serial;
+  rpc.request('GET_SELECTED_VOICE_CHANNEL',{}).then(data=>{
+    if(state.serial!==serial)return;
+    state.pending=false;state.error=null;
+    if(data===null){state.guild='';state.channel='';state.empty=true;return;}
+    const valid=value=>typeof value==='string' && /^\d{15,22}$/.test(value);
+    state.guild=valid(data?.guild_id)?data.guild_id:'';
+    state.channel=valid(data?.id)?data.id:'';
+    state.empty=false;
+    if(!state.guild || !state.channel || data.type!==2)state.error='unsupported';
+  }).catch(error=>{
+    if(state.serial!==serial)return;
+    state.pending=false;state.error=Number.isInteger(error?.code)?error.code:'unavailable';
+  });
+})();
+"""
+
 SNAPSHOT_SCRIPT = r"""(() => JSON.stringify({
   connected: window.__uvkrDiscordConnected === true,
   rpc: window.__uvkrDiscordStatus || null,
+  selected: window.__uvkrSelectedChannel || null,
   users: Array.from(document.querySelectorAll('li.voice_state[data-userid]')).map(el => ({
     id: el.getAttribute('data-userid'),
     name: (el.querySelector('.voice_username')?.textContent || '').trim(),
@@ -78,6 +106,7 @@ class DiscordSpeakerTab(QWidget):
         self._pending = False
         self._generation = 0
         self._setup_mode = False
+        self._auto_fallback = False
         self.timer = QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self._poll)
@@ -90,6 +119,10 @@ class DiscordSpeakerTab(QWidget):
         without_names = QPushButton('닉네임 연결 없이 자막 시작')
         without_names.clicked.connect(self.start_without_names)
         layout.addWidget(without_names)
+        self.auto_follow=QCheckBox('현재 통화방 자동 연결 · 다음 실행에도 자동으로 따라가기')
+        self.auto_follow.setChecked(bool(config.get('discord_auto_follow',True)))
+        self.auto_follow.toggled.connect(self._auto_changed)
+        layout.addWidget(self.auto_follow)
         setup = QGroupBox('01  ·  Discord 연결 승인')
         first = QVBoxLayout(setup)
         note = QLabel('Discord PC 앱에서 통화방에 들어간 뒤, 공식 연결 화면에서 Install for OBS를 누르세요.\n'
@@ -111,7 +144,7 @@ class DiscordSpeakerTab(QWidget):
         second.addWidget(self.url)
         buttons = QHBoxLayout()
         for label, fn in [('닉네임 연결 시작', self.connect_widget),
-                          ('연결 중지', self.disconnect_widget)]:
+                          ('연결 중지', self.stop_connection)]:
             button = QPushButton(label)
             if fn == self.connect_widget:
                 button.setObjectName('primaryButton')
@@ -134,10 +167,23 @@ class DiscordSpeakerTab(QWidget):
         preview_layout.addLayout(self.browser_layout, 1)
         layout.addWidget(preview, 1)
         limits = QLabel('닉네임은 발언 시각으로 추정합니다. 겹친 목소리는 동시 발화로 표시합니다.\n'
-                        '서버·통화방을 바꾸면 위젯 주소도 바꿔 주세요. 이름 숨기기는 꺼 두세요.')
+                        '자동 연결을 켜면 통화방 이동을 따라갑니다. 첫 연결 승인은 직접 완료해 주세요.')
         limits.setObjectName('muted')
         limits.setWordWrap(True)
         layout.addWidget(limits)
+        QTimer.singleShot(700,self._resume_auto)
+
+    def _resume_auto(self):
+        if self.auto_follow.isChecked():self.open_setup()
+
+    def _auto_changed(self,enabled):
+        self.config['discord_auto_follow']=bool(enabled);self.save_config()
+        self._auto_fallback=False
+        if enabled:self.open_setup()
+
+    def stop_connection(self):
+        self.auto_follow.setChecked(False)
+        self.disconnect_widget()
 
     def _ensure_browser(self):
         if self.browser is not None:
@@ -200,6 +246,7 @@ class DiscordSpeakerTab(QWidget):
         self.timer.start()
 
     def start_without_names(self):
+        self.auto_follow.setChecked(False)
         self.disconnect_widget()
         self.subtitles_requested.emit()
 
@@ -224,7 +271,8 @@ class DiscordSpeakerTab(QWidget):
             return
         self._pending = True
         generation = self._generation
-        self.browser.page().runJavaScript(SNAPSHOT_SCRIPT,
+        script=(AUTO_CHANNEL_SCRIPT if self.auto_follow.isChecked() else '')+SNAPSHOT_SCRIPT
+        self.browser.page().runJavaScript(script,
                         lambda value: self._received(value, generation))
 
     def _received(self, value, generation):
@@ -236,6 +284,27 @@ class DiscordSpeakerTab(QWidget):
                 value = json.loads(value)
             except (ValueError, TypeError):
                 value = None
+        if isinstance(value,dict) and self.auto_follow.isChecked():
+            selected=value.get('selected')
+            if isinstance(selected,dict):
+                if selected.get('empty'):
+                    self.timeline.record([])
+                    if not self._setup_mode:self.open_setup()
+                    self.state.setText('자동 연결 대기 · Discord PC 앱에서 음성 통화방에 들어가세요.')
+                    return
+                guild,channel=selected.get('guild'),selected.get('channel')
+                if guild and channel and not selected.get('error'):
+                    try:url=validate_widget_url('https://discord.com/channels/'+guild+'/'+channel)
+                    except ValueError:url=''
+                    if url and self.browser.url().toString()!=url:
+                        self.url.setText(url);self.connect_widget();return
+                if selected.get('error') and self._setup_mode:
+                    saved=self.config.get('discord_voice_widget','')
+                    if saved and not self._auto_fallback:
+                        self._auto_fallback=True;self.url.setText(saved);self.connect_widget();return
+                    self.timeline.record([])
+                    self.state.setText('현재 통화방 자동 조회를 사용할 수 없습니다. 한 번 채널 링크를 넣어 수동 연결해 주세요.')
+                    return
         ready, explanation = widget_connection_status(value, self._setup_mode)
         if not ready:
             self.timeline.record([])

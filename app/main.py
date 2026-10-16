@@ -181,7 +181,7 @@ class MainWindow(QMainWindow):
         self.reviewed_translation = ""
         self.review_pin = False  # do not overwrite the phrase under review
         self.plan_result.connect(self.on_plan_result)
-        self.setWindowTitle("Universal Voice KR v0.6 · 실시간 자막 · Discord 닉네임 연결")
+        self.setWindowTitle("Universal Voice KR v0.6.1 · 실시간 자막 · Discord 닉네임 연결")
         self.resize(1180, 820)
         self.setMinimumSize(1000, 740)
         self._build_ui()
@@ -230,7 +230,7 @@ class MainWindow(QMainWindow):
         local_note = QLabel('내 PC에서 음성 처리\n대화는 자동 저장되지 않아요')
         local_note.setObjectName('sideNote')
         side.addWidget(local_note)
-        version = QLabel('VERSION 0.6')
+        version = QLabel('VERSION 0.6.1')
         version.setObjectName('version')
         side.addWidget(version)
         outer.addWidget(sidebar)
@@ -264,6 +264,7 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.tab_profile, "프로필·오버레이")
         self.tab_discord = DiscordSpeakerTab(self.service.timeline, self.cfg,
                                             lambda: write_json(HOME / "settings.json", self.cfg))
+        self.tab_discord.subtitles_requested.connect(self.start_without_discord)
         self.tabs.addTab(self.tab_discord, "Discord 닉네임")
         self.tabs.addTab(self.tab_terms, "용어 사전·업데이트")
         self.tab_packs = QWidget()
@@ -795,6 +796,11 @@ class MainWindow(QMainWindow):
         self.btn_start.setEnabled(False)
         self.btn_stop.setEnabled(True)
         self.state.setText("상태: 엔진 시작 중")
+
+    def start_without_discord(self):
+        self.navigation.setCurrentRow(0)
+        if not self.service.running:
+            self.start_service()
 
     def stop_service(self, manual=True):
         self.manual_stop = manual

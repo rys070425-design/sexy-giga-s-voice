@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 [assembly: AssemblyTitle("Universal Voice KR Setup")]
-[assembly: AssemblyDescription("Universal Voice KR 0.6.0 streaming captions installer")]
-[assembly: AssemblyVersion("0.6.0.0")]
-[assembly: AssemblyFileVersion("0.6.0.0")]
+[assembly: AssemblyDescription("Universal Voice KR 0.6.1 Discord channel link fix")]
+[assembly: AssemblyVersion("0.6.1.0")]
+[assembly: AssemblyFileVersion("0.6.1.0")]
 
 static class Setup {
     public static string DefaultRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "UniversalVoiceKR_05");
@@ -103,7 +103,7 @@ class SetupForm : Form {
         Icon=Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
         Font=new Font("Malgun Gothic",10f); AutoScaleMode=AutoScaleMode.Dpi;
         Label brand=LabelAt("voice",32,22,500,56,31f,mint); brand.Font=new Font("Segoe UI",31f,FontStyle.Bold);
-        LabelAt("UNIVERSAL KR  /  0.6.0",35,82,500,24,9f,Color.FromArgb(150,166,185));
+        LabelAt("UNIVERSAL KR  /  0.6.1",35,82,500,24,9f,Color.FromArgb(150,166,185));
         LabelAt("음성 자막, 처음부터 간편하게.",32,132,610,38,19f,ForeColor);
         intro=LabelAt("기존 앱이 없어도 설치할 수 있습니다.\n실행 환경 · 음성 모델 · 영어 → 한국어 번역을 함께 준비합니다.",34,181,610,58,10f,Color.FromArgb(170,183,201));
         LabelAt("설치 위치",34,254,600,23,9f,Color.FromArgb(150,166,185));

@@ -1,11 +1,11 @@
-# Universal Voice KR 0.6
+# Universal Voice KR 0.6.1
 
 Windows PC에서 Discord 등의 출력 소리를 받아 자막으로 보여 주는 앱입니다.
 기본 음성 인식과 번역은 PC에서 처리하며 유료 API가 필요하지 않습니다.
 
 ## 설치
 
-[Windows 설치 파일 받기](https://github.com/rys070425-design/sexy-giga-s-voice/raw/refs/heads/main/dist/UniversalVoiceKR_Setup_v060.exe)
+[Windows 설치 파일 받기](https://github.com/rys070425-design/sexy-giga-s-voice/raw/refs/heads/main/dist/UniversalVoiceKR_Setup_v061.exe)
 
 1. 기존 앱과 이전 설치 프로그램을 닫고 설치 파일을 실행합니다.
 2. 기존 0.5 설치를 사용했다면 같은 위치를 선택합니다. 이미 받은 모델과 구성요소를 확인하여 이어서 준비합니다.
@@ -14,6 +14,8 @@ Windows PC에서 Discord 등의 출력 소리를 받아 자막으로 보여 주�
 최초 설치에는 인터넷 연결과 수 GB의 여유 공간이 필요합니다. Whisper large-v3-turbo와 영어→한국어 번역 모델을 내려받는 온라인 설치 파일입니다. 관리자 권한이나 시스템 PATH 변경 없이 사용자 계정에 설치합니다. NVIDIA GPU가 있으면 GPU를 우선 사용하며 CPU도 선택할 수 있습니다.
 
 ## 0.6에서 바뀐 점
+
+0.6.1에서는 Discord 통화방의 일반 채널 링크도 자동으로 처리합니다. 승인 대기·승인 실패·통화방 정보 읽기 실패를 구분해서 표시하며, **닉네임 연결 없이 자막 시작** 버튼을 추가했습니다. [연결 수정 안내](docs/discord-connection-v061.md)
 
 - 문장이 끝나기 전에도 약 0.5초 분량부터 임시 자막을 표시하고, 문장이 끝나면 선택한 인식 정밀도로 다시 확인합니다. GPU에서는 이후 약 0.4초 간격으로 새 초안을 준비합니다. CPU는 처리량을 고려해 간격을 늘립니다. 실제 표시 시간에는 처리 시간이 추가됩니다.
 - 한국어는 인식 직후 표시하고, 외국어는 원문을 먼저 표시한 다음 한국어 번역으로 갱신합니다.

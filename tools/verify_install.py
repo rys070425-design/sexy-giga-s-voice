@@ -76,6 +76,51 @@ tab.browser.setHtml('<html><li class="voice_state wrapper_speaking" data-userid=
 deadline=time.monotonic()+15
 while 'users' not in fixture and time.monotonic()<deadline:app.processEvents();time.sleep(.02)
 assert fixture.get('users',[{}])[0].get('name')=='Test',fixture
+from discord_widget import CONNECTION_SCRIPT
+def run_js(script):
+    answer={}
+    tab.browser.page().runJavaScript(script,lambda value:answer.update(value=value))
+    until=time.monotonic()+10
+    while 'value' not in answer and time.monotonic()<until:app.processEvents();time.sleep(.01)
+    assert 'value' in answer,'JavaScript callback timed out'
+    return json.loads(answer['value'])
+mock_socket='''window.WebSocket = class {
+  constructor(url) { this.handlers = {}; }
+  addEventListener(name, callback) { (this.handlers[name] ||= []).push(callback); }
+  fire(name, message) { for (const callback of (this.handlers[name] || [])) callback({data:JSON.stringify(message)}); }
+};'''
+snapshot=run_js(mock_socket+CONNECTION_SCRIPT+'''
+window.testSocket = new WebSocket('ws://127.0.0.1:6463/?v=1');
+window.testSocket.fire('open');
+'''+SNAPSHOT_SCRIPT)
+assert snapshot['connected'] and not snapshot['rpc']['authorized']
+tab._received(json.dumps(snapshot),tab._generation)
+assert '아직' in tab.state.text()
+snapshot=run_js('''
+window.testSocket.fire('message',{cmd:'AUTHENTICATE',data:{access_token:'MUST_NOT_RETAIN'}});
+window.testSocket.fire('message',{cmd:'GET_CHANNEL',evt:'ERROR',data:{code:4006}});
+'''+SNAPSHOT_SCRIPT)
+assert 'MUST_NOT_RETAIN' not in json.dumps(snapshot)
+tab._received(json.dumps(snapshot),tab._generation)
+assert '4006' in tab.state.text() and '읽지 못했습니다' in tab.state.text()
+snapshot=run_js('''
+window.testSocket.fire('message',{cmd:'GET_CHANNEL',data:{}});
+window.testSocket.fire('message',{cmd:'CREATE_CHANNEL_INVITE',evt:'ERROR',data:{code:4006}});
+'''+SNAPSHOT_SCRIPT)
+assert snapshot['rpc']['channel'] and not snapshot['rpc']['error']
+tab._received(json.dumps(snapshot),tab._generation)
+assert '발언 중: Test' in tab.state.text()
+snapshot=run_js('''
+window.newSocket = new WebSocket('ws://127.0.0.1:6464/?v=1');
+window.newSocket.fire('open');window.testSocket.fire('close');
+'''+SNAPSHOT_SCRIPT)
+assert snapshot['connected'],'Old socket invalidated a newer connection'
+started=[]
+original_start=window.start_service
+window.start_service=lambda:started.append(True)
+tab.start_without_names()
+assert started==[True] and window.navigation.currentRow()==0
+window.start_service=original_start
 assert 'torch' not in sys.modules
 window.close();app.processEvents()
 result=dict(result='FRESH_INSTALL_VERIFIED',python=sys.executable,source=str(root),transcription=text,translation=translation,ui_pages=7,webengine=True)

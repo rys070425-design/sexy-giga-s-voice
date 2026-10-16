@@ -14,13 +14,48 @@ UNKNOWN = '화자 미확인'
 
 
 def validate_widget_url(value):
-    url = urlsplit(value.strip())
-    if (url.scheme != 'https' or url.hostname != 'streamkit.discord.com'
-            or url.username or url.password or url.port not in (None, 443)
-            or not re.fullmatch(r'/overlay/voice/\d{15,22}/\d{15,22}/?', url.path)):
-        raise ValueError('Discord Streamkit의 Voice Widget 주소를 붙여넣어 주세요.')
+    message = 'Discord 통화방의 채널 링크 또는 공식 Streamkit Voice Widget 주소를 붙여넣어 주세요.'
+    try:
+        url = urlsplit(value.strip())
+        if url.scheme != 'https' or url.username or url.password or url.port not in (None, 443):
+            raise ValueError(message)
+        if url.hostname in ('discord.com', 'canary.discord.com', 'ptb.discord.com', 'discordapp.com'):
+            match = re.fullmatch(r'/channels/(\d{15,22})/(\d{15,22})/?', url.path)
+            if not match:
+                raise ValueError(message + ' 개인 메시지나 초대 링크는 사용할 수 없습니다.')
+            return 'https://streamkit.discord.com/overlay/voice/' + '/'.join(match.groups())
+        if (url.hostname != 'streamkit.discord.com' or
+                not re.fullmatch(r'/overlay/voice/\d{15,22}/\d{15,22}/?', url.path)):
+            raise ValueError(message)
+    except ValueError as exc:
+        if str(exc).startswith('Discord '):
+            raise
+        raise ValueError(message) from None
     # Force names to remain visible and show all users (including widget owner).
     return urlunsplit(('https', 'streamkit.discord.com', url.path.rstrip('/'), '', ''))
+
+
+def widget_connection_status(value, setup=False):
+    """Return (channel_ready, explanation) without mistaking an open socket for approval."""
+    if not isinstance(value, dict) or not value.get('connected'):
+        return False, 'Discord PC 앱 연결 대기 · PC 앱을 켜고 공식 연결 화면에서 승인해 주세요.'
+    rpc = value.get('rpc')
+    if not isinstance(rpc, dict):
+        return False, '연결 상태 확인 중 · 공식 연결 화면을 다시 열어 주세요.'
+    error = rpc.get('error')
+    if error:
+        code = rpc.get('code')
+        detail = f' (코드 {code})' if isinstance(code, int) else ''
+        if error in ('AUTHORIZE', 'AUTHENTICATE'):
+            return False, 'Discord 연결 승인 실패' + detail + ' · Discord의 권한 승인 창을 확인해 주세요.'
+        return False, '통화방 정보를 읽지 못했습니다' + detail + ' · 현재 참여한 음성 채널의 링크인지 확인해 주세요.'
+    if not rpc.get('authorized'):
+        return False, 'Discord PC 앱 접속됨 · 아직 연결 승인이 완료되지 않았습니다.'
+    if setup:
+        return False, 'Discord 연결 승인 완료 · 통화방의 채널 링크를 붙여넣고 닉네임 연결 시작을 누르세요.'
+    if not rpc.get('channel'):
+        return False, 'Discord 연결 승인 완료 · 통화방 정보를 불러오는 중입니다.'
+    return True, ''
 
 
 class SpeakerTimeline:

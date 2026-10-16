@@ -2,12 +2,15 @@
 from __future__ import annotations
 import json
 from collections import Counter
-from PySide6.QtCore import QTimer, QUrl, Qt
+from PySide6.QtCore import QTimer, QUrl, Qt, Signal
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QGroupBox
-from speaker_labels import validate_widget_url
+from speaker_labels import validate_widget_url, widget_connection_status
 
 CONNECTION_SCRIPT = r"""(() => {
   window.__uvkrDiscordConnected = false;
+  const fresh = () => ({ ready: false, authorized: false, channel: false, error: '', code: null });
+  window.__uvkrDiscordStatus = fresh();
+  let owner = null;
   const Original = window.WebSocket;
   window.WebSocket = class extends Original {
     constructor(...args) {
@@ -15,9 +18,38 @@ CONNECTION_SCRIPT = r"""(() => {
       let host = '';
       try { host = new URL(String(args[0])).hostname; } catch (_) {}
       if (host === '127.0.0.1' || host === 'localhost') {
-        this.addEventListener('open', () => { window.__uvkrDiscordConnected = true; });
-        this.addEventListener('close', () => { window.__uvkrDiscordConnected = false; });
-        this.addEventListener('error', () => { window.__uvkrDiscordConnected = false; });
+        this.addEventListener('open', () => {
+          owner = this; window.__uvkrDiscordConnected = true; window.__uvkrDiscordStatus = fresh();
+        });
+        const closed = () => {
+          if (owner !== this) return;
+          window.__uvkrDiscordConnected = false; window.__uvkrDiscordStatus = fresh();
+        };
+        this.addEventListener('close', closed);
+        this.addEventListener('error', closed);
+        this.addEventListener('message', event => {
+          if (owner !== this) return;
+          try {
+            // Observe command/status only. Never retain tokens, auth codes,
+            // complete payloads, user details, or message contents.
+            const message = JSON.parse(event.data);
+            const state = window.__uvkrDiscordStatus;
+            const cmd = message.cmd;
+            if (cmd === 'DISPATCH' && message.evt === 'READY') state.ready = true;
+            if (!['AUTHORIZE', 'AUTHENTICATE', 'GET_CHANNEL'].includes(cmd)) return;
+            if (message.evt === 'ERROR') {
+              state.error = cmd;
+              const code = message.data?.code;
+              state.code = Number.isInteger(code) ? code : null;
+              if (cmd === 'GET_CHANNEL') state.channel = false;
+              else state.authorized = false;
+            } else {
+              state.error = ''; state.code = null;
+              if (cmd === 'AUTHENTICATE') state.authorized = true;
+              if (cmd === 'GET_CHANNEL') state.channel = true;
+            }
+          } catch (_) {}
+        });
       }
     }
   };
@@ -26,6 +58,7 @@ CONNECTION_SCRIPT = r"""(() => {
 
 SNAPSHOT_SCRIPT = r"""(() => JSON.stringify({
   connected: window.__uvkrDiscordConnected === true,
+  rpc: window.__uvkrDiscordStatus || null,
   users: Array.from(document.querySelectorAll('li.voice_state[data-userid]')).map(el => ({
     id: el.getAttribute('data-userid'),
     name: (el.querySelector('.voice_username')?.textContent || '').trim(),
@@ -37,18 +70,26 @@ SNAPSHOT_SCRIPT = r"""(() => JSON.stringify({
 
 
 class DiscordSpeakerTab(QWidget):
+    subtitles_requested = Signal()
     def __init__(self, timeline, config, save_config, parent=None):
         super().__init__(parent)
         self.timeline, self.config, self.save_config = timeline, config, save_config
         self.browser = None
         self._pending = False
         self._generation = 0
+        self._setup_mode = False
         self.timer = QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self._poll)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(16)
+        independent = QLabel('이 연결은 닉네임 표시용입니다. 음성 자막은 Discord 연결이나 서버 초대 권한 없이 시작할 수 있어요.')
+        independent.setWordWrap(True)
+        layout.addWidget(independent)
+        without_names = QPushButton('닉네임 연결 없이 자막 시작')
+        without_names.clicked.connect(self.start_without_names)
+        layout.addWidget(without_names)
         setup = QGroupBox('01  ·  Discord 연결 승인')
         first = QVBoxLayout(setup)
         note = QLabel('Discord PC 앱에서 통화방에 들어간 뒤, 공식 연결 화면에서 Install for OBS를 누르세요.\n'
@@ -61,11 +102,12 @@ class DiscordSpeakerTab(QWidget):
         layout.addWidget(setup)
         channel = QGroupBox('02  ·  통화방 선택')
         second = QVBoxLayout(channel)
-        instructions = QLabel('공식 화면에서 Voice Widget → 서버 → 음성 채널을 선택하고, 제공된 주소를 아래에 붙여넣으세요.')
+        instructions = QLabel('Discord에서 현재 통화방을 우클릭 → 채널 링크 복사 → 아래에 붙여넣으세요.\n'
+                              '일반 discord.com/channels/… 주소를 자동으로 처리합니다. 공식 Voice Widget 주소도 사용할 수 있어요.')
         instructions.setWordWrap(True)
         second.addWidget(instructions)
         self.url = QLineEdit(config.get('discord_voice_widget', ''))
-        self.url.setPlaceholderText('Streamkit에서 복사한 Voice Widget 주소')
+        self.url.setPlaceholderText('Discord 통화방의 채널 링크를 붙여넣으세요')
         second.addWidget(self.url)
         buttons = QHBoxLayout()
         for label, fn in [('닉네임 연결 시작', self.connect_widget),
@@ -107,6 +149,8 @@ class DiscordSpeakerTab(QWidget):
             profile.setHttpUserAgent(profile.httpUserAgent().replace('QtWebEngine/', 'Chromium/'))
 
             class OfficialPage(QWebEnginePage):
+                def javaScriptConsoleMessage(page, level, message, line, source):
+                    pass  # Official page logs can contain complete RPC payloads.
                 def acceptNavigationRequest(page, url, kind, is_main):
                     if not is_main:
                         return True
@@ -132,9 +176,11 @@ class DiscordSpeakerTab(QWidget):
 
     def open_setup(self):
         self.disconnect_widget()
+        self._setup_mode = True
         if self._ensure_browser():
             self.browser.load(QUrl('https://streamkit.discord.com/overlay'))
             self.state.setText('공식 Streamkit 연결 화면 · Discord의 권한 승인 창을 확인하세요.')
+            self.timer.start()
 
     def connect_widget(self):
         try:
@@ -143,13 +189,19 @@ class DiscordSpeakerTab(QWidget):
             self.state.setText(str(exc))
             return
         self.disconnect_widget()
+        self._setup_mode = False
         if not self._ensure_browser():
             return
         self.config['discord_voice_widget'] = url
+        self.url.setText(url)
         self.save_config()
         self.browser.load(QUrl(url))
         self.state.setText('공식 Voice Widget 연결 중 · Discord가 권한을 요청하면 직접 승인하세요.')
         self.timer.start()
+
+    def start_without_names(self):
+        self.disconnect_widget()
+        self.subtitles_requested.emit()
 
     def disconnect_widget(self):
         self._generation += 1
@@ -184,9 +236,10 @@ class DiscordSpeakerTab(QWidget):
                 value = json.loads(value)
             except (ValueError, TypeError):
                 value = None
-        if not isinstance(value, dict) or not value.get('connected'):
+        ready, explanation = widget_connection_status(value, self._setup_mode)
+        if not ready:
             self.timeline.record([])
-            self.state.setText('Discord 위젯 연결 대기 · PC 앱과 권한 승인을 확인하세요.')
+            self.state.setText(explanation)
             return
         users = value.get('users', [])
         counts = Counter(u.get('name') for u in users)

@@ -168,7 +168,8 @@ def find_route(src: str, installed_pairs: set[tuple[str, str]], available_pairs:
 
 
 def get_installed_pairs() -> set[tuple[str, str]]:
-    from argostranslate import package
+    try:from argostranslate import package
+    except ImportError:return set()
     return {(p.from_code, p.to_code) for p in package.get_installed_packages()
             if p.from_code and p.to_code and getattr(p, "type", "translate") == "translate"}
 
@@ -184,7 +185,7 @@ def installed_for_language(code: str, target='ko') -> bool:
 
 
 def install_translation_models(code: str, log=lambda msg: None, target='ko') -> list[tuple[str, str]]:
-    """Downloads official Argos models (once) and installs exact needed pair(s).
+    """Prepares shared NLLB or optional legacy packages for the requested pair.
 
     Raises clear error when package index or route is unavailable; does not simulate success.
     """
@@ -197,6 +198,12 @@ def install_translation_models(code: str, log=lambda msg: None, target='ko') -> 
     supported=supported_languages()
     if ('pt' if code=='pb' else code) in supported and target in supported:
         log(f'{code} → {target}: 공용 NLLB 번역 모델이 이미 준비되어 있습니다.')
+        return []
+    from quality_translation import LANGUAGE_CODES,MODEL_DIR
+    if ('pt' if code=='pb' else code) in LANGUAGE_CODES and target in LANGUAGE_CODES:
+        from model_assets import install_quality_model
+        install_quality_model(MODEL_DIR.parent.parent,log)
+        if not installed_for_language(code,target):raise RuntimeError('공용 번역 모델 준비 상태를 확인할 수 없습니다.')
         return []
     from argostranslate import package
     log("공식 번역 모델 목록 확인 중 · 인터넷 연결 필요")

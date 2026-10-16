@@ -60,12 +60,24 @@ def translation_route(source, target, pairs):
 
 class LocalTranslator:
     def __init__(self):
-        from argostranslate.package import get_installed_packages
-        self.packages = {(p.from_code, p.to_code): p for p in get_installed_packages()
-                         if p.from_code and p.to_code and getattr(p, 'type', 'translate') == 'translate'}
+        self._packages=None
         self.models = OrderedDict()
         from quality_translation import QualityTranslator
         self.quality=QualityTranslator()
+
+    @property
+    def packages(self):
+        # Optional compatibility for previously installed language packages.
+        # New installations need neither Argos nor its Torch/Stanza stack.
+        if self._packages is None:
+            try:
+                from argostranslate.package import get_installed_packages
+            except ImportError:
+                self._packages={}
+            else:
+                self._packages={(p.from_code,p.to_code):p for p in get_installed_packages()
+                    if p.from_code and p.to_code and getattr(p,'type','translate')=='translate'}
+        return self._packages
 
     def supports(self,source,target):
         if self.quality.supports(source,target):return True
@@ -74,7 +86,7 @@ class LocalTranslator:
 
     @property
     def model_label(self):
-        return 'NLLB-200 600M · CPU int8 · 비상업용 모델' if self.quality.languages else 'Argos · 로컬'
+        return 'NLLB-200 600M · CPU int8 · 비상업용 모델' if self.quality.languages else '공용 번역 모델 미준비 · 번역 언어에서 확인하세요'
 
     def translate(self, text, source, target='ko'):
         if source==target:return text

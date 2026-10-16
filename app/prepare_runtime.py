@@ -37,6 +37,6 @@ device='cuda' if ctranslate2.get_cuda_device_count() else 'cpu'
 model=WhisperModel(str(target),device=device,compute_type='int8_float16' if device=='cuda' else 'int8',cpu_threads=4)
 segments,_=model.transcribe(np.zeros(16000,np.float32),language='en',beam_size=1)
 list(segments)
-report=dict(version='0.8.0',python=sys.executable,device=device,model='large-v3-turbo',translator='NLLB-200 distilled 600M int8',translation_ready=True,verified=True)
+report=dict(version='0.8.1',python=sys.executable,device=device,model='large-v3-turbo',translator='NLLB-200 distilled 600M int8',translation_ready=True,verified=True)
 (root/'INSTALL_SUCCESS.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
 print('RUNTIME_VERIFIED',flush=True)

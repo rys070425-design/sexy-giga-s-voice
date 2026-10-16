@@ -248,7 +248,7 @@ class MainWindow(QMainWindow):
         self.reviewed_translation = ""
         self.review_pin = False  # do not overwrite the phrase under review
         self.plan_result.connect(self.on_plan_result)
-        self.setWindowTitle("Universal Voice KR v0.8 · 읽기 편한 실시간 자막")
+        self.setWindowTitle("Universal Voice KR v0.8.1 · 읽기 편한 실시간 자막")
         self.setMinimumSize(960,620)
         screen=QApplication.primaryScreen()
         available=screen.availableGeometry() if screen else None
@@ -300,7 +300,7 @@ class MainWindow(QMainWindow):
         local_note = QLabel('내 PC에서 음성 처리\n대화는 자동 저장되지 않아요')
         local_note.setObjectName('sideNote')
         side.addWidget(local_note)
-        version = QLabel('VERSION 0.8')
+        version = QLabel('VERSION 0.8.1')
         version.setObjectName('version')
         side.addWidget(version)
         outer.addWidget(sidebar)
@@ -985,10 +985,11 @@ class MainWindow(QMainWindow):
         text=QLabel('Chrome·Edge에서 소리가 나는 탭의 사이트 이름을 연결합니다.\n\n'
                     '1. 아래 버튼으로 확장 폴더를 엽니다.\n'
                     '2. 브라우저의 확장 관리에서 개발자 모드를 켜고\n   압축 해제된 확장 로드로 이 폴더를 선택합니다.\n'
-                    '3. 확장 아이콘을 눌러 아래 연결 코드를 입력합니다.\n\n'
+                    '3. 연결 코드 복사를 누른 뒤 확장 설정에 붙여넣습니다.\n\n'
                     '재생 중인 탭의 도메인만 PC에 전달합니다. 대화나 페이지 내용은 보내지 않습니다.')
         text.setWordWrap(True);layout.addWidget(text)
-        code=QLineEdit(self.cfg['browser_pairing_key']);code.setReadOnly(True);layout.addWidget(code)
+        code=QLineEdit(self.cfg['browser_pairing_key']);code.setReadOnly(True)
+        code.setEchoMode(QLineEdit.Password);layout.addWidget(code)
         folder=Path(__file__).with_name('browser_source_extension')
         layout.addLayout(row(self._button('확장 폴더 열기',lambda:QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))),
                              self._button('연결 코드 복사',lambda:QApplication.clipboard().setText(code.text()))))

@@ -7,8 +7,8 @@ os.environ['QT_QPA_PLATFORM']='offscreen'
 os.environ['QTWEBENGINE_CHROMIUM_FLAGS']='--disable-gpu'
 from runtime_config import configure
 configure()
-import PySide6,ctranslate2,argostranslate.package,numpy
-for module in [PySide6,ctranslate2,argostranslate.package,numpy]:
+import PySide6,ctranslate2,numpy
+for module in [PySide6,ctranslate2,numpy]:
     assert Path(module.__file__).resolve().is_relative_to(root/'.venv'),module.__file__
 from cuda_runtime import prepare_cuda
 prepare_cuda()
@@ -208,6 +208,18 @@ tab.start_without_names()
 assert started==[True] and window.navigation.currentRow()==0
 window.start_service=original_start
 assert 'torch' not in sys.modules
+copied_codes=[]
+class TestClipboard:
+    def setText(self,value):copied_codes.append(value)
+def inspect_pairing_dialog(dialog):
+    fields=dialog.findChildren(main.QLineEdit)
+    assert len(fields)==1 and fields[0].echoMode()==main.QLineEdit.Password
+    button=next(button for button in dialog.findChildren(main.QPushButton) if button.text()=='연결 코드 복사')
+    button.click()
+    return 0
+with patch.object(main.QApplication,'clipboard',return_value=TestClipboard()),patch.object(main.QDialog,'exec',inspect_pairing_dialog):
+    window.browser_source_setup()
+assert copied_codes==[window.cfg['browser_pairing_key']],'Masked code could not be copied'
 window.close();app.processEvents()
 result=dict(result='FRESH_INSTALL_VERIFIED',python=sys.executable,source=str(root),transcription=text,translation=translation,ui_pages=7,webengine=True)
 (root/'FRESH_TEST_RESULT.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')

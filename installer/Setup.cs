@@ -9,27 +9,37 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 [assembly: AssemblyTitle("Universal Voice KR Setup")]
-[assembly: AssemblyDescription("Universal Voice KR 0.7 readable subtitles and automatic sources")]
-[assembly: AssemblyVersion("0.7.0.0")]
-[assembly: AssemblyFileVersion("0.7.0.0")]
+[assembly: AssemblyDescription("Universal Voice KR 0.8 multilingual readable subtitles")]
+[assembly: AssemblyVersion("0.8.0.0")]
+[assembly: AssemblyFileVersion("0.8.0.0")]
 
 static class Setup {
     public static string DefaultRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "UniversalVoiceKR_05");
-    public static Process Child;
-    public static bool Cancelled;
+    public static volatile Process Child;
+    public static volatile bool Cancelled;
     public static string Quote(string value) { return "\"" + value.Replace("\"", "\\\"").TrimEnd('\\') + "\""; }
     public static int Install(string root, bool shortcuts, Action<string> line) {
-        root = Path.GetFullPath(root);
-        Directory.CreateDirectory(root);
-        string staging = Path.Combine(root, ".installer");
-        Directory.CreateDirectory(staging);
-        using (var log = new StreamWriter(Path.Combine(root, "installation.log"), false, new UTF8Encoding(false))) {
+        if(Cancelled)return 2;
+        string staging;
+        FileStream installLock=null;
+        StreamWriter installLog;
+        try {
+            root = Path.GetFullPath(root);
+            Directory.CreateDirectory(root);
+            staging = Path.Combine(root, ".installer");
+            Directory.CreateDirectory(staging);
+            installLock = new FileStream(Path.Combine(staging,"installation.lock"),FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);
+            installLog = new StreamWriter(Path.Combine(root,"installation.log"),false,new UTF8Encoding(false));
+        } catch(Exception ex) {if(installLock!=null)installLock.Dispose();line("INSTALL_ERROR: 설치 위치를 사용할 수 없거나 다른 설치가 진행 중입니다. " + ex.Message);return 1;}
+        using(installLock)
+        using (var log = installLog) {
             object sync = new object();
             Action<string> report = s => { if (s == null) return; lock(sync) { log.WriteLine(s); log.Flush(); } line(s); };
             try {
                 using (var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream("payload.zip"))
                 using (var zip = new ZipArchive(resource, ZipArchiveMode.Read)) {
                     foreach (var entry in zip.Entries) {
+                        if(Cancelled)return 2;
                         var dest = Path.GetFullPath(Path.Combine(root, entry.FullName));
                         if (!dest.StartsWith(root.TrimEnd('\\') + "\\", StringComparison.OrdinalIgnoreCase)) throw new Exception("Invalid payload path");
                         if (entry.FullName.EndsWith("/")) { Directory.CreateDirectory(dest); continue; }
@@ -50,10 +60,12 @@ static class Setup {
                 info.EnvironmentVariables["PSModulePath"] = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System),"WindowsPowerShell","v1.0","Modules");
                 info.WorkingDirectory = root;
                 using(var child = new Process()) {
+                    if(Cancelled)return 2;
                     Child = child; child.StartInfo = info;
                     child.OutputDataReceived += (s,e) => report(e.Data);
                     child.ErrorDataReceived += (s,e) => report(e.Data);
                     child.Start(); child.BeginOutputReadLine(); child.BeginErrorReadLine();
+                    if(Cancelled)Cancel();
                     child.WaitForExit(); child.WaitForExit();
                     int code = child.ExitCode; Child = null;
                     if (Cancelled) return 2;
@@ -103,9 +115,9 @@ class SetupForm : Form {
         Icon=Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
         Font=new Font("Malgun Gothic",10f); AutoScaleMode=AutoScaleMode.Dpi;
         Label brand=LabelAt("voice",32,22,500,56,31f,mint); brand.Font=new Font("Segoe UI",31f,FontStyle.Bold);
-        LabelAt("UNIVERSAL KR  /  0.7.0",35,82,500,24,9f,Color.FromArgb(150,166,185));
+        LabelAt("UNIVERSAL KR  /  0.8.0",35,82,500,24,9f,Color.FromArgb(150,166,185));
         LabelAt("음성 자막, 처음부터 간편하게.",32,132,610,38,19f,ForeColor);
-        intro=LabelAt("기존 앱이 없어도 설치할 수 있습니다.\n실행 환경 · 음성 모델 · 영어 → 한국어 번역을 함께 준비합니다.",34,181,610,58,10f,Color.FromArgb(170,183,201));
+        intro=LabelAt("기존 앱이 없어도 설치할 수 있습니다.\n실행 환경 · 음성 모델 · 다국어 번역(비상업용 모델)을 준비합니다.",34,181,610,58,10f,Color.FromArgb(170,183,201));
         LabelAt("설치 위치",34,254,600,23,9f,Color.FromArgb(150,166,185));
         path=new TextBox {Left=34,Top=282,Width=610,Height=30,Text=root,BackColor=panel,ForeColor=ForeColor,BorderStyle=BorderStyle.FixedSingle}; Controls.Add(path);
         LabelAt("인터넷 연결 필요 · 구성에 따라 수 GB 다운로드 · 관리자 권한 불필요",34,321,610,28,9f,Color.FromArgb(150,166,185));

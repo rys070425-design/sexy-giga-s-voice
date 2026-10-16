@@ -1,0 +1,132 @@
+[
+  {
+    "source": "Could you speak a little more slowly?",
+    "translation": "좀 더 느리게 말할 수 있나요?",
+    "seconds": 1.077
+  },
+  {
+    "source": "I didn't catch the last part.",
+    "translation": "마지막 부분은 못 봤어요",
+    "seconds": 0.175
+  },
+  {
+    "source": "The meeting starts in ten minutes.",
+    "translation": "회의는 10분 후에 시작됩니다.",
+    "seconds": 0.222
+  },
+  {
+    "source": "Please turn left at the next street.",
+    "translation": "다음 거리에서 왼쪽으로 돌세요.",
+    "seconds": 0.23
+  },
+  {
+    "source": "I will be back after lunch.",
+    "translation": "점심 후에 돌아오겠습니다.",
+    "seconds": 0.166
+  },
+  {
+    "source": "We need to change the plan.",
+    "translation": "계획을 바꿔야 해",
+    "seconds": 0.154
+  },
+  {
+    "source": "Is it okay if I join you?",
+    "translation": "같이 갈 수 있어?",
+    "seconds": 0.188
+  },
+  {
+    "source": "Do you mean today or tomorrow?",
+    "translation": "오늘이나 내일?",
+    "seconds": 0.156
+  },
+  {
+    "source": "This is more difficult than I expected.",
+    "translation": "내가 예상했던 것보다 더 어려운 일이에요",
+    "seconds": 0.237
+  },
+  {
+    "source": "I am not sure that is the right answer.",
+    "translation": "저는 그것이 올바른 답인지 확신하지 못합니다.",
+    "seconds": 0.258
+  },
+  {
+    "source": "Please close the door.",
+    "translation": "문 닫으세요.",
+    "seconds": 0.164
+  },
+  {
+    "source": "I do not want to miss the train.",
+    "translation": "저는 기차를 놓치고 싶지 않습니다.",
+    "seconds": 0.242
+  },
+  {
+    "source": "Could you repeat that, please?",
+    "translation": "되풀이해 주시겠습니까?",
+    "seconds": 0.195
+  },
+  {
+    "source": "I disagree with that idea.",
+    "translation": "저는 이 아이디어에 동의하지 않습니다.",
+    "seconds": 0.22
+  },
+  {
+    "source": "The train is delayed by fifteen minutes.",
+    "translation": "열차는 15분 지연합니다.",
+    "seconds": 0.279
+  },
+  {
+    "source": "I bought this yesterday, but it does not work.",
+    "translation": "어제 샀지만 효과가 없어요.",
+    "seconds": 0.197
+  },
+  {
+    "source": "The sound is too quiet.",
+    "translation": "소리가 너무 조용해",
+    "seconds": 0.159
+  },
+  {
+    "source": "What time does the store close?",
+    "translation": "가게가 언제 문을 닫나요?",
+    "seconds": 0.207
+  },
+  {
+    "source": "Let me know when you are ready.",
+    "translation": "준비되면 알려줘",
+    "seconds": 0.162
+  },
+  {
+    "source": "Would you mind sending me the link?",
+    "translation": "링크를 보내 주시겠습니까?",
+    "seconds": 0.204
+  },
+  {
+    "source": "Do not turn left.",
+    "translation": "왼쪽으로 돌리지 마",
+    "seconds": 0.181
+  },
+  {
+    "source": "Turn left.",
+    "translation": "왼쪽으로 돌봐",
+    "seconds": 0.136
+  },
+  {
+    "source": "I agree with that idea.",
+    "translation": "저는 이 아이디어에 동의합니다.",
+    "seconds": 0.21
+  },
+  {
+    "source": "She did not say he stole the money.",
+    "translation": "그녀는 그가 돈을 훔쳤다고 말하지 않았다.",
+    "seconds": 0.255
+  },
+  {
+    "source": "The price fell from fifty dollars to fifteen dollars.",
+    "translation": "가격은 50달러에서 15달러로 떨어졌다.",
+    "seconds": 0.271
+  },
+  {
+    "source": "We have already finished the work, so you do not need to come tomorrow.",
+    "translation": "우리는 이미 일을 끝냈고, 내일은 오지 않아도 됩니다.",
+    "seconds": 0.374
+  }
+]

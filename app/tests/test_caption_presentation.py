@@ -1,4 +1,5 @@
 import unittest
+from dataclasses import replace
 from caption_presentation import ReadableCaptions,clean_caption_label,wrap_measured
 from live_captions import CaptionUpdate
 
@@ -31,6 +32,24 @@ class PresentationTests(unittest.TestCase):
     def test_duplicate_text_does_not_redraw(self):
         model=ReadableCaptions();model.offer(update(0,25,'같은 말'),'YouTube',0)
         self.assertFalse(model.offer(update(0,45,'같은 말'),'YouTube',1))
+    def test_untranslated_draft_does_not_discard_inflight_translation(self):
+        model=ReadableCaptions()
+        model.offer(update(0,25,'번역문'),'YouTube',0)
+        model.offer(update(1,45,'foreign',language='en'),'YouTube',.2)
+        self.assertTrue(model.offer(update(0,35,'번역문 이어서'),'YouTube',1))
+        self.assertEqual(model.current.text,'번역문 이어서')
+    def test_late_final_corrects_previous_without_rewinding_or_reholding(self):
+        model=ReadableCaptions()
+        model.offer(update(0,25,'이전 임시 문장'),'YouTube',0)
+        model.offer(update(1,25,'현재 문장'),'YouTube',1)
+        previous_at=model.previous_at
+        self.assertTrue(model.offer(update(0,90,'이전 확정 문장',True),'YouTube',1.2))
+        self.assertEqual(model.current.text,'현재 문장')
+        self.assertEqual(model.previous.text,'이전 확정 문장')
+        self.assertEqual(model.previous_at,previous_at)
+        self.assertFalse(model.offer(update(0,30,'뒤늦은 임시 문장'),'YouTube',2))
+        self.assertFalse(model.offer(update(0,80,'오래된 확정 문장',True),'YouTube',2))
+        self.assertEqual(model.previous.text,'이전 확정 문장')
     def test_previous_sentence_stays_when_speech_is_fast(self):
         model=ReadableCaptions()
         model.offer(update(0,25,'첫 문장',True),'YouTube',0)
@@ -48,10 +67,23 @@ class PresentationTests(unittest.TestCase):
         model=ReadableCaptions();model.offer(update(2,45,'최근'),'YouTube',0)
         self.assertFalse(model.offer(update(1,90,'과거',True),'YouTube',2))
         self.assertEqual(model.current.text,'최근')
+    def test_speaker_groups_in_one_clip_are_separate_reading_lines(self):
+        model=ReadableCaptions()
+        first=update(0,100,'먼저 말한 사람',True)
+        second=replace(update(0,101,'다음 말한 사람',True),part=1)
+        model.offer(first,'Discord · A',0)
+        model.offer(second,'Discord · B',1)
+        self.assertEqual(model.previous.text,'먼저 말한 사람')
+        self.assertEqual(model.current.text,'다음 말한 사람')
+        self.assertTrue(model.offer(replace(first,translated='앞 문장 정정',revision=102),'Discord · A',1.2))
+        self.assertEqual(model.previous.text,'앞 문장 정정')
+        self.assertEqual(model.current.label,'Discord · B')
     def test_clean_labels_have_no_unknown_status(self):
         self.assertEqual(clean_caption_label('화자 미확인','YouTube'),'YouTube')
         self.assertEqual(clean_caption_label('민수','Discord'),'Discord · 민수')
         self.assertEqual(clean_caption_label('민수','YouTube'),'YouTube')
+        self.assertEqual(clean_caption_label('민수','여러 소리 · Discord + YouTube'),
+                         '여러 소리 · Discord + YouTube')
         self.assertEqual(clean_caption_label('화자 미확인'),'오디오')
         self.assertEqual(clean_caption_label('민수','Discord','example.com'),'example.com')
     def test_wrap_does_not_elide_content(self):

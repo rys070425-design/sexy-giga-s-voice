@@ -1,7 +1,8 @@
 """Universal Voice KR · local Windows speech subtitle prototype.
 
 Discord voice is the first-class use case. Output loopback only; never microphone input.
-No Discord token, bot, API or privileged injection is used.
+Discord names use the officially approved Streamkit connection; no user token,
+server bot or privileged injection is used.
 """
 from __future__ import annotations
 import copy
@@ -15,7 +16,7 @@ import webbrowser
 import urllib.request
 from datetime import datetime
 
-from PySide6.QtCore import Qt, QTimer, Signal, QUrl
+from PySide6.QtCore import Qt, QTimer, Signal, QUrl, QStandardPaths
 from PySide6.QtGui import QFont, QIcon, QFontMetrics, QDesktopServices, QColor
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFormLayout,
     QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QMainWindow,
@@ -47,8 +48,16 @@ def row(*items):
     return lay
 
 
+def paragraph(text):
+    label=QLabel(text)
+    label.setWordWrap(True)
+    return label
+
+
 def combo(items, val=None):
     w = QComboBox()
+    w.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+    w.setMinimumContentsLength(12)
     for label, value in items:
         w.addItem(str(label), value)
     if val is not None:
@@ -97,7 +106,7 @@ class SubtitleOverlay(QWidget):
         self.speaker_label = QLabel('')
         self.speaker_label.setTextFormat(Qt.PlainText)
         self.speaker_label.setFont(QFont('Malgun Gothic', 12, QFont.DemiBold))
-        self.speaker_label.setStyleSheet('color: #8ce8cb;')
+        self.speaker_label.setStyleSheet('color: #8ce8cb; font-size: 12pt;')
         self.speaker_label.setAlignment(Qt.AlignCenter)
         caption_layout.addWidget(self.speaker_label)
         self.previous_label = QLabel('')
@@ -116,7 +125,7 @@ class SubtitleOverlay(QWidget):
         self.original_label.setWordWrap(True)
         self.original_label.setFont(QFont('Malgun Gothic', 12))
         self.original_label.setAlignment(Qt.AlignCenter)
-        self.original_label.setStyleSheet('color: #aebdce;')
+        self.original_label.setStyleSheet('color: #aebdce; font-size: 12pt;')
         caption_layout.addWidget(self.original_label)
         for text_label in (self.previous_label,self.label,self.speaker_label):
             shadow=QGraphicsDropShadowEffect(text_label)
@@ -140,11 +149,16 @@ class SubtitleOverlay(QWidget):
         font = int(profile.get("font", 26))
         self.label.setFont(QFont("Malgun Gothic", font, QFont.DemiBold))
         self.previous_label.setFont(QFont("Malgun Gothic", font))
+        # The application-wide QWidget font rule otherwise overrides setFont,
+        # silently shrinking subtitles to the settings UI's 13-pixel text.
+        self.label.setStyleSheet(f'color:#f4f6fc;font-size:{font}pt;font-weight:600;')
+        self.previous_label.setStyleSheet(f'color:#c5d1df;font-size:{font}pt;')
         opacity=max(15,min(80,int(profile.get('background_opacity',42))))
         self.surface.setStyleSheet('QFrame#subtitleSurface {background: rgba(12,18,27,'+str(round(opacity*2.55))+'); border: 1px solid rgba(160,190,205,45); border-radius: 14px;} QLabel {background: transparent;border: none;}')
-        self.speaker_label.setText(card.label)
         screen = QApplication.primaryScreen()
         if screen:self.setFixedWidth(min(1000,int(screen.availableGeometry().width()*.80)))
+        header_metrics=QFontMetrics(self.speaker_label.font())
+        self.speaker_label.setText(header_metrics.elidedText(card.label,Qt.ElideRight,max(80,self.width()-80)))
         metrics=QFontMetrics(self.label.font())
         lines=wrap_measured(card.text,max(80,self.width()-80),metrics.horizontalAdvance)
         if len(lines)>=2:
@@ -154,7 +168,9 @@ class SubtitleOverlay(QWidget):
             old_lines=wrap_measured(previous.text,max(80,self.width()-80),metrics.horizontalAdvance) if previous else []
             older=old_lines[-1] if old_lines else ''
             if previous and previous.label!=card.label:
-                prefix=previous.label+' · '
+                previous_name=previous.label
+                if card.label.startswith('Discord · '):previous_name=previous_name.removeprefix('Discord · ')
+                prefix=metrics.elidedText(previous_name,Qt.ElideRight,max(40,int((self.width()-80)*.3)))+' · '
                 old_lines=wrap_measured(previous.text,max(40,self.width()-80-metrics.horizontalAdvance(prefix)),metrics.horizontalAdvance)
                 older=prefix+(old_lines[-1] if old_lines else '')
         self.previous_label.setText(older)
@@ -205,6 +221,10 @@ class MainWindow(QMainWindow):
         self.caption_timer=QTimer(self)
         self.caption_timer.setInterval(80)
         self.caption_timer.timeout.connect(self.advance_captions)
+        self.appearance_save_timer=QTimer(self)
+        self.appearance_save_timer.setSingleShot(True)
+        self.appearance_save_timer.setInterval(500)
+        self.appearance_save_timer.timeout.connect(lambda:write_json(HOME/'settings.json',self.cfg))
         if not isinstance(self.cfg.get('browser_pairing_key'),str) or len(self.cfg['browser_pairing_key'])<20:
             self.cfg['browser_pairing_key']=secrets.token_urlsafe(32)
             write_json(HOME/'settings.json',self.cfg)
@@ -228,9 +248,12 @@ class MainWindow(QMainWindow):
         self.reviewed_translation = ""
         self.review_pin = False  # do not overwrite the phrase under review
         self.plan_result.connect(self.on_plan_result)
-        self.setWindowTitle("Universal Voice KR v0.7 · 읽기 편한 실시간 자막")
-        self.resize(1180, 820)
-        self.setMinimumSize(1000, 740)
+        self.setWindowTitle("Universal Voice KR v0.8 · 읽기 편한 실시간 자막")
+        self.setMinimumSize(960,620)
+        screen=QApplication.primaryScreen()
+        available=screen.availableGeometry() if screen else None
+        self.resize(min(1180,max(960,available.width()-64)) if available else 1180,
+                    min(820,max(620,available.height()-48)) if available else 820)
         self._build_ui()
         self._refresh_profiles()
         self._load_profile()
@@ -277,7 +300,7 @@ class MainWindow(QMainWindow):
         local_note = QLabel('내 PC에서 음성 처리\n대화는 자동 저장되지 않아요')
         local_note.setObjectName('sideNote')
         side.addWidget(local_note)
-        version = QLabel('VERSION 0.7')
+        version = QLabel('VERSION 0.8')
         version.setObjectName('version')
         side.addWidget(version)
         outer.addWidget(sidebar)
@@ -360,19 +383,22 @@ class MainWindow(QMainWindow):
         l = QVBoxLayout(self.tab_live)
         l.setContentsMargins(0, 0, 0, 0)
         l.setSpacing(14)
-        source_box = QGroupBox("대화 소리")
+        source_box = QGroupBox("대화 소리 / Playback audio")
         sb = QVBoxLayout(source_box)
         self.source = QComboBox()
+        self.source.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        self.source.setMinimumContentsLength(16)
         sources = QHBoxLayout()
         sources.addWidget(self.source, 1)
         refresh = self._button('새로고침', self._refresh_sources)
         refresh.setFixedWidth(112)
         sources.addWidget(refresh)
         sb.addLayout(sources)
-        sb.addWidget(QLabel('Discord에서 사용하는 출력 장치를 선택하세요. 내 마이크는 수집하지 않습니다.'))
+        sb.addWidget(paragraph('Discord·YouTube 등의 소리가 재생되는 출력 장치를 선택하세요. 내 마이크는 수집하지 않습니다.'))
         self.source_label=QLineEdit()
         self.source_label.setPlaceholderText('출처 이름 · 비워 두면 자동 / 직접 입력 예: YouTube')
         self.source_label.setMaxLength(60)
+        self.source_label.editingFinished.connect(self.update_caption_source)
         sb.addLayout(row(self.source_label,self._button('웹사이트 이름 연결',self.browser_source_setup)))
         self.cb_exclude_own_mic = QCheckBox("내 마이크 제외")
         self.cb_exclude_own_mic.setChecked(True)
@@ -386,20 +412,24 @@ class MainWindow(QMainWindow):
         profile_label.setFixedWidth(65)
         profiles.addWidget(profile_label)
         profiles.addWidget(self.picker, 1)
-        profiles.addWidget(QLabel('음성 언어'))
+        profiles.addWidget(paragraph('음성 언어 / Speech'))
         self.live_language = combo(list(LANGUAGES.items()))
         self.live_language.setToolTip('짧은 말의 정확도와 속도를 높이려면 주로 말하는 언어를 선택하세요. 변경은 다음 자막 시작부터 적용됩니다.')
         profiles.addWidget(self.live_language, 1)
         l.addLayout(profiles)
-        self.target_language=combo([('한국어 번역','ko'),('English captions · 영어 자막','en')])
+        self.target_language=combo([('한국어','ko'),('English','en'),('Español','es'),
+                                   ('Français','fr'),('Deutsch','de'),('日本語','ja'),
+                                   ('中文','zh'),('Português','pt')])
+        self.target_language.setToolTip('Output language / 표시 언어. 다른 언어로 번역하려면 [번역 언어]에서 해당 방향의 모델을 한 번 설치하세요. 변경은 다음 시작부터 적용됩니다.')
+        self.target_language.currentIndexChanged.connect(self.show_pack_state)
         l.addLayout(row(QLabel('표시 언어 / Captions'),self.target_language))
-        self.btn_start = self._button("자막 시작", self.start_service)
+        self.btn_start = self._button("자막 시작 / Start", self.start_service)
         self.btn_start.setObjectName('primaryButton')
         self.btn_start.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
-        self.btn_stop = self._button("중지", self.stop_service)
+        self.btn_stop = self._button("중지 / Stop", self.stop_service)
         self.btn_stop.setIcon(self.style().standardIcon(QStyle.SP_MediaStop))
         self.btn_stop.setEnabled(False)
-        self.btn_preview = self._button("미리보기", self.preview)
+        self.btn_preview = self._button("미리보기 / Preview", self.preview)
         l.addLayout(row(self.btn_start, self.btn_stop, self.btn_preview))
         self.state = QLabel("상태: 대기 중")
         self.state.setObjectName('statusText')
@@ -428,9 +458,13 @@ class MainWindow(QMainWindow):
         self.history.document().setMaximumBlockCount(500)
         l.addWidget(self.history, 1)
         footer = QHBoxLayout()
-        note = QLabel('음성은 PC에서 처리 · 대화 자동 저장 안 함')
+        note = QLabel('PC에서 처리 · 대화 자동 저장 안 함 · 비상업용 번역 모델')
         note.setObjectName('muted')
         footer.addWidget(note, 1)
+        save_history=self._button('기록 저장 / Save',self.save_history)
+        save_history.setObjectName('textButton')
+        save_history.setToolTip('지금 남아 있는 대화 기록의 원문과 번역을 텍스트로 저장합니다. 음성은 저장하지 않습니다.')
+        footer.addWidget(save_history)
         review = self._button('최근 문장 다듬기', self.ask_review)
         review.setObjectName('textButton')
         footer.addWidget(review)
@@ -499,12 +533,12 @@ class MainWindow(QMainWindow):
         form.addRow("프로필 전용 용어 사전", self.profile_terms)
         form.addRow("프로필 적용 게임(.exe)", self.exe_names)
         l.addLayout(form)
-        l.addWidget(QLabel('실시간은 Turbo를, 어려운 발음은 Large와 직접 지정한 음성 언어를 권장합니다.\n변경한 설정은 다음 자막 시작부터 적용됩니다.'))
+        l.addWidget(paragraph('실시간은 Turbo를, 어려운 발음은 Large와 직접 지정한 음성 언어를 권장합니다.\n변경한 설정은 다음 자막 시작부터 적용됩니다.'))
         l.addStretch()
 
     def _build_terms(self):
         l = QVBoxLayout(self.tab_terms)
-        l.addWidget(QLabel("영어 줄임말을 풀어 음성 인식 문장을 한국어 번역 전에 교정합니다. 오역이 있으면 직접 수정할 수 있어요."))
+        l.addWidget(paragraph("영어 줄임말을 풀어 음성 인식 문장을 한국어 번역 전에 교정합니다. 오역이 있으면 직접 수정할 수 있어요."))
         self.group = QComboBox()
         self.group.currentIndexChanged.connect(self._refresh_terms_text)
         l.addLayout(row(QLabel("적용 사전:"), self.group,
@@ -525,13 +559,14 @@ class MainWindow(QMainWindow):
         l.addWidget(g)
         l.addLayout(row(self._button("업데이트 설정 저장", self.save_update),
                         self._button("지금 업데이트 확인", self.check_update)))
-        l.addWidget(QLabel("업데이트는 앱 실행 시 확인하고 적용 전에 미리보기를 보여줍니다. URL이 없으면 수동 사전만 사용합니다."))
-        l.addWidget(QLabel("번역 모델 설치는 왼쪽의 [번역 언어] 메뉴를 이용하세요."))
+        l.addWidget(paragraph("업데이트는 앱 실행 시 확인하고 적용 전에 미리보기를 보여줍니다. URL이 없으면 수동 사전만 사용합니다."))
+        l.addWidget(paragraph("번역 모델 설치는 왼쪽의 [번역 언어] 메뉴를 이용하세요."))
 
     def _build_packs(self):
         lay = QVBoxLayout(self.tab_packs)
-        lay.addWidget(QLabel("다국어 음성 자동 감지에는 공용 Whisper 모델을 사용합니다. 아래 언어팩은 한국어 번역 모델을 설치합니다."))
-        lay.addWidget(QLabel("최초 설치: 인터넷 연결 필요 / 설치 후: 오프라인 번역 가능 / 모든 언어의 모델 공급이 보장되지는 않습니다."))
+        lay.addWidget(paragraph("NLLB 공용 번역 모델은 설치 프로그램에서 함께 준비됩니다. / Shared multilingual translation is included in setup."))
+        lay.addWidget(paragraph("무료 개인·비상업용 모델(CC-BY-NC-4.0)입니다. 상업용 배포·서비스에는 별도 검토가 필요합니다."))
+        lay.addWidget(paragraph("지원하는 언어는 추가 다운로드 없이 번역합니다. 아래에서 음성 언어 → 표시 언어 준비 상태를 확인하세요."))
         g = QGroupBox("언어 선택 · 여러 나라가 같은 언어를 사용하면 모델은 한 번만 설치")
         form = QFormLayout(g)
         self.pack_lang = combo([(f"{name} ({code}) — {countries}", code) for code, (name, countries) in PACK_LANGUAGES.items()])
@@ -545,15 +580,15 @@ class MainWindow(QMainWindow):
         lay.addWidget(self.btn_install_pack)
         lay.addWidget(self.btn_import_pack)
         lay.addWidget(self._button("설치 상태 확인", self.show_pack_state))
-        lay.addWidget(QLabel("설치 설명팩(.uvkrpack)에는 대용량 모델이 들어 있지 않습니다. 파일을 가져오면 공식 Argos 목록에서 모델을 받습니다."))
-        lay.addWidget(QLabel("자동 감지 → 해당 언어 번역팩이 준비됐으면 한국어 자막으로 표시. 없는 언어는 원문과 오류 안내가 나옵니다."))
-        lay.addWidget(QLabel("미지원 언어팩은 실패를 알리며 설치 완료로 표시하지 않습니다."))
+        lay.addWidget(paragraph("설치 설명팩(.uvkrpack)에는 대용량 모델이 들어 있지 않습니다. 파일을 가져오면 공식 Argos 목록에서 모델을 받습니다."))
+        lay.addWidget(paragraph("자동 감지 시에도 해당 방향의 번역 모델이 필요합니다. 음성과 표시 언어가 같으면 추가 번역 모델은 필요하지 않습니다."))
+        lay.addWidget(paragraph("미지원 언어팩은 실패를 알리며 설치 완료로 표시하지 않습니다."))
         lay.addStretch()
 
     def _build_chatgpt(self):
         l = QVBoxLayout(self.tab_chatgpt)
-        l.addWidget(QLabel("로컬 음성 번역은 기존대로 무료입니다. ChatGPT 연결은 선택 사항입니다."))
-        l.addWidget(QLabel("디스코드에 다른 사람이 말할 때 자동 호출하지 않습니다. 반드시 내가 [보정 요청]을 클릭해야 합니다."))
+        l.addWidget(paragraph("로컬 음성 번역은 기존대로 무료입니다. ChatGPT 연결은 선택 사항입니다."))
+        l.addWidget(paragraph("디스코드에 다른 사람이 말할 때 자동 호출하지 않습니다. 반드시 내가 [보정 요청]을 클릭해야 합니다."))
         g = QGroupBox("ChatGPT Plus · 개인용 오픈소스 연동 (별도 API 키 불필요)")
         f = QFormLayout(g)
         self.plan_state = QLabel("연결 확인 중")
@@ -567,29 +602,29 @@ class MainWindow(QMainWindow):
                         self._button("연결 해제", self.disconnect_plan)))
         l.addLayout(row(self._button("ChatGPT 사용량 설정 열기", self.open_usage),
                         self._button("ChatGPT에서 직접 번역하기", self.manual_chatgpt)))
-        l.addWidget(QLabel("최근 음성 원문과 로컬 번역을 아래에서 확인 후 필요한 문장만 직접 보정하세요."))
+        l.addWidget(paragraph("최근 음성 원문과 로컬 번역을 아래에서 확인 후 필요한 문장만 직접 보정하세요."))
         self.review_input = QPlainTextEdit()
         self.review_input.setPlaceholderText("아직 음성이 들어오지 않았습니다. 직접 원문을 붙여넣어도 됩니다.")
         self.review_input.setMaximumHeight(85)
-        l.addWidget(QLabel("보정 요청할 원문 (필요하면 직접 편집)") )
+        l.addWidget(paragraph("보정 요청할 원문 (필요하면 직접 편집)") )
         l.addWidget(self.review_input)
         l.addWidget(self._button("가장 최근 음성 가져오기", self.pull_latest_caption))
         self.review_local = QPlainTextEdit()
         self.review_local.setMaximumHeight(75)
-        l.addWidget(QLabel("현재 로컬 번역 (필요하면 직접 편집)"))
+        l.addWidget(paragraph("현재 로컬 번역 (필요하면 직접 편집)"))
         l.addWidget(self.review_local)
         self.review_lang = QLineEdit("auto")
         self.review_lang.setPlaceholderText("언어 코드, 예: en / ru / es")
         l.addLayout(row(QLabel("원문 언어"), self.review_lang))
         l.addWidget(self._button("선택한 문장 ChatGPT 보정 요청", self.ask_review))
-        l.addWidget(QLabel("ChatGPT 보정 결과 · 원문 텍스트만 전송하며 음성 파일이나 마이크 소리는 보내지 않습니다."))
+        l.addWidget(paragraph("ChatGPT 보정 결과 · 원문 텍스트만 전송하며 음성 파일이나 마이크 소리는 보내지 않습니다."))
         self.review_result = QPlainTextEdit()
         self.review_result.setPlaceholderText("보정 결과가 여기에 표시됩니다.")
         self.review_result.setMaximumHeight(110)
         l.addWidget(self.review_result)
         l.addLayout(row(self._button("이 문장 번역을 내 PC 사전에 저장", self.save_reviewed_phrase),
                         self._button("보정 자막 미리보기", self.preview_review)))
-        l.addWidget(QLabel("사전에 저장된 전체 문장은 동일한 문장이 다시 나올 때 로컬에서 바로 재사용합니다. AI 재학습은 아닙니다."))
+        l.addWidget(paragraph("사전에 저장된 전체 문장은 동일한 문장이 다시 나올 때 로컬에서 바로 재사용합니다. AI 재학습은 아닙니다."))
         l.addStretch()
 
     def _plan_worker(self, operation, fn):
@@ -744,7 +779,10 @@ class MainWindow(QMainWindow):
         self.profile_name.setText(p.get("name", "프로필"))
         self.source_label.setText(p.get('source_label',''))
         self.target_language.setCurrentIndex(max(0,self.target_language.findData(p.get('target_language','ko'))))
+        self.background_opacity.blockSignals(True)
         self.background_opacity.setValue(int(p.get('background_opacity',42)))
+        self.opacity_value.setText(str(self.background_opacity.value())+'%')
+        self.background_opacity.blockSignals(False)
         self.asr_hotwords.setText(p.get('asr_hotwords', ''))
         for widget, value in [(self.model, p.get("model", "large-v3-turbo")),
                               (self.device, p.get("device", "auto")),
@@ -833,7 +871,7 @@ class MainWindow(QMainWindow):
     def _refresh_sources(self):
         previous = self.source.currentData() if self.source.count() else ""
         self.source.clear()
-        self.source.addItem("기본 출력 장치", "")
+        self.source.addItem("기본 출력 장치 / Default output", "")
         try:
             import soundcard as sc
             for dev in sc.all_microphones(include_loopback=True):
@@ -924,7 +962,12 @@ class MainWindow(QMainWindow):
 
     def update_caption_opacity(self,value):
         self.cfg['profiles'][self.profile_idx]['background_opacity']=value
+        self.appearance_save_timer.start()
         if self.presentation.current:self.render_captions()
+
+    def update_caption_source(self):
+        self.cfg['profiles'][self.profile_idx]['source_label']=self.source_label.text().strip()
+        self.appearance_save_timer.start()
 
     def render_captions(self):
         current,previous=self.presentation.current,self.presentation.previous
@@ -949,7 +992,7 @@ class MainWindow(QMainWindow):
         folder=Path(__file__).with_name('browser_source_extension')
         layout.addLayout(row(self._button('확장 폴더 열기',lambda:QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))),
                              self._button('연결 코드 복사',lambda:QApplication.clipboard().setText(code.text()))))
-        if self.browser_bridge.error:layout.addWidget(QLabel(self.browser_bridge.error))
+        if self.browser_bridge.error:layout.addWidget(paragraph(self.browser_bridge.error))
         dialog.exec()
 
     def on_caption(self, original, translated, language, speaker="화자 미확인", show_overlay=True):
@@ -963,6 +1006,19 @@ class MainWindow(QMainWindow):
         self.history.append_caption(speaker, translated, original, current, language)
         if show_overlay:
             self.overlay.show_caption(original, translated, self.cfg["profiles"][self.profile_idx], speaker)
+
+    def save_history(self):
+        if not self.history.toPlainText().strip():
+            self.on_status('저장할 대화 기록이 없습니다. / No captions to save.');return
+        folder=Path(QStandardPaths.writableLocation(QStandardPaths.DocumentsLocation))
+        suggested=folder/('VoiceKR_'+datetime.now().strftime('%Y%m%d_%H%M')+'.txt')
+        filename,_=QFileDialog.getSaveFileName(self,'대화 기록 저장 / Save captions',str(suggested),'Text files (*.txt)')
+        if not filename:return
+        try:
+            Path(filename).write_text(self.history.toPlainText()+'\n',encoding='utf-8-sig')
+            self.on_status('화면의 대화 기록을 저장했습니다. 음성 파일은 저장하지 않습니다.')
+        except OSError as error:
+            QMessageBox.warning(self,'기록 저장 실패',str(error))
 
     def preview(self):
         self.save_profile(quiet=True)
@@ -1118,14 +1174,15 @@ class MainWindow(QMainWindow):
         if not hasattr(self, "pack_state"):
             return
         lang = self.pack_lang.currentData()
+        target=self.target_language.currentData()
         if not lang or self.pack_busy:
             return
         try:
-            ok = installed_for_language(lang)
-            if lang == "ko":
-                self.pack_state.setText("한국어 : 음성 인식 기본 지원 · 추가 번역 모델 불필요")
+            ok = installed_for_language(lang,target)
+            if lang == target or (lang=='pb' and target=='pt'):
+                self.pack_state.setText("원문 자막 / Original captions · 추가 번역 모델 불필요")
             else:
-                self.pack_state.setText(f"{PACK_LANGUAGES[lang][0]} : " +
+                self.pack_state.setText(f"{lang} → {target} : " +
                                         ("번역 모델 설치됨 · 오프라인 사용 가능" if ok else "번역 모델 미설치 · 최초 다운로드 필요"))
         except Exception as e:
             self.pack_state.setText("상태 확인 불가: " + str(e))
@@ -1135,18 +1192,19 @@ class MainWindow(QMainWindow):
             self.on_status("다른 언어팩이 설치 중입니다")
             return
         if not isinstance(manifest, dict):
-            manifest = create_manifest(self.pack_lang.currentData())
+            manifest = create_manifest(self.pack_lang.currentData(),self.target_language.currentData())
         code = manifest["code"]
-        if code == "ko":
+        target=manifest['translation_target']
+        if code == target or (code=='pb' and target=='pt'):
             try:
                 save_terms_without_overwrite(manifest, HOME)
-                self.on_pack_result("한국어 언어팩 적용 완료 · Whisper 모델을 그대로 사용합니다", True)
+                self.on_pack_result("원문 자막 준비 완료 · Whisper 모델을 그대로 사용합니다", True)
             except Exception as e:
-                self.on_pack_result("한국어 팩 적용 오류: " + str(e), False)
+                self.on_pack_result("언어팩 적용 오류: " + str(e), False)
             return
         reply = QMessageBox.question(
             self, "언어팩 다운로드 확인",
-            f"{manifest['language']} → 한국어 번역 모델을 설치할까요?\n\n"
+            f"{manifest['language']} ({code}) → {target} 번역 모델을 설치할까요?\n\n"
             "실제 AI 모델은 이 작은 설명팩에 포함되지 않습니다.\n"
             "최초 설치에는 인터넷 연결과 디스크 공간이 필요합니다.\n"
             "설치 완료 후에는 로컬 PC에서 번역합니다.",
@@ -1157,11 +1215,11 @@ class MainWindow(QMainWindow):
         self.btn_install_pack.setEnabled(False)
         self.btn_import_pack.setEnabled(False)
         self.pack_state.setText(f"{manifest['language']} 모델 설치 중…")
-        self.on_status(f"{manifest['language']} → 한국어 번역 모델 다운로드 시작")
+        self.on_status(f"{code} → {target} 번역 모델 다운로드 시작")
 
         def work():
             try:
-                installed_edges = install_translation_models(code, self.pack_progress.emit)
+                installed_edges = install_translation_models(code, self.pack_progress.emit,target)
                 save_terms_without_overwrite(manifest, HOME)
                 desc = ", ".join(f"{a}→{b}" for a,b in installed_edges) or "이미 설치됨"
                 self.pack_result.emit(f"{manifest['language']} 설치 확인 완료 ({desc})", True)
@@ -1196,6 +1254,9 @@ class MainWindow(QMainWindow):
         self.show_pack_state()
 
     def closeEvent(self, event):
+        if self.appearance_save_timer.isActive():
+            self.appearance_save_timer.stop()
+            write_json(HOME/'settings.json',self.cfg)
         if self.service.running:
             self.closing = True
             self.scan_timer.stop()
@@ -1265,11 +1326,19 @@ QToolTip {background: #273247; color: #f4f6fb; border: 1px solid #52647c; paddin
 def main():
     app = QApplication(sys.argv)
     app.setApplicationName("Universal Voice KR")
+    from single_instance import SingleInstance
+    instance=SingleInstance(HOME,app)
+    if not instance.acquire():
+        return
+    app.aboutToQuit.connect(instance.close)
     icon_path = Path(__file__).with_name('voice.ico')
     if icon_path.is_file():
         app.setWindowIcon(QIcon(str(icon_path)))
     app.setStyleSheet(STYLESHEET)
     win = MainWindow()
+    def activate_window():
+        win.showNormal();win.raise_();win.activateWindow()
+    instance.activated.connect(activate_window)
     win.show()
     sys.exit(app.exec())
 

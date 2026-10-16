@@ -46,7 +46,17 @@ class SourceTracker:
             scores[label]=scores.get(label,0)+duration
         if not scores:return ''
         label,coverage=max(scores.items(),key=lambda item:item[1])
-        return label if coverage>=min(.15,max(.02,(end-start)*.15)) else ''
+        if coverage<min(.15,max(.02,(end-start)*.15)):return ''
+        # A clip may straddle two apps. Do not attribute its whole sentence
+        # to whichever app happened to win by a single probe sample.
+        observed=sum(scores.values())
+        significant=[name for name,duration in scores.items()
+                     if duration>=max(.1,observed*.2)]
+        if len(significant)<=1:return label
+        names=set()
+        for name in significant:
+            names.update(name.removeprefix('여러 소리 · ').split(' + '))
+        return ('여러 소리 · '+' + '.join(sorted(names)))[:140]
 
 class WindowsAudioProbe:
     def __init__(self,audio_id=''):

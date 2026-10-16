@@ -11,3 +11,4 @@ PyJWT[crypto]==2.15.1
 keyring==25.7.0
 pycaw==20260927
 comtypes==1.4.17
+sentencepiece==0.2.1

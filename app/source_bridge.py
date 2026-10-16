@@ -16,11 +16,13 @@ class BrowserSourceBridge:
                 origin=self.headers.get('Origin','')
                 return not origin or origin.startswith('chrome-extension://')
             def reply(self,code,data):
+                payload=json.dumps(data).encode()
                 self.send_response(code)
                 origin=self.headers.get('Origin','')
                 if origin and self.allowed_origin():self.send_header('Access-Control-Allow-Origin',origin)
                 self.send_header('Content-Type','application/json')
-                self.end_headers();self.wfile.write(json.dumps(data).encode())
+                self.send_header('Content-Length',str(len(payload)))
+                self.end_headers();self.wfile.write(payload)
             def do_OPTIONS(self):
                 if not self.allowed_origin():return self.reply(403,{})
                 self.send_response(204)
@@ -29,12 +31,20 @@ class BrowserSourceBridge:
                 self.send_header('Access-Control-Allow-Headers','Authorization, Content-Type')
                 self.end_headers()
             def do_POST(self):
-                if self.path!='/source' or not self.allowed_origin():return self.reply(403,{})
-                if not hmac.compare_digest(self.headers.get('Authorization',''),'Bearer '+bridge.key):return self.reply(401,{})
+                # Drain bounded request bodies before replying. Closing a
+                # Windows socket with unread data can reset even a valid 401.
                 try:
                     count=int(self.headers.get('Content-Length','0'))
                     if count<=0 or count>4096:raise ValueError()
-                    data=json.loads(self.rfile.read(count));hosts=data.get('hosts')
+                    self.connection.settimeout(2)
+                    payload=self.rfile.read(count)
+                    if len(payload)!=count:raise ValueError()
+                except (ValueError,OSError):return self.reply(400,{})
+                if self.path!='/source' or not self.allowed_origin():return self.reply(403,{})
+                if not hmac.compare_digest(self.headers.get('Authorization','').encode('utf-8'),
+                                           ('Bearer '+bridge.key).encode('utf-8')):return self.reply(401,{})
+                try:
+                    data=json.loads(payload);hosts=data.get('hosts')
                     if not isinstance(hosts,list) or len(hosts)>8 or not all(isinstance(h,str) for h in hosts):raise ValueError()
                     bridge.tracker.set_sites(data.get('browser'),hosts)
                 except (ValueError,TypeError,AttributeError):return self.reply(400,{})

@@ -27,3 +27,13 @@ class SourceTests(unittest.TestCase):
         source=SourceTracker();source.set_sites('chrome',['youtube.com'],0)
         source.record([],0)
         self.assertEqual(source.resolve(0,.3),'')
+    def test_switching_apps_does_not_claim_whole_clip_is_one_source(self):
+        source=SourceTracker();source.set_sites('chrome',['youtube.com'],0)
+        for i in range(10):source.record(['discord.exe' if i<5 else 'chrome.exe'],i*.2)
+        label=source.resolve(0,2)
+        self.assertIn('여러 소리',label)
+        self.assertIn('Discord',label);self.assertIn('YouTube',label)
+    def test_brief_notification_does_not_replace_main_source(self):
+        source=SourceTracker()
+        for i in range(20):source.record(['discord.exe' if i==5 else 'chrome.exe'],i*.2)
+        self.assertEqual(source.resolve(0,4),'Chrome')

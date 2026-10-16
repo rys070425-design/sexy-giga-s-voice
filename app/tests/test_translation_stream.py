@@ -7,6 +7,22 @@ from live_captions import CaptionUpdate
 
 
 class TranslationStreamTests(unittest.TestCase):
+    def test_spanish_output_uses_requested_direction_and_no_korean_phrase(self):
+        calls=[]
+        class Translator:
+            packages={}
+            def translate(self,text,source,target='ko'):
+                calls.append((text,source,target));return 'Necesito ayuda.'
+        service=VoiceService();service.profile={'language':'en','target_language':'es','translation_context':'game'}
+        service.dictionary={};service._workers_remaining=1;service.asr_done.set()
+        service.text_q.put(CaptionUpdate(0,100,'I need healing.','','en','시험',True,target_language='es'))
+        captions=[];service.attributed_caption.connect(lambda *p:captions.append(p))
+        with tempfile.TemporaryDirectory() as directory:
+            with patch('core.HOME',Path(directory)),patch('local_translation.LocalTranslator',return_value=Translator()):
+                service._translate(service.stop_event)
+        self.assertEqual(calls,[('I need healing.','en','es')])
+        self.assertEqual(captions[0][1],'Necesito ayuda.')
+
     def test_english_captions_do_not_use_saved_korean_or_game_translation(self):
         class Translator:
             packages={}

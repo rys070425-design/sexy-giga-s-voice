@@ -14,6 +14,24 @@ class VerifyLogWindow {
         Application.ThreadException+=(s,e)=>uiError=e.Exception;
         try {
             var asm=Assembly.LoadFrom(args[0]);
+            var setup=asm.GetType("Setup");
+            var installMethod=setup.GetMethod("Install",BindingFlags.Static|BindingFlags.Public);
+            string testRoot=System.IO.Path.GetFullPath(args[1]);
+            string staging=System.IO.Path.Combine(testRoot,".installer");
+            System.IO.Directory.CreateDirectory(staging);
+            string report="";Action<string> capture=s=>report=s;
+            using(var held=new System.IO.FileStream(System.IO.Path.Combine(staging,"installation.lock"),System.IO.FileMode.OpenOrCreate,System.IO.FileAccess.ReadWrite,System.IO.FileShare.None)) {
+                int busy=(int)installMethod.Invoke(null,new object[]{testRoot,false,capture});
+                Require(busy==1 && report.StartsWith("INSTALL_ERROR:"),"Concurrent installer not rejected");
+            }
+            setup.GetField("Cancelled",BindingFlags.Static|BindingFlags.Public).SetValue(null,true);
+            int cancelled=(int)installMethod.Invoke(null,new object[]{testRoot,false,capture});
+            Require(cancelled==2,"Cancelled installer launched work");
+            setup.GetField("Cancelled",BindingFlags.Static|BindingFlags.Public).SetValue(null,false);
+            string invalidRoot=System.IO.Path.Combine(testRoot,"existing-file");
+            System.IO.File.WriteAllText(invalidRoot,"fixture");
+            int invalid=(int)installMethod.Invoke(null,new object[]{invalidRoot,false,capture});
+            Require(invalid==1,"Invalid target crashed instead of reporting an error");
             var type=asm.GetType("SetupForm");
             var form=(Form)Activator.CreateInstance(type,BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic,null,new object[]{System.IO.Path.GetTempPath()},null);
             form.Opacity=0;form.ShowInTaskbar=false;form.Show();Pump();
@@ -38,7 +56,7 @@ class VerifyLogWindow {
             Require(((TextBox)Field(form,"details")).Text.EndsWith("after-trim"+Environment.NewLine),"Log trim failed");
             Call(form,"UpdateLine","queued-before-dispose");form.Dispose();Pump();
             Task.Run(()=>Call(form,"UpdateLine","after-dispose")).Wait();Pump();
-            Console.WriteLine("PASS: 30 close/reopen cycles, queued and closed-window output, progress, trim, disposal");
+            Console.WriteLine("PASS: installer lock/cancellation/invalid target; 30 close/reopen cycles, queued output, progress, trim, disposal");
             return 0;
         } catch(Exception ex) {Console.WriteLine("FAIL: "+ex);return 1;}
     }

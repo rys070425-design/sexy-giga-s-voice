@@ -195,7 +195,7 @@ class VoiceService(QObject):
                                            text if info.language == self.profile.get('target_language','ko') else '',
                                            info.language, label, clip.final, False,
                                            self.sources.resolve(clip.start+clip.overlap,clip.start+len(clip.audio)/SAMPLE_RATE),
-                                           self.profile.get('target_language','ko'))
+                                           self.profile.get('target_language','ko'),part=index)
                     self.live_caption.emit(update)
                     if clip.final:
                         self._enqueue(self.text_q, update, '번역')
@@ -234,10 +234,12 @@ class VoiceService(QObject):
             from language_packs import combine_terms, installed_for_language
             from local_translation import LocalTranslator, game_phrase_translation
             translator = LocalTranslator()
+            self.status.emit('번역 모델: '+getattr(translator,'model_label','로컬 번역'))
             language = self.profile.get('language', 'auto')
             target_language=self.profile.get('target_language','ko')
             source = 'en' if language == 'auto' else ('pt' if language == 'pb' else language)
-            if source != target_language and (source, target_language) in translator.packages:
+            can_translate=getattr(translator,'supports',lambda a,b:(a,b) in translator.packages)
+            if source != target_language and can_translate(source,target_language):
                 # Load the native translator in parallel with Whisper startup,
                 # rather than delaying the first actual foreign sentence.
                 translator.translate('', source, target_language)

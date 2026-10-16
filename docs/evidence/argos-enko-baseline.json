@@ -1,0 +1,102 @@
+[
+  {
+    "source": "Could you speak a little more slowly?",
+    "translation": "조금 더 천천히 말할 수 있습니까?",
+    "seconds": 0.307
+  },
+  {
+    "source": "I didn't catch the last part.",
+    "translation": "나는 마지막 부분을 붙잡지 않았다.",
+    "seconds": 0.033
+  },
+  {
+    "source": "The meeting starts in ten minutes.",
+    "translation": "회의는 10 분에서 시작합니다.",
+    "seconds": 0.032
+  },
+  {
+    "source": "Please turn left at the next street.",
+    "translation": "다음 길에서 좌회전하십시오.",
+    "seconds": 0.033
+  },
+  {
+    "source": "I will be back after lunch.",
+    "translation": "점심 후에 돌아올 것입니다.",
+    "seconds": 0.031
+  },
+  {
+    "source": "We need to change the plan.",
+    "translation": "우리는 계획을 변경해야합니다.",
+    "seconds": 0.029
+  },
+  {
+    "source": "Is it okay if I join you?",
+    "translation": "가입하면 괜찮습니까?",
+    "seconds": 0.033
+  },
+  {
+    "source": "Do you mean today or tomorrow?",
+    "translation": "오늘 또는 내일을 의미합니까?",
+    "seconds": 0.029
+  },
+  {
+    "source": "This is more difficult than I expected.",
+    "translation": "예상보다 더 어렵습니다.",
+    "seconds": 0.03
+  },
+  {
+    "source": "I am not sure that is the right answer.",
+    "translation": "나는 올바른 대답은 확실하지 않습니다.",
+    "seconds": 0.036
+  },
+  {
+    "source": "Please close the door.",
+    "translation": "자주 묻는 질문",
+    "seconds": 0.019
+  },
+  {
+    "source": "I do not want to miss the train.",
+    "translation": "기차를 놓치지 마세요.",
+    "seconds": 0.037
+  },
+  {
+    "source": "Could you repeat that, please?",
+    "translation": "당신은 그것을 반복 할 수 있습니까?",
+    "seconds": 0.032
+  },
+  {
+    "source": "I disagree with that idea.",
+    "translation": "나는 그 생각에 동의한다.",
+    "seconds": 0.029
+  },
+  {
+    "source": "The train is delayed by fifteen minutes.",
+    "translation": "기차는 15 분에 의해 지연됩니다.",
+    "seconds": 0.038
+  },
+  {
+    "source": "I bought this yesterday, but it does not work.",
+    "translation": "나는 어제를 샀지만, 작동하지 않습니다.",
+    "seconds": 0.044
+  },
+  {
+    "source": "The sound is too quiet.",
+    "translation": "소리는 너무 조용합니다.",
+    "seconds": 0.03
+  },
+  {
+    "source": "What time does the store close?",
+    "translation": "상점은 몇시입니까?",
+    "seconds": 0.032
+  },
+  {
+    "source": "Let me know when you are ready.",
+    "translation": "준비가 될 때 나를 알 수 있습니다.",
+    "seconds": 0.032
+  },
+  {
+    "source": "Would you mind sending me the link?",
+    "translation": "링크를 보내시겠습니까?",
+    "seconds": 0.041
+  }
+]

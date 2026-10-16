@@ -30,6 +30,7 @@ class CaptionUpdate:
     complete: bool = False
     source: str = ''
     target_language: str = 'ko'
+    part: int = 0
 
 
 class DisplayOrder:

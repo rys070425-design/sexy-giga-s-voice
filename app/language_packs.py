@@ -62,13 +62,13 @@ TERMS = {
 }
 
 
-def create_manifest(code: str) -> dict:
-    if code not in LANGUAGES:
+def create_manifest(code: str, target: str = 'ko') -> dict:
+    if code not in LANGUAGES or target not in LANGUAGES or target=='pb':
         raise ValueError(f"미지원 코드: {code}")
     name, countries = LANGUAGES[code]
     return {"format": PACK_FORMAT, "schema": PACK_FORMAT_VERSION, "code": code,
             "language": name, "countries": countries, "version": "1.0.0",
-            "translation_target": "ko", "terms": TERMS.get(code, {}),
+            "translation_target": target, "terms": TERMS.get(code, {}),
             "note": "다운로드용 설치 설명팩. 번역 AI 모델 데이터는 포함되지 않으며, 첫 설치 시 인터넷 연결이 필요합니다."}
 
 
@@ -76,7 +76,7 @@ def validate_manifest(obj) -> dict:
     if not isinstance(obj, dict) or obj.get("format") != PACK_FORMAT or obj.get("schema") != PACK_FORMAT_VERSION:
         raise ValueError("지원하지 않는 언어팩 형식입니다")
     code = obj.get("code")
-    if code not in LANGUAGES or obj.get("translation_target") != "ko":
+    if code not in LANGUAGES or obj.get("translation_target") not in LANGUAGES or obj.get('translation_target')=='pb':
         raise ValueError("지원하지 않는 언어/번역 방향입니다")
     terms = obj.get("terms")
     if not isinstance(terms, dict) or len(terms) > 300:
@@ -144,22 +144,22 @@ def save_terms_without_overwrite(manifest: dict, app_home: Path):
     return target
 
 
-def find_route(src: str, installed_pairs: set[tuple[str, str]], available_pairs: set[tuple[str, str]]):
+def find_route(src: str, installed_pairs: set[tuple[str, str]], available_pairs: set[tuple[str, str]], target='ko'):
     """Shortest viable route <= 2 edges, prefers installed models over new installs.
 
-    Korean source uses no model. Only English pivot for safety/predictability.
+    Same-language captions use no model. Only English pivot is considered.
     Returns list of missing pairs, or None when the upstream index cannot serve it.
     """
-    if src == "ko":
+    if src == target or (src=='pb' and target=='pt'):
         return []
     # Brazilian Portuguese shares the standard Portuguese translation model.
     # Retain pb only for the Brazilian glossary and UI selection.
     if src == "pb":
         src = "pt"
     # Prefer already-installed route even if the catalog offers a direct model.
-    routes = [[(src, "ko")]]
-    if src != "en":
-        routes.append([(src, "en"), ("en", "ko")])
+    routes = [[(src, target)]]
+    if src != "en" and target!='en':
+        routes.append([(src, "en"), ("en", target)])
     routes = [r for r in routes if all(edge in (installed_pairs | available_pairs) for edge in r)]
     if not routes:
         return None
@@ -173,22 +173,30 @@ def get_installed_pairs() -> set[tuple[str, str]]:
             if p.from_code and p.to_code and getattr(p, "type", "translate") == "translate"}
 
 
-def installed_for_language(code: str) -> bool:
-    if code == "ko":
+def installed_for_language(code: str, target='ko') -> bool:
+    if code == target or (code=='pb' and target=='pt'):
         return True
-    route = find_route(code, get_installed_pairs(), set())
+    from quality_translation import supported_languages
+    supported=supported_languages()
+    if ('pt' if code=='pb' else code) in supported and target in supported:return True
+    route = find_route(code, get_installed_pairs(), set(),target)
     return route == []
 
 
-def install_translation_models(code: str, log=lambda msg: None) -> list[tuple[str, str]]:
+def install_translation_models(code: str, log=lambda msg: None, target='ko') -> list[tuple[str, str]]:
     """Downloads official Argos models (once) and installs exact needed pair(s).
 
     Raises clear error when package index or route is unavailable; does not simulate success.
     """
-    if code not in LANGUAGES:
+    if code not in LANGUAGES or target not in LANGUAGES or target=='pb':
         raise ValueError("선택한 언어를 지원하지 않습니다")
-    if code == "ko":
-        log("한국어 음성 인식은 Whisper에 기본 포함됩니다. 추가 번역 모델이 필요하지 않습니다.")
+    if code == target or (code=='pb' and target=='pt'):
+        log("원문 자막에는 추가 번역 모델이 필요하지 않습니다.")
+        return []
+    from quality_translation import supported_languages
+    supported=supported_languages()
+    if ('pt' if code=='pb' else code) in supported and target in supported:
+        log(f'{code} → {target}: 공용 NLLB 번역 모델이 이미 준비되어 있습니다.')
         return []
     from argostranslate import package
     log("공식 번역 모델 목록 확인 중 · 인터넷 연결 필요")
@@ -196,13 +204,13 @@ def install_translation_models(code: str, log=lambda msg: None) -> list[tuple[st
     available = {(p.from_code, p.to_code): p for p in package.get_available_packages()
                  if p.from_code and p.to_code and getattr(p, "type", "translate") == "translate"}
     installed = get_installed_pairs()
-    missing = find_route(code, installed, set(available))
+    missing = find_route(code, installed, set(available),target)
     if missing is None:
-        raise RuntimeError(f"현재 공식 Argos 목록에 {code} → 한국어 번역 경로가 없습니다. 모델이 추가될 때 다시 확인해 주세요.")
+        raise RuntimeError(f"현재 공식 Argos 목록에 {code} → {target} 번역 경로가 없습니다. 모델이 추가될 때 다시 확인해 주세요.")
     for edge in missing:
         model = available[edge]
         log(f"모델 다운로드·설치: {edge[0]} → {edge[1]} (파일 크기와 시간은 모델에 따라 다릅니다)")
         package.install_from_path(model.download())
-    if not installed_for_language(code):
+    if not installed_for_language(code,target):
         raise RuntimeError("모델 설치 후 번역 경로를 확인할 수 없습니다. 설치 기록을 확인해 주세요.")
     return missing

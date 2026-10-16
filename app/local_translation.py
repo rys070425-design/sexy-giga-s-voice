@@ -64,8 +64,22 @@ class LocalTranslator:
         self.packages = {(p.from_code, p.to_code): p for p in get_installed_packages()
                          if p.from_code and p.to_code and getattr(p, 'type', 'translate') == 'translate'}
         self.models = OrderedDict()
+        from quality_translation import QualityTranslator
+        self.quality=QualityTranslator()
+
+    def supports(self,source,target):
+        if self.quality.supports(source,target):return True
+        try:translation_route(source,target,set(self.packages));return True
+        except ValueError:return False
+
+    @property
+    def model_label(self):
+        return 'NLLB-200 600M · CPU int8 · 비상업용 모델' if self.quality.languages else 'Argos · 로컬'
 
     def translate(self, text, source, target='ko'):
+        if source==target:return text
+        if self.quality.supports(source,target):
+            return self.quality.translate(text,source,target)
         import ctranslate2
         for edge in translation_route(source, target, set(self.packages)):
             package = self.packages[edge]
@@ -83,7 +97,8 @@ class LocalTranslator:
             prefix = [[package.target_prefix]] if package.target_prefix else None
             result = self.models[edge].translate_batch([tokens], target_prefix=prefix,
                            replace_unknowns=True, beam_size=4, num_hypotheses=1,
-                           length_penalty=0.2, max_decoding_length=256)[0]
+                           length_penalty=1.0 if edge==('en','ko') else 0.2,
+                           max_decoding_length=256)[0]
             text = package.tokenizer.decode(result.hypotheses[0])
             if package.target_prefix and text.startswith(package.target_prefix):
                 text = text[len(package.target_prefix):]

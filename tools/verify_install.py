@@ -1,4 +1,5 @@
-import os,sys,json,time
+import os,sys,json,time,subprocess
+from unittest.mock import patch
 from pathlib import Path
 root=Path(sys.argv[1]).resolve()
 sys.path.insert(0,str(root))
@@ -19,10 +20,30 @@ assert '기지' in text and '공격' in text,text
 from local_translation import LocalTranslator
 translation=LocalTranslator().translate('I need help.','en')
 assert '도움' in translation,translation
+assert 'NLLB' in LocalTranslator().model_label
+assert '동의하지' in LocalTranslator().translate('I disagree with that idea.','en')
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QFontDatabase
 import main,core
 app=QApplication([])
+from single_instance import SingleInstance
+first_instance=SingleInstance(root/'test-instance')
+second_instance=SingleInstance(root/'test-instance')
+activations=[]
+first_instance.activated.connect(lambda:activations.append(True))
+assert first_instance.acquire()
+assert not second_instance.acquire(),'A second launch must not load another model'
+app.processEvents()
+assert activations,'Second launch did not activate the existing window'
+first_instance.close()
+assert second_instance.acquire(),'Normal shutdown did not release the application lock'
+second_instance.close()
+crash_home=root/'test-crash-instance'
+child_code="import sys,os; from pathlib import Path; from PySide6.QtCore import QCoreApplication; sys.path.insert(0,sys.argv[1]); from single_instance import SingleInstance; app=QCoreApplication([]); owner=SingleInstance(Path(sys.argv[2])); assert owner.acquire(); os._exit(0)"
+subprocess.run([sys.executable,'-B','-c',child_code,str(root),str(crash_home)],check=True,timeout=15)
+recovered=SingleInstance(crash_home)
+assert recovered.acquire(),'An interrupted app left a permanent launch lock'
+recovered.close()
 QFontDatabase.addApplicationFont('C:/Windows/Fonts/malgun.ttf')
 app.setStyleSheet(main.STYLESHEET)
 testhome=root/'test-state'
@@ -41,6 +62,7 @@ window.on_live_caption(CaptionUpdate(1,60,'test draft','','en','시험 화자'))
 assert not window.live_text.isVisible(),'Untranslated foreign draft should not flash'
 window.on_live_caption(CaptionUpdate(1,60,'test draft','초안','en','시험 화자',False,True))
 assert window.overlay.label.text()=='초안'
+assert window.overlay.label.font().pointSizeF()>=24,'Application styles shrank the subtitle font'
 window.on_live_caption(CaptionUpdate(1,100,'final words','','en','시험 화자',True))
 assert window.overlay.label.text()=='초안','Existing translation flickered back to original'
 assert window.history.toPlainText()==''
@@ -54,21 +76,37 @@ window.on_live_caption(CaptionUpdate(2,60,'new draft','새 문장','en','화자 
 window.presentation.changed_at-=1;window.advance_captions()
 window.on_live_caption(CaptionUpdate(1,100,'old words','늦은 이전 번역','en','이전 화자',True,True))
 assert window.overlay.label.text()=='새 문장'
-assert '확정 문장' in window.overlay.previous_label.text()
+assert '늦은 이전 번역' in window.overlay.previous_label.text()
 assert window.overlay.speaker_label.text()=='YouTube'
 assert '인식 중' not in window.live_text.text() and '화자 미확인' not in window.live_text.text()
 assert '107' in window.overlay.surface.styleSheet()
 window.background_opacity.setValue(20)
 assert '51' in window.overlay.surface.styleSheet()
 window.background_opacity.setValue(42)
+window.source_label.setText('시험 출처')
+window.source_label.editingFinished.emit()
+until=time.monotonic()+.7
+while time.monotonic()<until:app.processEvents();time.sleep(.01)
+saved=json.loads((testhome/'settings.json').read_text(encoding='utf-8'))
+assert saved['profiles'][window.profile_idx]['background_opacity']==42
+assert saved['profiles'][window.profile_idx]['source_label']=='시험 출처'
+window.source_label.clear();window.source_label.editingFinished.emit()
 assert window.history.toPlainText().count('늦은 이전 번역')==1
+export_path=testhome/'caption-export.txt'
+with patch.object(main.QFileDialog,'getSaveFileName',return_value=(str(export_path),'Text files (*.txt)')):
+    window.save_history()
+exported=export_path.read_text(encoding='utf-8-sig')
+assert '늦은 이전 번역' in exported and 'old words' in exported,'Saved captions lost the original or translation'
 assert window.live_text.isVisible()
 window.live_language.setCurrentIndex(window.live_language.findData('ko'))
 assert window.language.currentData()=='ko'
 window.language.setCurrentIndex(window.language.findData('en'))
 assert window.live_language.currentData()=='en'
-window.resize(1000,740)
-for i in range(7):window.navigation.setCurrentRow(i);app.processEvents();assert window.tabs.currentIndex()==i
+window.resize(960,620)
+for i in range(7):
+    window.navigation.setCurrentRow(i);app.processEvents();assert window.tabs.currentIndex()==i
+    scroll=window.tabs.widget(i)
+    assert scroll.widget().width()<=scroll.viewport().width(),('Page clips horizontally',i,scroll.widget().width(),scroll.viewport().width())
 window.navigation.setCurrentRow(0)
 window.on_caption('Test','설치 검증이 완료되었습니다.','en','테스트')
 app.processEvents()
@@ -126,6 +164,15 @@ window.newSocket.fire('open');window.testSocket.fire('close');
 '''+SNAPSHOT_SCRIPT)
 assert snapshot['connected'],'Old socket invalidated a newer connection'
 from discord_widget import AUTO_CHANNEL_SCRIPT
+run_js('''window.savedNow=Date.now;window.testNow=100000;Date.now=()=>window.testNow;
+window.connectAttempts=0;window.rpc={connected:false,connect:()=>{window.connectAttempts++;return Promise.reject('fixture');}};
+'''+AUTO_CHANNEL_SCRIPT*12+SNAPSHOT_SCRIPT)
+attempts=run_js('JSON.stringify({attempts:window.connectAttempts})')
+assert attempts['attempts']==1,'Disconnected RPC was being retried on every UI poll'
+run_js('window.testNow+=5000;'+AUTO_CHANNEL_SCRIPT+SNAPSHOT_SCRIPT)
+attempts=run_js('JSON.stringify({attempts:window.connectAttempts})')
+assert attempts['attempts']==2,'Discord reconnect did not recover after its backoff'
+run_js('Date.now=window.savedNow;delete window.__uvkrSelectedChannel;'+SNAPSHOT_SCRIPT)
 run_js('''window.commands=[];window.rpc={connected:true,authenticated:true,
 request:(cmd,args)=>{window.commands.push(cmd);return Promise.resolve({id:'234567890123456789',guild_id:'123456789012345678',type:2});}};
 '''+AUTO_CHANNEL_SCRIPT+SNAPSHOT_SCRIPT)

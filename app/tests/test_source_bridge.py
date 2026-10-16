@@ -24,6 +24,9 @@ class BridgeTests(unittest.TestCase):
     def test_regular_web_page_cannot_submit_source(self):
         with self.assertRaises(HTTPError) as error:self.request(origin='https://example.com')
         self.assertEqual(error.exception.code,403)
+    def test_non_ascii_wrong_code_is_rejected_without_handler_crash(self):
+        with self.assertRaises(HTTPError) as error:self.request(key='wrong-é')
+        self.assertEqual(error.exception.code,401)
     def test_invalid_payload_is_rejected(self):
         with self.assertRaises(HTTPError) as error:self.request(hosts='not-a-list')
         self.assertEqual(error.exception.code,400)

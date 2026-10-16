@@ -20,28 +20,23 @@ from cuda_runtime import prepare_cuda
 prepare_cuda()
 from faster_whisper import WhisperModel
 from faster_whisper.utils import download_model
-from argostranslate import package
 from local_translation import LocalTranslator
+from model_assets import install_quality_model
 
 print('STAGE:4:음성 인식 모델 다운로드',flush=True)
 target=root/'models'/'large-v3-turbo'
 download_model('large-v3-turbo',output_dir=str(target))
-print('STAGE:5:영어 → 한국어 번역 모델 준비',flush=True)
-installed={(p.from_code,p.to_code) for p in package.get_installed_packages()}
-if ('en','ko') not in installed:
-    package.update_package_index()
-    candidates=[p for p in package.get_available_packages() if p.from_code=='en' and p.to_code=='ko' and getattr(p,'type','translate')=='translate']
-    if not candidates:raise RuntimeError('공식 영어 → 한국어 번역 모델을 찾지 못했습니다.')
-    package.install_from_path(candidates[-1].download())
+print('STAGE:5:NLLB 공용 번역 모델 준비 · 비상업용 모델',flush=True)
+install_quality_model(root,lambda line:print(line,flush=True))
 print('STAGE:6:새 설치 환경 확인',flush=True)
 translator=LocalTranslator()
-translation=translator.translate('Hello, how are you?','en')
-if not translation.strip():raise RuntimeError('번역 모델 확인 실패')
+translation=translator.translate('I disagree with that idea.','en')
+if '동의하지' not in translation:raise RuntimeError('번역 모델 의미 보존 확인 실패: '+translation)
 import ctranslate2
 device='cuda' if ctranslate2.get_cuda_device_count() else 'cpu'
 model=WhisperModel(str(target),device=device,compute_type='int8_float16' if device=='cuda' else 'int8',cpu_threads=4)
 segments,_=model.transcribe(np.zeros(16000,np.float32),language='en',beam_size=1)
 list(segments)
-report=dict(version='0.7.0',python=sys.executable,device=device,model='large-v3-turbo',translation_ready=True,verified=True)
+report=dict(version='0.8.0',python=sys.executable,device=device,model='large-v3-turbo',translator='NLLB-200 distilled 600M int8',translation_ready=True,verified=True)
 (root/'INSTALL_SUCCESS.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
 print('RUNTIME_VERIFIED',flush=True)

@@ -1,0 +1,590 @@
+[
+  {
+    "model": "m2m100_418M",
+    "target": "ko",
+    "source": "I disagree with that idea.",
+    "translation": "나는 그 아이디어에 동의하지 않는다.",
+    "seconds": 0.27
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "ko",
+    "source": "I agree with that idea.",
+    "translation": "나는 그 아이디어에 동의한다.",
+    "seconds": 0.204
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "ko",
+    "source": "You do not need to come tomorrow.",
+    "translation": "당신은 내일 오지 않을 필요가 없습니다.",
+    "seconds": 0.227
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "ko",
+    "source": "Do not close the door.",
+    "translation": "문을 닫지 마세요.",
+    "seconds": 0.176
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "ko",
+    "source": "I did not hear what you said.",
+    "translation": "당신이 말한 것을 듣지 못했습니다.",
+    "seconds": 0.215
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "ko",
+    "source": "The store closes at nine tonight.",
+    "translation": "쇼핑몰은 오늘 밤 9시에 닫습니다.",
+    "seconds": 0.272
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "es",
+    "source": "I disagree with that idea.",
+    "translation": "No estoy de acuerdo con esa idea.",
+    "seconds": 0.207
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "es",
+    "source": "I agree with that idea.",
+    "translation": "Estoy de acuerdo con esa idea.",
+    "seconds": 0.208
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "es",
+    "source": "You do not need to come tomorrow.",
+    "translation": "No tienes que venir mañana.",
+    "seconds": 0.188
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "es",
+    "source": "Do not close the door.",
+    "translation": "No cierre la puerta.",
+    "seconds": 0.165
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "es",
+    "source": "I did not hear what you said.",
+    "translation": "No he oído lo que has dicho.",
+    "seconds": 0.212
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "es",
+    "source": "The store closes at nine tonight.",
+    "translation": "La tienda se cierra a las nueve de la noche.",
+    "seconds": 0.259
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "fr",
+    "source": "I disagree with that idea.",
+    "translation": "Je ne suis pas d'accord avec cette idée.",
+    "seconds": 0.222
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "fr",
+    "source": "I agree with that idea.",
+    "translation": "Je suis d'accord avec cette idée.",
+    "seconds": 0.201
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "fr",
+    "source": "You do not need to come tomorrow.",
+    "translation": "Vous n’avez pas besoin de venir demain.",
+    "seconds": 0.235
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "fr",
+    "source": "Do not close the door.",
+    "translation": "Ne fermez pas la porte.",
+    "seconds": 0.163
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "fr",
+    "source": "I did not hear what you said.",
+    "translation": "Je n'ai pas entendu ce que tu dis.",
+    "seconds": 0.268
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "fr",
+    "source": "The store closes at nine tonight.",
+    "translation": "La boutique se ferme à 9h ce soir.",
+    "seconds": 0.234
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "de",
+    "source": "I disagree with that idea.",
+    "translation": "Ich bin mit dieser Idee nicht einverstanden.",
+    "seconds": 0.208
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "de",
+    "source": "I agree with that idea.",
+    "translation": "Ich bin mit dieser Idee einverstanden.",
+    "seconds": 0.194
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "de",
+    "source": "You do not need to come tomorrow.",
+    "translation": "Du musst morgen nicht kommen.",
+    "seconds": 0.163
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "de",
+    "source": "Do not close the door.",
+    "translation": "Schließen Sie die Tür nicht.",
+    "seconds": 0.161
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "de",
+    "source": "I did not hear what you said.",
+    "translation": "Ich habe nicht gehört, was du sagst.",
+    "seconds": 0.217
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "de",
+    "source": "The store closes at nine tonight.",
+    "translation": "Das Geschäft schließt heute Abend um neun Uhr.",
+    "seconds": 0.261
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "ja",
+    "source": "I disagree with that idea.",
+    "translation": "そのアイデアに賛成です。",
+    "seconds": 0.21
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "ja",
+    "source": "I agree with that idea.",
+    "translation": "そのアイデアに賛成です。",
+    "seconds": 0.186
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "ja",
+    "source": "You do not need to come tomorrow.",
+    "translation": "明日来る必要はない。",
+    "seconds": 0.2
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "ja",
+    "source": "Do not close the door.",
+    "translation": "ドアを閉じないで。",
+    "seconds": 0.232
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "ja",
+    "source": "I did not hear what you said.",
+    "translation": "あなたが言ったことを聞いていませんでした。",
+    "seconds": 0.226
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "ja",
+    "source": "The store closes at nine tonight.",
+    "translation": "店は今夜9時に閉店。",
+    "seconds": 0.253
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "zh",
+    "source": "I disagree with that idea.",
+    "translation": "我不同意这个想法。",
+    "seconds": 0.154
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "zh",
+    "source": "I agree with that idea.",
+    "translation": "我同意这个想法。",
+    "seconds": 0.125
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "zh",
+    "source": "You do not need to come tomorrow.",
+    "translation": "你不需要明天来。",
+    "seconds": 0.184
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "zh",
+    "source": "Do not close the door.",
+    "translation": "不要关上门。",
+    "seconds": 0.15
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "zh",
+    "source": "I did not hear what you said.",
+    "translation": "我没有听到你说的话。",
+    "seconds": 0.174
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "zh",
+    "source": "The store closes at nine tonight.",
+    "translation": "商店今天晚上9点关闭。",
+    "seconds": 0.233
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "pt",
+    "source": "I disagree with that idea.",
+    "translation": "Não concordo com essa ideia.",
+    "seconds": 0.183
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "pt",
+    "source": "I agree with that idea.",
+    "translation": "Concordo com essa ideia.",
+    "seconds": 0.155
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "pt",
+    "source": "You do not need to come tomorrow.",
+    "translation": "Você não precisa vir amanhã.",
+    "seconds": 0.183
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "pt",
+    "source": "Do not close the door.",
+    "translation": "Não feche a porta.",
+    "seconds": 0.145
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "pt",
+    "source": "I did not hear what you said.",
+    "translation": "Não ouvi o que você disse.",
+    "seconds": 0.201
+  },
+  {
+    "model": "m2m100_418M",
+    "target": "pt",
+    "source": "The store closes at nine tonight.",
+    "translation": "As lojas fecham às nove da noite.",
+    "seconds": 0.223
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "ko",
+    "source": "I disagree with that idea.",
+    "translation": "저는 이 아이디어에 동의하지 않습니다.",
+    "seconds": 0.255
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "ko",
+    "source": "I agree with that idea.",
+    "translation": "저는 이 아이디어에 동의합니다.",
+    "seconds": 0.237
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "ko",
+    "source": "You do not need to come tomorrow.",
+    "translation": "내일 오지 않아도 돼.",
+    "seconds": 0.167
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "ko",
+    "source": "Do not close the door.",
+    "translation": "문을 닫지 마",
+    "seconds": 0.169
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "ko",
+    "source": "I did not hear what you said.",
+    "translation": "난 네가 말한 걸 듣지 못했어",
+    "seconds": 0.232
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "ko",
+    "source": "The store closes at nine tonight.",
+    "translation": "가게는 오늘 밤 9시에 문을 닫습니다.",
+    "seconds": 0.292
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "es",
+    "source": "I disagree with that idea.",
+    "translation": "No estoy de acuerdo con esa idea.",
+    "seconds": 0.311
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "es",
+    "source": "I agree with that idea.",
+    "translation": "Estoy de acuerdo con esa idea.",
+    "seconds": 0.253
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "es",
+    "source": "You do not need to come tomorrow.",
+    "translation": "No tienes que venir mañana.",
+    "seconds": 0.225
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "es",
+    "source": "Do not close the door.",
+    "translation": "No cierren la puerta.",
+    "seconds": 0.227
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "es",
+    "source": "I did not hear what you said.",
+    "translation": "No escuché lo que dijiste.",
+    "seconds": 0.272
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "es",
+    "source": "The store closes at nine tonight.",
+    "translation": "La tienda cierra a las nueve esta noche.",
+    "seconds": 0.355
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "fr",
+    "source": "I disagree with that idea.",
+    "translation": "Je ne suis pas d'accord avec cette idée.",
+    "seconds": 0.316
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "fr",
+    "source": "I agree with that idea.",
+    "translation": "Je suis d'accord avec cette idée.",
+    "seconds": 0.294
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "fr",
+    "source": "You do not need to come tomorrow.",
+    "translation": "Vous n'avez pas besoin de venir demain.",
+    "seconds": 0.335
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "fr",
+    "source": "Do not close the door.",
+    "translation": "Ne ferme pas la porte.",
+    "seconds": 0.236
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "fr",
+    "source": "I did not hear what you said.",
+    "translation": "Je n'ai pas entendu ce que vous avez dit.",
+    "seconds": 0.368
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "fr",
+    "source": "The store closes at nine tonight.",
+    "translation": "Le magasin ferme à neuf heures ce soir.",
+    "seconds": 0.319
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "de",
+    "source": "I disagree with that idea.",
+    "translation": "Ich stimme dieser Idee nicht zu.",
+    "seconds": 0.314
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "de",
+    "source": "I agree with that idea.",
+    "translation": "Ich stimme dieser Idee zu.",
+    "seconds": 0.294
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "de",
+    "source": "You do not need to come tomorrow.",
+    "translation": "Du musst morgen nicht kommen.",
+    "seconds": 0.244
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "de",
+    "source": "Do not close the door.",
+    "translation": "Schließen Sie die Tür nicht.",
+    "seconds": 0.228
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "de",
+    "source": "I did not hear what you said.",
+    "translation": "Ich habe nicht gehört, was du gesagt hast.",
+    "seconds": 0.304
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "de",
+    "source": "The store closes at nine tonight.",
+    "translation": "Der Laden schließt heute Abend um neun Uhr.",
+    "seconds": 0.329
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "ja",
+    "source": "I disagree with that idea.",
+    "translation": "私はその考えに同意しない.",
+    "seconds": 0.231
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "ja",
+    "source": "I agree with that idea.",
+    "translation": "私はその考えに同意します.",
+    "seconds": 0.226
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "ja",
+    "source": "You do not need to come tomorrow.",
+    "translation": "明日は来る必要はない.",
+    "seconds": 0.187
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "ja",
+    "source": "Do not close the door.",
+    "translation": "ドアを閉めないで.",
+    "seconds": 0.234
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "ja",
+    "source": "I did not hear what you said.",
+    "translation": "言ったことは聞かなかった.",
+    "seconds": 0.219
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "ja",
+    "source": "The store closes at nine tonight.",
+    "translation": "店は今夜9時に閉店する.",
+    "seconds": 0.339
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "zh",
+    "source": "I disagree with that idea.",
+    "translation": "我不同意这个想法.",
+    "seconds": 0.23
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "zh",
+    "source": "I agree with that idea.",
+    "translation": "我同意这个想法.",
+    "seconds": 0.179
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "zh",
+    "source": "You do not need to come tomorrow.",
+    "translation": "你不需要明天来.",
+    "seconds": 0.234
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "zh",
+    "source": "Do not close the door.",
+    "translation": "不要关门.",
+    "seconds": 0.179
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "zh",
+    "source": "I did not hear what you said.",
+    "translation": "我没有听到你说的话.",
+    "seconds": 0.249
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "zh",
+    "source": "The store closes at nine tonight.",
+    "translation": "今天晚上9点,商店关门.",
+    "seconds": 0.35
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "pt",
+    "source": "I disagree with that idea.",
+    "translation": "Não concordo com essa ideia.",
+    "seconds": 0.26
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "pt",
+    "source": "I agree with that idea.",
+    "translation": "Eu concordo com essa ideia.",
+    "seconds": 0.227
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "pt",
+    "source": "You do not need to come tomorrow.",
+    "translation": "Não precisas de vir amanhã.",
+    "seconds": 0.207
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "pt",
+    "source": "Do not close the door.",
+    "translation": "Não feche a porta.",
+    "seconds": 0.198
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "pt",
+    "source": "I did not hear what you said.",
+    "translation": "Não ouvi o que disseste.",
+    "seconds": 0.259
+  },
+  {
+    "model": "nllb-200-distilled-600M",
+    "target": "pt",
+    "source": "The store closes at nine tonight.",
+    "translation": "A loja fecha às nove da noite.",
+    "seconds": 0.279
+  }
+]

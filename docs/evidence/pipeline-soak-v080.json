@@ -1,0 +1,398 @@
+[
+  {
+    "cycle": 1,
+    "elapsed": 129.8,
+    "counts": {
+      "complete": 48,
+      "preview": 476,
+      "redraw": 124
+    },
+    "post_stop_rss_mb": 741.7,
+    "samples": [
+      {
+        "seconds": 0.0,
+        "rss_mb": 132.4,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 10.0,
+        "rss_mb": 1436.7,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 20.0,
+        "rss_mb": 1439.6,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 30.0,
+        "rss_mb": 1439.7,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 40.0,
+        "rss_mb": 1448.3,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 50.0,
+        "rss_mb": 1446.9,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 60.0,
+        "rss_mb": 1448.3,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 70.0,
+        "rss_mb": 1448.4,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 80.0,
+        "rss_mb": 1446.9,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 90.0,
+        "rss_mb": 1447.0,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 100.0,
+        "rss_mb": 1448.5,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 110.0,
+        "rss_mb": 1447.0,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 120.0,
+        "rss_mb": 1448.5,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      }
+    ],
+    "recent": [
+      [
+        "Watch the right side.",
+        "오른쪽으로 조심해"
+      ],
+      [
+        "Wait a second, I am healing.",
+        "잠깐만요, 내가 치유되고 있어요."
+      ],
+      [
+        "We need to defend the entrance together",
+        "우리는 함께 입구를 방어해야 합니다"
+      ],
+      [
+        "They are pushing our base. Watch the right side. Wait a second.",
+        "그들은 우리 기지를 밀어내고 있습니다. 오른쪽 쪽을 조심하세요. 잠깐만."
+      ],
+      [
+        "I am healing",
+        "난 치유되고 있어"
+      ],
+      [
+        "We need to defend the entrance together",
+        "우리는 함께 입구를 방어해야 합니다"
+      ],
+      [
+        "They are pushing our base",
+        "그들은 우리의 기지를 밀어내고 있습니다."
+      ],
+      [
+        "Watch the right side.",
+        "오른쪽으로 조심해"
+      ],
+      [
+        "Wait a second, I am healing.",
+        "잠깐만요, 내가 치유되고 있어요."
+      ],
+      [
+        "We need to defend the entrance together",
+        "우리는 함께 입구를 방어해야 합니다"
+      ]
+    ]
+  },
+  {
+    "cycle": 2,
+    "elapsed": 129.7,
+    "counts": {
+      "complete": 48,
+      "preview": 478,
+      "redraw": 126
+    },
+    "post_stop_rss_mb": 742.8,
+    "samples": [
+      {
+        "seconds": 0.0,
+        "rss_mb": 742.5,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 10.0,
+        "rss_mb": 1444.3,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 20.0,
+        "rss_mb": 1446.7,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 30.0,
+        "rss_mb": 1444.3,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 40.0,
+        "rss_mb": 1451.8,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 50.0,
+        "rss_mb": 1450.3,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 60.0,
+        "rss_mb": 1450.3,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 70.0,
+        "rss_mb": 1451.9,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 80.0,
+        "rss_mb": 1451.9,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 90.0,
+        "rss_mb": 1450.5,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 100.0,
+        "rss_mb": 1450.5,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 110.0,
+        "rss_mb": 1450.6,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 120.0,
+        "rss_mb": 1452.1,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      }
+    ],
+    "recent": [
+      [
+        "Watch the right side.",
+        "오른쪽으로 조심해"
+      ],
+      [
+        "Wait a second, I am healing.",
+        "잠깐만요, 내가 치유되고 있어요."
+      ],
+      [
+        "We need to defend the entrance together",
+        "우리는 함께 입구를 방어해야 합니다"
+      ],
+      [
+        "They are pushing our base. Watch the right side. Wait a second.",
+        "그들은 우리 기지를 밀어내고 있습니다. 오른쪽 쪽을 조심하세요. 잠깐만."
+      ],
+      [
+        "I am healing",
+        "난 치유되고 있어"
+      ],
+      [
+        "We need to defend the entrance together",
+        "우리는 함께 입구를 방어해야 합니다"
+      ],
+      [
+        "They are pushing our base",
+        "그들은 우리의 기지를 밀어내고 있습니다."
+      ],
+      [
+        "Watch the right side.",
+        "오른쪽으로 조심해"
+      ],
+      [
+        "Wait a second, I am healing.",
+        "잠깐만요, 내가 치유되고 있어요."
+      ],
+      [
+        "We need to defend the entrance together",
+        "우리는 함께 입구를 방어해야 합니다"
+      ]
+    ]
+  },
+  {
+    "cycle": 3,
+    "elapsed": 129.7,
+    "counts": {
+      "complete": 48,
+      "preview": 478,
+      "redraw": 124
+    },
+    "post_stop_rss_mb": 749.2,
+    "samples": [
+      {
+        "seconds": 0.0,
+        "rss_mb": 743.5,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 10.0,
+        "rss_mb": 1445.2,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 20.0,
+        "rss_mb": 1444.9,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 30.0,
+        "rss_mb": 1446.3,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 40.0,
+        "rss_mb": 1453.9,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 50.0,
+        "rss_mb": 1452.4,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 60.0,
+        "rss_mb": 1452.4,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 70.0,
+        "rss_mb": 1453.9,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 80.0,
+        "rss_mb": 1452.4,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 90.0,
+        "rss_mb": 1452.4,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 100.0,
+        "rss_mb": 1453.9,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 110.0,
+        "rss_mb": 1452.5,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      },
+      {
+        "seconds": 120.0,
+        "rss_mb": 1454.0,
+        "audio_waiting": 0,
+        "translation_waiting": 0
+      }
+    ],
+    "recent": [
+      [
+        "Watch the right side.",
+        "오른쪽으로 조심해"
+      ],
+      [
+        "Wait a second, I am healing.",
+        "잠깐만요, 내가 치유되고 있어요."
+      ],
+      [
+        "We need to defend the entrance together",
+        "우리는 함께 입구를 방어해야 합니다"
+      ],
+      [
+        "They are pushing our base. Watch the right side. Wait a second.",
+        "그들은 우리 기지를 밀어내고 있습니다. 오른쪽 쪽을 조심하세요. 잠깐만."
+      ],
+      [
+        "I am healing.",
+        "나는 치유되고 있습니다."
+      ],
+      [
+        "We need to defend the entrance together",
+        "우리는 함께 입구를 방어해야 합니다"
+      ],
+      [
+        "They are pushing our base",
+        "그들은 우리의 기지를 밀어내고 있습니다."
+      ],
+      [
+        "Watch the right side.",
+        "오른쪽으로 조심해"
+      ],
+      [
+        "Wait a second, I am healing.",
+        "잠깐만요, 내가 치유되고 있어요."
+      ],
+      [
+        "We need to defend the entrance together",
+        "우리는 함께 입구를 방어해야 합니다"
+      ]
+    ]
+  }
+]

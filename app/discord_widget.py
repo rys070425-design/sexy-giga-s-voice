@@ -59,12 +59,23 @@ CONNECTION_SCRIPT = r"""(() => {
 AUTO_CHANNEL_SCRIPT = r"""(() => {
   const rpc=window.rpc;
   if (!rpc) return;
-  if (!rpc.connected) { rpc.connect(); return; }
-  if (!rpc.authenticated) return;
   const state=window.__uvkrSelectedChannel ||= {pending:false,last:0,guild:'',channel:'',empty:false,error:null};
   const now=Date.now();
+  if (!rpc.connected) {
+    state.guild='';state.channel='';state.empty=false;state.pending=false;
+    state.serial=(state.serial||0)+1;
+    if(state.lastConnect===undefined || now-state.lastConnect>=5000) {
+      state.lastConnect=now;
+      try { const attempt=rpc.connect(); if(attempt?.catch)attempt.catch(()=>{}); } catch (_) {}
+    }
+    return;
+  }
+  if (!rpc.authenticated) {
+    state.guild='';state.channel='';state.empty=false;state.pending=false;
+    state.serial=(state.serial||0)+1;return;
+  }
   if (state.pending && now-state.last<5000) return;
-  if (now-state.last<1000) return;
+  if (now-state.last<(state.error?10000:1000)) return;
   state.pending=true;state.last=now;state.serial=(state.serial||0)+1;
   const serial=state.serial;
   rpc.request('GET_SELECTED_VOICE_CHANNEL',{}).then(data=>{

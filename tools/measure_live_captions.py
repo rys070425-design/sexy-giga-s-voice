@@ -1,13 +1,20 @@
 """Feed owned speech fixtures in real time; measure actual visible updates.
 
-Usage: installed-python measure_live_captions.py INSTALL_ROOT FIXTURES REPORT.json
+Usage: installed-python measure_live_captions.py INSTALL_ROOT FIXTURES REPORT.json [--device cpu|cuda]
 Model warmup precedes the timing origin. No microphone or account is used.
 """
-import os,sys,time,types,json
+import os,sys,time,types,json,argparse
 from pathlib import Path
 import numpy as np
 from scipy.signal import resample_poly
-runtime,fixtures,report=map(lambda value:Path(value).resolve(),sys.argv[1:4])
+parser=argparse.ArgumentParser()
+parser.add_argument('runtime',type=Path)
+parser.add_argument('fixtures',type=Path)
+parser.add_argument('report',type=Path)
+parser.add_argument('--device',choices=('cpu','cuda'),default='cuda')
+args=parser.parse_args()
+runtime,fixtures,report=(path.resolve() for path in (args.runtime,args.fixtures,args.report))
+device=args.device
 sys.path.insert(0,str(runtime))
 from runtime_config import configure
 configure()
@@ -30,7 +37,8 @@ QFontDatabase.addApplicationFont('C:/Windows/Fonts/malgun.ttf')
 app.setStyleSheet(STYLESHEET)
 overlay=SubtitleOverlay()
 display_profile=dict(font=26,background_opacity=42,show_original=False,overlay=True)
-model=WhisperModel(str(runtime/'models'/'large-v3-turbo'),device='cuda',compute_type='int8_float16',cpu_threads=4)
+model=WhisperModel(str(runtime/'models'/'large-v3-turbo'),device=device,
+                   compute_type='int8_float16' if device=='cuda' else 'int8',cpu_threads=4)
 segments,_=model.transcribe(np.zeros(16000,np.float32),language='en',beam_size=1)
 list(segments)
 results=[]
@@ -48,7 +56,7 @@ for language,mode,target,kind in [('en','en','ko','normal'),('en','auto','ko','n
         overlay.grab()  # Complete actual offscreen Qt layout and paint.
         visible.append(dict(seconds=round(time.monotonic()-origin[0],3),
                             decision_seconds=round(presentation.changed_at-origin[0],3),text=presentation.current.text))
-    def load(self):self.resolved_device='cuda';return model
+    def load(self):self.resolved_device=device;return model
     service._load_model=types.MethodType(load,service)
     def update(event):
         now=time.monotonic();events.append(dict(seconds=round(now-origin[0],3),text=event.translated,final=event.final,complete=event.complete))
@@ -58,7 +66,7 @@ for language,mode,target,kind in [('en','en','ko','normal'),('en','auto','ko','n
     def capture(self,stop):
         try:
             assert self.ready.wait(30) and self.translator_ready.wait(30)
-            origin.append(time.monotonic());segmenter=Segmenter(1)
+            origin.append(time.monotonic());segmenter=Segmenter(1,.4 if device=='cuda' else 1.2)
             signal=np.r_[audio,np.zeros(16000,np.float32)]
             for offset in range(0,len(signal),800):
                 delay=origin[0]+(offset+800)/16000-time.monotonic()
@@ -73,15 +81,18 @@ for language,mode,target,kind in [('en','en','ko','normal'),('en','auto','ko','n
         except Exception as exc:errors.append(str(exc));stop.set()
         finally:self._worker_finished(stop)
     service._capture=types.MethodType(capture,service)
-    service.start(dict(model='large-v3-turbo',device='cuda',language=mode,target_language=target,
+    service.start(dict(model='large-v3-turbo',device=device,language=mode,target_language=target,
                        beam_size=5,translation_context='general'),{})
-    deadline=time.monotonic()+45
+    deadline=time.monotonic()+(120 if device=='cpu' else 45)
     while service.running and time.monotonic()<deadline:
         app.processEvents()
         if origin and presentation.advance():render()
         time.sleep(.005)
     app.processEvents()
     assert not service.running and not errors,errors
+    for thread in service.threads:
+        thread.join(2)
+        assert not thread.is_alive(),thread.name
     assert visible and any(event['final'] and event['complete'] for event in events),events
     gaps=[round(b['seconds']-a['seconds'],3) for a,b in zip(visible,visible[1:])]
     # Late corrections to the retained line do not change current text and are
@@ -90,7 +101,7 @@ for language,mode,target,kind in [('en','en','ko','normal'),('en','auto','ko','n
     # Cold paint can take longer than later paints. Completion timestamps
     # therefore differ slightly from the guaranteed display-decision pacing.
     assert all(gap>=.79 for gap in decisions),decisions
-    row=dict(language=language,mode=mode,target=target,kind=kind,first_visible=visible[0]['seconds'],
+    row=dict(device=device,language=language,mode=mode,target=target,kind=kind,first_visible=visible[0]['seconds'],
              visible_updates=len(visible),minimum_update_gap=min(gaps) if gaps else None,
              minimum_decision_gap=min(decisions) if decisions else None,
              visible=visible,events=events)

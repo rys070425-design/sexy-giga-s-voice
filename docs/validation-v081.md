@@ -21,6 +21,22 @@
 
 이번 버전은 음성 인식 모델이나 자막 표시 간격을 바꾸지 않았습니다. 0.8의 첫 자막 렌더링 측정값 0.781~1.250초는 같은 PC의 합성 입력 7개 조건에서 얻은 첫 초안 기준이며, 실제 모든 통화의 1.4초 보장은 아닙니다. 실제 Discord 계정 승인과 통화방 이동, 사용자의 Chrome/Edge 확장 설치는 아직 사용자 환경에서 확인해야 합니다.
 
+### CPU 모드는 별도 측정
+
+Intel Core i7-13700H에서 GPU를 끄고 Whisper large-v3-turbo CPU int8 / 인식 4스레드 / NLLB CPU int8로 같은 7개 합성 입력 조건을 실제 시간으로 공급했습니다. CPU의 실제 앱 설정과 같은 1.2초 초안 간격을 적용했고, 모델 준비 이후부터 Qt offscreen 렌더링 완료까지 측정했습니다.
+
+| 입력 / 표시 | CPU 첫 표시 |
+|---|---:|
+| 영어 고정 → 한국어 | 7.625초 |
+| 영어 자동 감지 → 한국어 | 13.656초 |
+| 한국어 고정 → 한국어 | 7.391초 |
+| 한국어 자동 감지 → 한국어 | 13.438초 |
+| 영어 1.25배속 → 한국어 | 7.641초 |
+| 영어 + 10dB 잡음 → 한국어 | 7.891초 |
+| 영어 → 영어 원문 자막 | 7.391초 |
+
+**이 큰 모델의 CPU 모드는 실시간 대화용 1.4초 목표를 달성하지 못했습니다.** 7개 조건 모두 결과와 정상 작업 종료는 확인했지만, 이 CPU 설정에서는 GPU처럼 빠르게 사용할 수 없습니다. 자동 언어 감지는 고정 언어보다 더 느렸습니다. 현재 PC에서는 NVIDIA GPU 우선과 주 사용 언어 고정을 권장합니다. 더 작은 모델 옵션은 남겨 두었으나 이번 CPU 비교에서 품질·속도를 측정한 것은 아닙니다. 속도 수치를 맞추려고 기본 인식 모델을 자동으로 낮추거나 긴 문맥을 잘라 정확도를 희생하는 변경은 하지 않았습니다. 원시 측정 기록은 `docs/evidence/readable-latency-v081-cpu.json`입니다. 각 조건 1회이며 모든 PC의 CPU 성능을 대표하지 않습니다.
+
 ## 설치와 사용
 
 1. 기존 앱과 설치 프로그램을 닫고 0.8.1 설치 파일을 실행합니다. 기존 설치가 없어도 사용할 수 있으며 최초 준비에는 인터넷과 수 GB의 여유 공간이 필요합니다.
@@ -31,4 +47,7 @@
 
 For English listeners: select English under Speech, select your caption language, and press Start. English, Korean, Spanish, French, German, Japanese, Chinese, and Portuguese caption options are available. Most settings remain in Korean.
 
+[English quick start and Korean label guide](quickstart-en.md)
+
 음성 인식은 **Whisper large-v3-turbo / faster-whisper**, 번역은 **NLLB-200 distilled 600M CPU int8**입니다. 유료 API 없이 PC에서 실행하며 NLLB는 **CC-BY-NC-4.0 비상업용**입니다. 개인 사용은 무료지만 상업용 무제한 라이선스는 아닙니다. [모델 출처와 라이선스](third-party.md)를 확인하세요.
+

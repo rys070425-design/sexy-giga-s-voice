@@ -18,6 +18,7 @@ Windows PC에서 Discord 등의 출력 소리를 받아 자막으로 보여 주�
 - 기본 번역에 쓰지 않는 Argos·Torch·Stanza 등의 중복 설치를 제거했습니다. 같은 PC의 새 설치 가상환경은 모델 파일을 제외하고 약 849MiB 작아졌습니다. 기존 언어 팩은 삭제하지 않습니다.
 - 사이트 이름 연결 코드를 가려 표시하고 복사 버튼으로 연결합니다.
 - 해당 구성요소가 없는 새 설치에서 91개 회귀 검사와 실제 GPU 인식·NLLB 번역·화면 검사를 통과했습니다.
+- 별도 i7-13700H CPU 시험은 첫 초안 7.4~13.7초로 1.4초 목표를 달성하지 못했습니다. 실시간 대화에는 NVIDIA GPU 우선과 음성 언어 고정을 권장합니다.
 
 [0.8.1 설치·사용·검증 안내](docs/validation-v081.md)
 
@@ -32,6 +33,8 @@ Windows PC에서 Discord 등의 출력 소리를 받아 자막으로 보여 주�
 [0.8 사용법·측정 결과·모델 비교와 남은 한계](docs/validation-v080.md)
 
 For English listeners: choose your playback device, select English under Speech, choose a caption language, and press Start. Setup includes a shared offline translation model. The translation model is for noncommercial use. Most settings are still written in Korean.
+
+[English quick start and Korean label guide](docs/quickstart-en.md)
 
 ## 0.7에서 바뀐 점
 

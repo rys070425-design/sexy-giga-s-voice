@@ -1,0 +1,22 @@
+[
+  {
+    "case": "korean1",
+    "audio_seconds": 43.15,
+    "wer": 0.1739,
+    "final_segments": 11,
+    "translated_drafts": 77,
+    "first_display_decision": 2.516,
+    "queue_overflow": 0,
+    "clean_shutdown": true
+  },
+  {
+    "case": "spanish1",
+    "audio_seconds": 33.65,
+    "wer": 0.0435,
+    "final_segments": 7,
+    "translated_drafts": 73,
+    "first_display_decision": 1.344,
+    "queue_overflow": 0,
+    "clean_shutdown": true
+  }
+]

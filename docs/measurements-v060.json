@@ -1,0 +1,174 @@
+{
+  "unit_tests_passed": 50,
+  "unit_tests": 50,
+  "fresh_installer_verified": true,
+  "accent": [
+    {
+      "version": "0.5.2",
+      "sample": "korean1",
+      "clips": 11,
+      "WER": 0.1739
+    },
+    {
+      "version": "0.6",
+      "sample": "korean1",
+      "clips": 11,
+      "WER": 0.1739
+    },
+    {
+      "version": "0.5.2",
+      "sample": "spanish1",
+      "clips": 7,
+      "WER": 0.0435
+    },
+    {
+      "version": "0.6",
+      "sample": "spanish1",
+      "clips": 7,
+      "WER": 0.0435
+    }
+  ],
+  "latency": [
+    {
+      "language": "ko",
+      "language_mode": "ko",
+      "first_original": 0.859,
+      "first_korean": 0.859
+    },
+    {
+      "language": "ko",
+      "language_mode": "auto",
+      "first_original": 1.109,
+      "first_korean": 1.109
+    },
+    {
+      "language": "en",
+      "language_mode": "en",
+      "first_original": 0.828,
+      "first_korean": 0.875
+    },
+    {
+      "language": "en",
+      "language_mode": "auto",
+      "first_original": 1.094,
+      "first_korean": 1.11
+    }
+  ],
+  "quality": [
+    {
+      "version": "0.5.2",
+      "language": "ko",
+      "case": "normal",
+      "clips": 4,
+      "error_rate": 0.0
+    },
+    {
+      "version": "0.6",
+      "language": "ko",
+      "case": "normal",
+      "clips": 4,
+      "error_rate": 0.0
+    },
+    {
+      "version": "0.5.2",
+      "language": "ko",
+      "case": "quiet",
+      "clips": 4,
+      "error_rate": 0.0
+    },
+    {
+      "version": "0.6",
+      "language": "ko",
+      "case": "quiet",
+      "clips": 4,
+      "error_rate": 0.0
+    },
+    {
+      "version": "0.5.2",
+      "language": "ko",
+      "case": "fast",
+      "clips": 2,
+      "error_rate": 0.0
+    },
+    {
+      "version": "0.6",
+      "language": "ko",
+      "case": "fast",
+      "clips": 2,
+      "error_rate": 0.0
+    },
+    {
+      "version": "0.5.2",
+      "language": "ko",
+      "case": "muffled-fast-noisy",
+      "clips": 4,
+      "error_rate": 0.1702
+    },
+    {
+      "version": "0.6",
+      "language": "ko",
+      "case": "muffled-fast-noisy",
+      "clips": 4,
+      "error_rate": 0.1702
+    },
+    {
+      "version": "0.5.2",
+      "language": "en",
+      "case": "normal",
+      "clips": 4,
+      "error_rate": 0.0
+    },
+    {
+      "version": "0.6",
+      "language": "en",
+      "case": "normal",
+      "clips": 4,
+      "error_rate": 0.0
+    },
+    {
+      "version": "0.5.2",
+      "language": "en",
+      "case": "quiet",
+      "clips": 4,
+      "error_rate": 0.0
+    },
+    {
+      "version": "0.6",
+      "language": "en",
+      "case": "quiet",
+      "clips": 4,
+      "error_rate": 0.0
+    },
+    {
+      "version": "0.5.2",
+      "language": "en",
+      "case": "fast",
+      "clips": 2,
+      "error_rate": 0.0
+    },
+    {
+      "version": "0.6",
+      "language": "en",
+      "case": "fast",
+      "clips": 2,
+      "error_rate": 0.0
+    },
+    {
+      "version": "0.5.2",
+      "language": "en",
+      "case": "muffled-fast-noisy",
+      "clips": 4,
+      "error_rate": 0.0
+    },
+    {
+      "version": "0.6",
+      "language": "en",
+      "case": "muffled-fast-noisy",
+      "clips": 4,
+      "error_rate": 0.0
+    }
+  ],
+  "model": "large-v3-turbo",
+  "hardware": "RTX 4050 Laptop 6 GB",
+  "date": "2026-10-17"
+}

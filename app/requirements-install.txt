@@ -1,0 +1,11 @@
+PySide6==6.12.0
+numpy==2.4.6
+scipy==1.17.1
+soundcard==0.4.6
+faster-whisper==1.2.1
+ctranslate2==4.8.3
+argostranslate==1.11.0
+webrtcvad-wheels==2.0.14.post1
+psutil==7.2.2
+PyJWT[crypto]==2.15.1
+keyring==25.7.0

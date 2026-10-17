@@ -1,0 +1,66 @@
+[
+  {
+    "pause_ms": 480,
+    "long_pause_ms": 160,
+    "case": "korean1",
+    "clips": 11,
+    "wer": 0.1739,
+    "compute_seconds": 4.012
+  },
+  {
+    "pause_ms": 480,
+    "long_pause_ms": 160,
+    "case": "spanish1",
+    "clips": 7,
+    "wer": 0.0435,
+    "compute_seconds": 2.433
+  },
+  {
+    "pause_ms": 640,
+    "long_pause_ms": 320,
+    "case": "korean1",
+    "clips": 10,
+    "wer": 0.1449,
+    "compute_seconds": 3.038
+  },
+  {
+    "pause_ms": 640,
+    "long_pause_ms": 320,
+    "case": "spanish1",
+    "clips": 6,
+    "wer": 0.087,
+    "compute_seconds": 2.099
+  },
+  {
+    "pause_ms": 800,
+    "long_pause_ms": 400,
+    "case": "korean1",
+    "clips": 8,
+    "wer": 0.1014,
+    "compute_seconds": 2.484
+  },
+  {
+    "pause_ms": 800,
+    "long_pause_ms": 400,
+    "case": "spanish1",
+    "clips": 5,
+    "wer": 0.0435,
+    "compute_seconds": 1.82
+  },
+  {
+    "pause_ms": 1000,
+    "long_pause_ms": 600,
+    "case": "korean1",
+    "clips": 7,
+    "wer": 0.1159,
+    "compute_seconds": 2.44
+  },
+  {
+    "pause_ms": 1000,
+    "long_pause_ms": 600,
+    "case": "spanish1",
+    "clips": 5,
+    "wer": 0.0435,
+    "compute_seconds": 1.814
+  }
+]

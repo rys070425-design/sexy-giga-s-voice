@@ -1,0 +1,26 @@
+[
+  {
+    "kind": "normal",
+    "preserve_context": false,
+    "wer": 0.0,
+    "clips": 4
+  },
+  {
+    "kind": "normal",
+    "preserve_context": true,
+    "wer": 0.0,
+    "clips": 3
+  },
+  {
+    "kind": "muffled_fast_15dB",
+    "preserve_context": false,
+    "wer": 0.0333,
+    "clips": 4
+  },
+  {
+    "kind": "muffled_fast_15dB",
+    "preserve_context": true,
+    "wer": 0.0333,
+    "clips": 2
+  }
+]

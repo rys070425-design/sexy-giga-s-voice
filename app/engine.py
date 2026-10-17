@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 from scipy.signal import resample_poly
 from PySide6.QtCore import QObject, Signal
-from speech_quality import SAMPLE_RATE, FRAME, Segmenter, AudioClip, decoder_options, transcript_parts
+from speech_quality import SAMPLE_RATE, FRAME, Segmenter, AudioClip, decoder_options, transcript_parts, make_segmenter
 from speaker_labels import SpeakerTimeline, group_words
 from live_captions import LatestSlot, CaptionUpdate
 from audio_sources import SourceTracker
@@ -102,7 +102,7 @@ class VoiceService(QObject):
                                          self.profile.get('audio_id', ''), sc.default_speaker())
             self.status.emit(f'출력 소리 수집 중: {mic.name}')
             interval = 0.4 if self.resolved_device == 'cuda' else 1.2
-            segmenter = Segmenter(self.profile.get('vad', 1), interval)
+            segmenter = make_segmenter(self.profile, interval)
             with mic.recorder(samplerate=48000, channels=2, blocksize=2400) as recorder:
                 origin = None
                 while not current_stop.is_set():

@@ -1,0 +1,28 @@
+[
+  {
+    "app_version": "0.8.2",
+    "model": "large-v3-turbo",
+    "device": "cuda",
+    "case": "korean1",
+    "audio_seconds": 43.15,
+    "wer": 0.1014,
+    "final_segments": 7,
+    "translated_drafts": 76,
+    "first_display_decision": 2.453,
+    "queue_overflow": 0,
+    "clean_shutdown": true
+  },
+  {
+    "app_version": "0.8.2",
+    "model": "large-v3-turbo",
+    "device": "cuda",
+    "case": "spanish1",
+    "audio_seconds": 33.65,
+    "wer": 0.0435,
+    "final_segments": 5,
+    "translated_drafts": 73,
+    "first_display_decision": 1.313,
+    "queue_overflow": 0,
+    "clean_shutdown": true
+  }
+]

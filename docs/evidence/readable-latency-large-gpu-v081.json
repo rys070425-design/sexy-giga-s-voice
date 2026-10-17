@@ -1,0 +1,806 @@
+[
+  {
+    "model": "large-v3",
+    "device": "cuda",
+    "language": "en",
+    "mode": "en",
+    "target": "ko",
+    "kind": "normal",
+    "first_visible": 1.063,
+    "visible_updates": 4,
+    "minimum_update_gap": 0.781,
+    "minimum_decision_gap": 0.812,
+    "visible": [
+      {
+        "seconds": 1.063,
+        "decision_seconds": 1.031,
+        "text": "그들은"
+      },
+      {
+        "seconds": 1.844,
+        "decision_seconds": 1.844,
+        "text": "그들은 우리의"
+      },
+      {
+        "seconds": 2.656,
+        "decision_seconds": 2.656,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다."
+      },
+      {
+        "seconds": 3.563,
+        "decision_seconds": 3.547,
+        "text": "오른쪽을 조심해"
+      }
+    ],
+    "events": [
+      {
+        "seconds": 0.891,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.031,
+        "text": "그들은",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 1.297,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.438,
+        "text": "그들은 우리의",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 1.766,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 2.063,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 2.203,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 2.469,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 2.969,
+        "text": "",
+        "final": true,
+        "complete": false
+      },
+      {
+        "seconds": 2.969,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": true,
+        "complete": true
+      },
+      {
+        "seconds": 3.406,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 3.547,
+        "text": "오른쪽을 조심해",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 4.125,
+        "text": "",
+        "final": true,
+        "complete": false
+      },
+      {
+        "seconds": 4.266,
+        "text": "오른쪽으로 조심해",
+        "final": true,
+        "complete": true
+      }
+    ]
+  },
+  {
+    "model": "large-v3",
+    "device": "cuda",
+    "language": "en",
+    "mode": "auto",
+    "target": "ko",
+    "kind": "normal",
+    "first_visible": 1.266,
+    "visible_updates": 4,
+    "minimum_update_gap": 0.812,
+    "minimum_decision_gap": 0.812,
+    "visible": [
+      {
+        "seconds": 1.266,
+        "decision_seconds": 1.266,
+        "text": "그들은"
+      },
+      {
+        "seconds": 2.078,
+        "decision_seconds": 2.078,
+        "text": "그들은 우리의"
+      },
+      {
+        "seconds": 2.891,
+        "decision_seconds": 2.891,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다."
+      },
+      {
+        "seconds": 4.297,
+        "decision_seconds": 4.297,
+        "text": "오른쪽을 조심해"
+      }
+    ],
+    "events": [
+      {
+        "seconds": 1.156,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.266,
+        "text": "그들은",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 1.875,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.985,
+        "text": "그들은 우리의",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 2.594,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 2.875,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 3.391,
+        "text": "",
+        "final": true,
+        "complete": false
+      },
+      {
+        "seconds": 3.688,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": true,
+        "complete": true
+      },
+      {
+        "seconds": 4.141,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 4.297,
+        "text": "오른쪽을 조심해",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 4.922,
+        "text": "",
+        "final": true,
+        "complete": false
+      },
+      {
+        "seconds": 5.063,
+        "text": "오른쪽으로 조심해",
+        "final": true,
+        "complete": true
+      }
+    ]
+  },
+  {
+    "model": "large-v3",
+    "device": "cuda",
+    "language": "ko",
+    "mode": "ko",
+    "target": "ko",
+    "kind": "normal",
+    "first_visible": 0.86,
+    "visible_updates": 4,
+    "minimum_update_gap": 0.812,
+    "minimum_decision_gap": 0.812,
+    "visible": [
+      {
+        "seconds": 0.86,
+        "decision_seconds": 0.86,
+        "text": "적들이"
+      },
+      {
+        "seconds": 1.672,
+        "decision_seconds": 1.672,
+        "text": "적들이 우리"
+      },
+      {
+        "seconds": 2.485,
+        "decision_seconds": 2.485,
+        "text": "적들이 우리 기지로 밀고"
+      },
+      {
+        "seconds": 3.297,
+        "decision_seconds": 3.297,
+        "text": "적들이 우리 기지로 밀고 들어오고 있어요."
+      }
+    ],
+    "events": [
+      {
+        "seconds": 0.86,
+        "text": "적들이",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 0.907,
+        "text": "적들이",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 1.297,
+        "text": "적들이 우리",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.297,
+        "text": "적들이 우리",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 1.735,
+        "text": "적들이 우리 기지로",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.75,
+        "text": "적들이 우리 기지로",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 2.188,
+        "text": "적들이 우리 기지로 밀고",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 2.188,
+        "text": "적들이 우리 기지로 밀고",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 2.719,
+        "text": "적들이 우리 기지로 밀고 들어오고 있습니다.",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 2.75,
+        "text": "적들이 우리 기지로 밀고 들어오고 있습니다.",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 3.266,
+        "text": "적들이 우리 기지로 밀고 들어오고 있어요.",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 3.313,
+        "text": "적들이 우리 기지로 밀고 들어오고 있어요.",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 3.86,
+        "text": "적들이 우리 기지로 밀고 들어오고 있어요.",
+        "final": true,
+        "complete": false
+      },
+      {
+        "seconds": 3.86,
+        "text": "적들이 우리 기지로 밀고 들어오고 있어요.",
+        "final": true,
+        "complete": true
+      }
+    ]
+  },
+  {
+    "model": "large-v3",
+    "device": "cuda",
+    "language": "ko",
+    "mode": "auto",
+    "target": "ko",
+    "kind": "normal",
+    "first_visible": 1.141,
+    "visible_updates": 4,
+    "minimum_update_gap": 0.812,
+    "minimum_decision_gap": 0.812,
+    "visible": [
+      {
+        "seconds": 1.141,
+        "decision_seconds": 1.141,
+        "text": "적들이"
+      },
+      {
+        "seconds": 1.953,
+        "decision_seconds": 1.953,
+        "text": "적들이 우리"
+      },
+      {
+        "seconds": 2.766,
+        "decision_seconds": 2.766,
+        "text": "적들이 우리 기지로 밀고"
+      },
+      {
+        "seconds": 3.578,
+        "decision_seconds": 3.578,
+        "text": "적들이 우리 기지로 밀고 들어오고 있어요."
+      }
+    ],
+    "events": [
+      {
+        "seconds": 1.141,
+        "text": "적들이",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.157,
+        "text": "적들이",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 1.813,
+        "text": "적들이 우리",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.813,
+        "text": "적들이 우리",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 2.547,
+        "text": "적들이 우리 기지로 밀고",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 2.578,
+        "text": "적들이 우리 기지로 밀고",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 3.344,
+        "text": "적들이 우리 기지로 밀고 들어오고 있어요.",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 3.375,
+        "text": "적들이 우리 기지로 밀고 들어오고 있어요.",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 4.219,
+        "text": "적들이 우리 기지로 밀고 들어오고 있어요.",
+        "final": true,
+        "complete": false
+      },
+      {
+        "seconds": 4.219,
+        "text": "적들이 우리 기지로 밀고 들어오고 있어요.",
+        "final": true,
+        "complete": true
+      }
+    ]
+  },
+  {
+    "model": "large-v3",
+    "device": "cuda",
+    "language": "en",
+    "mode": "en",
+    "target": "ko",
+    "kind": "fast",
+    "first_visible": 1.078,
+    "visible_updates": 4,
+    "minimum_update_gap": 0.797,
+    "minimum_decision_gap": 0.812,
+    "visible": [
+      {
+        "seconds": 1.078,
+        "decision_seconds": 1.063,
+        "text": "밀고 있어요"
+      },
+      {
+        "seconds": 1.875,
+        "decision_seconds": 1.875,
+        "text": "그들은 우리를 뒤집고 있습니다."
+      },
+      {
+        "seconds": 2.688,
+        "decision_seconds": 2.688,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다."
+      },
+      {
+        "seconds": 3.516,
+        "decision_seconds": 3.5,
+        "text": "권익을 지켜봐"
+      }
+    ],
+    "events": [
+      {
+        "seconds": 0.906,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.063,
+        "text": "밀고 있어요",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 1.36,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.625,
+        "text": "그들은 우리를 뒤집고 있습니다.",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 1.797,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 2.094,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 2.281,
+        "text": "",
+        "final": true,
+        "complete": false
+      },
+      {
+        "seconds": 2.281,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": true,
+        "complete": true
+      },
+      {
+        "seconds": 2.703,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 2.828,
+        "text": "조심해",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 3.094,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 3.281,
+        "text": "권익을 지켜봐",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 3.578,
+        "text": "",
+        "final": true,
+        "complete": false
+      },
+      {
+        "seconds": 3.578,
+        "text": "권익을 지켜봐",
+        "final": true,
+        "complete": true
+      }
+    ]
+  },
+  {
+    "model": "large-v3",
+    "device": "cuda",
+    "language": "en",
+    "mode": "en",
+    "target": "ko",
+    "kind": "noisy",
+    "first_visible": 1.0,
+    "visible_updates": 4,
+    "minimum_update_gap": 0.812,
+    "minimum_decision_gap": 0.812,
+    "visible": [
+      {
+        "seconds": 1.0,
+        "decision_seconds": 1.0,
+        "text": "그들은"
+      },
+      {
+        "seconds": 1.813,
+        "decision_seconds": 1.813,
+        "text": "그들은 계속 추진하고 있습니다."
+      },
+      {
+        "seconds": 2.625,
+        "decision_seconds": 2.625,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다."
+      },
+      {
+        "seconds": 3.531,
+        "decision_seconds": 3.516,
+        "text": "나머지 영상을 보세요."
+      }
+    ],
+    "events": [
+      {
+        "seconds": 0.875,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.0,
+        "text": "그들은",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 1.297,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.5,
+        "text": "그들은 계속 추진하고 있습니다.",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 1.735,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 2.016,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 2.375,
+        "text": "",
+        "final": true,
+        "complete": false
+      },
+      {
+        "seconds": 2.375,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": true,
+        "complete": true
+      },
+      {
+        "seconds": 3.344,
+        "text": "",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 3.516,
+        "text": "나머지 영상을 보세요.",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 4.016,
+        "text": "",
+        "final": true,
+        "complete": false
+      },
+      {
+        "seconds": 4.156,
+        "text": "오른쪽으로 조심해",
+        "final": true,
+        "complete": true
+      }
+    ]
+  },
+  {
+    "model": "large-v3",
+    "device": "cuda",
+    "language": "en",
+    "mode": "en",
+    "target": "en",
+    "kind": "normal",
+    "first_visible": 0.907,
+    "visible_updates": 4,
+    "minimum_update_gap": 0.812,
+    "minimum_decision_gap": 0.812,
+    "visible": [
+      {
+        "seconds": 0.907,
+        "decision_seconds": 0.907,
+        "text": "They are"
+      },
+      {
+        "seconds": 1.719,
+        "decision_seconds": 1.719,
+        "text": "They are pushing our"
+      },
+      {
+        "seconds": 2.532,
+        "decision_seconds": 2.532,
+        "text": "they are pushing our base"
+      },
+      {
+        "seconds": 3.344,
+        "decision_seconds": 3.344,
+        "text": "Watch"
+      }
+    ],
+    "events": [
+      {
+        "seconds": 0.907,
+        "text": "They are",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 0.922,
+        "text": "They are",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 1.313,
+        "text": "They are pushing our",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.313,
+        "text": "They are pushing our",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 1.75,
+        "text": "They are pushing our base.",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 1.782,
+        "text": "They are pushing our base.",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 2.188,
+        "text": "they are pushing our base",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 2.219,
+        "text": "they are pushing our base",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 2.657,
+        "text": "They are pushing our base.",
+        "final": true,
+        "complete": false
+      },
+      {
+        "seconds": 2.657,
+        "text": "They are pushing our base.",
+        "final": true,
+        "complete": true
+      },
+      {
+        "seconds": 3.032,
+        "text": "Watch",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 3.032,
+        "text": "Watch",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 3.454,
+        "text": "Watch the rights.",
+        "final": false,
+        "complete": false
+      },
+      {
+        "seconds": 3.469,
+        "text": "Watch the rights.",
+        "final": false,
+        "complete": true
+      },
+      {
+        "seconds": 4.11,
+        "text": "Watch the right side.",
+        "final": true,
+        "complete": false
+      },
+      {
+        "seconds": 4.11,
+        "text": "Watch the right side.",
+        "final": true,
+        "complete": true
+      }
+    ]
+  }
+]

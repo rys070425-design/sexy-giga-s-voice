@@ -1,17 +1,26 @@
-# Universal Voice KR 0.8.1
+# Universal Voice KR 0.8.2
 
 Windows PC에서 Discord 등의 출력 소리를 받아 자막으로 보여 주는 앱입니다.
 기본 음성 인식과 번역은 PC에서 처리하며 유료 API가 필요하지 않습니다. 기본 번역 모델은 무료 개인·비상업용(CC-BY-NC-4.0)입니다.
 
 ## 설치
 
-[Windows 설치 파일 받기](https://github.com/rys070425-design/sexy-giga-s-voice/raw/refs/heads/main/dist/UniversalVoiceKR_Setup_v081.exe)
+[Windows 설치 파일 받기](https://github.com/rys070425-design/sexy-giga-s-voice/raw/refs/heads/main/dist/UniversalVoiceKR_Setup_v082.exe)
 
 1. 기존 앱과 이전 설치 프로그램을 닫고 설치 파일을 실행합니다.
 2. 기존 0.5 설치를 사용했다면 같은 위치를 선택합니다. 이미 받은 모델과 구성요소를 확인하여 이어서 준비합니다.
 3. 설치가 끝나면 앱에서 Discord의 출력 장치와 주로 사용하는 **음성 언어**를 선택하고 **자막 시작**을 누릅니다.
 
 최초 설치에는 인터넷 연결과 수 GB의 여유 공간이 필요합니다. Whisper large-v3-turbo와 NLLB-200 distilled 600M 번역 모델을 내려받는 온라인 설치 파일입니다. 번역 자료는 약 582MB이며 SHA-256을 확인합니다. 관리자 권한이나 시스템 PATH 변경 없이 사용자 계정에 설치합니다. NVIDIA GPU가 있으면 음성 인식에 GPU를 우선 사용하며 CPU도 선택할 수 있습니다.
+
+## 0.8.2에서 바뀐 점
+
+- 일반 대화의 짧은 머뭇거림을 너무 빨리 문장 끝으로 처리하던 부분을 고쳤습니다. 첫 초안은 계속 먼저 표시하며 게임 대화의 짧은 호출 간격은 유지합니다.
+- 실제 영어 억양 녹음 두 개의 전체 흐름 검사에서 WER는 각각 17.39%→10.14%, 4.35%→4.35%였습니다. 작은 시험이며 번역 정확도나 모든 억양의 보장은 아닙니다.
+- 새 일상 문장과 빠르고 먹먹한 변형 입력에서 오류 증가가 없었고, 새 일반 대화 모드의 GPU 합성 입력 7조건 첫 Qt 렌더링은 0.781~1.250초였습니다. 모든 실제 통화의 1.4초 보장은 아닙니다.
+- 94개 회귀 검사와 실제 설치 파일·GPU 인식·NLLB 번역·화면 검사를 통과했습니다.
+
+[0.8.2 설치·권장 설정·검증](docs/validation-v082.md) · [큰 모델과 작은 CPU 모델을 비교한 이유](docs/model-choice.md)
 
 ## 0.8.1에서 바뀐 점
 

@@ -1,10 +1,31 @@
 import unittest
 import numpy as np
 from live_captions import LatestSlot, DisplayOrder, CaptionUpdate
-from speech_quality import Segmenter, decoder_options
+from speech_quality import Segmenter, decoder_options, make_segmenter
 
 
 class LiveCaptionTests(unittest.TestCase):
+    def test_general_context_keeps_hesitation_without_delaying_first_draft(self):
+        seg=make_segmenter({'translation_context':'general'})
+        seg.vad.is_speech=lambda pcm,rate:pcm!=bytes(len(pcm))
+        self.assertEqual(seg.push(np.full(9600,.2,np.float32)),[])
+        self.assertIsNotNone(seg.preview())
+        self.assertEqual(seg.push(np.zeros(7680,np.float32)),[])
+        self.assertEqual(len(seg.push(np.zeros(5120,np.float32))),1)
+
+    def test_game_short_calls_keep_original_commit_delay(self):
+        seg=make_segmenter({'translation_context':'game'})
+        seg.vad.is_speech=lambda pcm,rate:pcm!=bytes(len(pcm))
+        seg.push(np.full(3200,.2,np.float32))
+        self.assertEqual(len(seg.push(np.zeros(7680,np.float32))),1)
+
+    def test_general_long_turn_waits_through_a_short_pause(self):
+        seg=make_segmenter({'translation_context':'general'})
+        seg.vad.is_speech=lambda pcm,rate:pcm!=bytes(len(pcm))
+        seg.push(np.full(64000,.2,np.float32))
+        self.assertEqual(seg.push(np.zeros(5120,np.float32)),[])
+        self.assertEqual(len(seg.push(np.zeros(1280,np.float32))),1)
+
     def test_user_supplied_vocabulary_is_bounded_and_opt_in(self):
         self.assertNotIn('hotwords',decoder_options({}))
         self.assertEqual(decoder_options({'asr_hotwords':'  민수   아크  '})['hotwords'],'민수 아크')

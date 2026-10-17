@@ -248,7 +248,7 @@ class MainWindow(QMainWindow):
         self.reviewed_translation = ""
         self.review_pin = False  # do not overwrite the phrase under review
         self.plan_result.connect(self.on_plan_result)
-        self.setWindowTitle("Universal Voice KR v0.8.1 · 읽기 편한 실시간 자막")
+        self.setWindowTitle("Universal Voice KR v0.8.2 · 읽기 편한 실시간 자막")
         self.setMinimumSize(960,620)
         screen=QApplication.primaryScreen()
         available=screen.availableGeometry() if screen else None
@@ -300,7 +300,7 @@ class MainWindow(QMainWindow):
         local_note = QLabel('내 PC에서 음성 처리\n대화는 자동 저장되지 않아요')
         local_note.setObjectName('sideNote')
         side.addWidget(local_note)
-        version = QLabel('VERSION 0.8.1')
+        version = QLabel('VERSION 0.8.2')
         version.setObjectName('version')
         side.addWidget(version)
         outer.addWidget(sidebar)
@@ -486,7 +486,7 @@ class MainWindow(QMainWindow):
         self.language = combo(list(LANGUAGES.items()))
         self.live_language.currentIndexChanged.connect(self.language.setCurrentIndex)
         self.language.currentIndexChanged.connect(self.live_language.setCurrentIndex)
-        self.translation_context = combo([('게임 대화 · 기본 호출 표현 보정', 'game'), ('일반 대화', 'general')])
+        self.translation_context = combo([('게임 대화 · 기본 호출 표현 보정', 'game'), ('일반 대화 · 문장 문맥 유지', 'general')])
         self.asr_hotwords = QLineEdit()
         self.asr_hotwords.setMaxLength(200)
         self.asr_hotwords.setPlaceholderText('선택 사항 · 자주 틀리는 닉네임, 지명, 게임 용어')

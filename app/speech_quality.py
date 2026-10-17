@@ -19,7 +19,7 @@ class AudioClip:
 
 class Segmenter:
     """Keep short calls, prefer pauses, and retain context across forced splits."""
-    def __init__(self, level=1, preview_interval=0.4):
+    def __init__(self, level=1, preview_interval=0.4, preserve_context=False):
         import webrtcvad
         self.vad = webrtcvad.Vad(int(level))
         self.pending = np.empty(0, np.float32)
@@ -31,6 +31,7 @@ class Segmenter:
         self.sequence = 0
         self.preview_interval = int(preview_interval * SAMPLE_RATE / FRAME)
         self.last_preview = 0
+        self.pause_frames,self.long_pause_frames=(40,20) if preserve_context else (24,8)
 
     def _complete(self, forced=False):
         result = None
@@ -76,7 +77,7 @@ class Segmenter:
                 self.silence = 0 if voiced else self.silence + 1
             # A preview keeps continuous speech visible without cutting its
             # context. Only commit on a real pause or the original 8 s limit.
-            pause = self.silence >= 24 or (len(self.clip) >= 150 and self.silence >= 8)
+            pause = self.silence >= self.pause_frames or (len(self.clip) >= 150 and self.silence >= self.long_pause_frames)
             forced = len(self.clip) >= 400 and not pause
             if pause or forced:
                 clip = self._complete(forced)
@@ -101,6 +102,11 @@ class Segmenter:
             return []
         clip = self._complete()
         return [clip] if clip is not None else []
+
+
+def make_segmenter(profile,preview_interval=.4):
+    context=profile.get('translation_context','game' if '디스코드' in profile.get('name','') else 'general')
+    return Segmenter(profile.get('vad',1),preview_interval,preserve_context=context=='general')
 
 
 def decoder_options(profile):

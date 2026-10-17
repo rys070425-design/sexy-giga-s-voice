@@ -15,7 +15,7 @@ core.HOME=report.parent/'isolated-soak-state'
 from PySide6.QtCore import QCoreApplication
 from faster_whisper.audio import decode_audio
 from engine import VoiceService
-from speech_quality import Segmenter
+from speech_quality import make_segmenter
 from caption_presentation import ReadableCaptions
 app=QCoreApplication([])
 audio=decode_audio(str(fixtures/'speech-en.wav'))
@@ -35,7 +35,7 @@ for cycle in range(3):
     def capture(self,stop):
         try:
             assert self.ready.wait(30) and self.translator_ready.wait(30)
-            origin.append(time.monotonic());segmenter=Segmenter(1);offset=0;turn=0
+            origin.append(time.monotonic());segmenter=make_segmenter({'vad':1,'translation_context':'general'});offset=0;turn=0
             while offset/16000<seconds and not stop.is_set():
                 speed=[(1,1),(20,23),(4,5)][turn%3]
                 signal=resample_poly(audio,*speed).astype(np.float32)*[1.,.4,.15][turn%3]

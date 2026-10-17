@@ -15,7 +15,7 @@ DEFAULT_PROFILES = [
      "vad": 1, "beam_size": 5, "translation_context": "game", "font": 26, "position": "bottom", "show_original": False,
      "overlay": True, "audio_id": "", "glossary_group": "global", "game_exes": []},
     {"name": "디스코드 · 대화", "model": "large-v3-turbo", "device": "auto", "language": "auto",
-     "vad": 1, "beam_size": 5, "translation_context": "game", "font": 27, "position": "bottom", "show_original": True,
+     "vad": 1, "beam_size": 5, "translation_context": "general", "font": 27, "position": "bottom", "show_original": True,
      "overlay": True, "audio_id": "", "glossary_group": "global", "game_exes": []},
     {"name": "영상 · 일반", "model": "large-v3-turbo", "device": "auto", "language": "auto",
      "vad": 1, "beam_size": 5, "translation_context": "general", "font": 25, "position": "bottom", "show_original": True,

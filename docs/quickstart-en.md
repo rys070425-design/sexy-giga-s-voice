@@ -23,7 +23,7 @@ The app captions sound played by your Windows output device. It can caption Disc
 
 Updates are paced so drafts do not flash on every recognition result. A previous sentence remains briefly visible while a new one arrives. Very long text uses a two-line reading window; the conversation view retains more text. Save is manual and exports retained text only, rather than guaranteeing a complete transcript of a long call. The app does not automatically record audio or save conversations.
 
-For everyday conversation or videos, use the **영상 · 일반** profile or select **일반 대화** under translation context. The game profile includes a small exact-phrase glossary for game calls. You can add actual names and specialist vocabulary under **인식할 이름·용어**; do not paste entire unrelated conversations there.
+For everyday conversation or videos, use the **영상 · 일반** profile or select **일반 대화 · 문장 문맥 유지** under translation context. Version 0.8.2 keeps a little more context across hesitation while still showing drafts before the sentence ends. Final confirmation may arrive later. Newly created **디스코드 · 대화** profiles use this mode; existing saved profiles keep your settings. The game profile includes a small exact-phrase glossary for game calls and retains its shorter commit timing. You can add actual names and specialist vocabulary under **인식할 이름·용어**; do not paste entire unrelated conversations there.
 
 ## Show who or what is playing
 
@@ -33,8 +33,8 @@ For everyday conversation or videos, use the **영상 · 일반** profile or sel
 
 ## Performance and limitations
 
-Use automatic GPU selection or NVIDIA GPU when available. With the large speech model, our i7-13700H CPU test took about 7.4–13.7 seconds to show the first draft across seven synthetic-input conditions after warmup. It did not meet the 1.4-second goal. A fast GPU measurement is not a CPU promise. Smaller speech models are available in profile settings and can lose accuracy; they were not measured in that CPU comparison. Game load, noise, overlapping voices, and accents can affect both delay and recognition.
+Use automatic GPU selection or NVIDIA GPU when available. With large-v3-turbo, our i7-13700H CPU test took about 7.4–13.7 seconds to show the first draft across seven synthetic-input conditions after warmup. Small CPU took about 2.6–6.9 seconds and made slightly more word errors in the two accent samples. Neither met the 1.4-second goal. Those CPU comparisons used the earlier 0.8.1 segmentation. A fast GPU measurement is not a CPU promise. See [model comparisons](model-choice.md). Game load, noise, overlapping voices, and accents can affect both delay and recognition.
 
 Speech recognition uses **Whisper large-v3-turbo / faster-whisper**. Translation uses **NLLB-200 distilled 600M, CPU int8**. No model was retrained for your voice. Translation can still change meanings, including negation or short ambiguous expressions; compare the original when meaning matters.
 
-The default NLLB translation model is licensed **CC-BY-NC-4.0 for noncommercial use**. Free personal use does not grant unrestricted commercial rights. See [third-party notices](third-party.md) and [validation details](validation-v081.md). The optional ChatGPT correction page has its own login and account terms and is not required for default live captions.
+The default NLLB translation model is licensed **CC-BY-NC-4.0 for noncommercial use**. Free personal use does not grant unrestricted commercial rights. See [third-party notices](third-party.md) and [validation details](validation-v082.md). The optional ChatGPT correction page has its own login and account terms and is not required for default live captions.

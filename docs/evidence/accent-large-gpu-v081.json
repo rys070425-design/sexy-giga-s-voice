@@ -1,0 +1,26 @@
+[
+  {
+    "model": "large-v3",
+    "device": "cuda",
+    "case": "korean1",
+    "audio_seconds": 43.15,
+    "wer": 0.1739,
+    "final_segments": 11,
+    "translated_drafts": 59,
+    "first_display_decision": 2.828,
+    "queue_overflow": 0,
+    "clean_shutdown": true
+  },
+  {
+    "model": "large-v3",
+    "device": "cuda",
+    "case": "spanish1",
+    "audio_seconds": 33.65,
+    "wer": 0.1014,
+    "final_segments": 7,
+    "translated_drafts": 51,
+    "first_display_decision": 2.547,
+    "queue_overflow": 0,
+    "clean_shutdown": true
+  }
+]

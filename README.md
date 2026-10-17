@@ -1,17 +1,28 @@
-# Universal Voice KR 0.8.2
+# Universal Voice KR 0.9.0
 
 Windows PC에서 Discord 등의 출력 소리를 받아 자막으로 보여 주는 앱입니다.
 기본 음성 인식과 번역은 PC에서 처리하며 유료 API가 필요하지 않습니다. 기본 번역 모델은 무료 개인·비상업용(CC-BY-NC-4.0)입니다.
 
 ## 설치
 
-[Windows 설치 파일 받기](https://github.com/rys070425-design/sexy-giga-s-voice/raw/refs/heads/main/dist/UniversalVoiceKR_Setup_v082.exe)
+[Windows 설치 파일 받기](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_Setup_v090.exe)
 
 1. 기존 앱과 이전 설치 프로그램을 닫고 설치 파일을 실행합니다.
-2. 기존 0.5 설치를 사용했다면 같은 위치를 선택합니다. 이미 받은 모델과 구성요소를 확인하여 이어서 준비합니다.
-3. 설치가 끝나면 앱에서 Discord의 출력 장치와 주로 사용하는 **음성 언어**를 선택하고 **자막 시작**을 누릅니다.
+2. 영어로 시작하는 설치 창의 **Language**에서 언어를 고릅니다. 한국어를 고르면 안내가 즉시 한국어로 바뀝니다. 기존 설치와 같은 위치를 선택하면 받은 모델과 구성요소를 재사용합니다.
+3. 설치 후 같은 언어가 앱 UI와 자막 언어에 적용됩니다. 재생 출력 장치를 선택하고 **자막 시작**을 누릅니다. 기본적으로 설정한 언어의 말은 자막과 기록에서 제외합니다.
 
 최초 설치에는 인터넷 연결과 수 GB의 여유 공간이 필요합니다. Whisper large-v3-turbo와 NLLB-200 distilled 600M 번역 모델을 내려받는 온라인 설치 파일입니다. 번역 자료는 약 582MB이며 SHA-256을 확인합니다. 관리자 권한이나 시스템 PATH 변경 없이 사용자 계정에 설치합니다. NVIDIA GPU가 있으면 음성 인식에 GPU를 우선 사용하며 CPU도 선택할 수 있습니다.
+
+## 0.9.0에서 바뀐 점
+
+- 설치와 앱의 **Language** 목록을 기존 언어팩 목록의 25개 선택지와 통일했습니다. 브라질 포르투갈어는 포르투갈어 번역 모델과 UI를 공유합니다.
+- 설치 창은 영어로 시작하며 언어 선택 즉시 바뀝니다. 설치 언어를 모든 저장 프로필의 자막 언어로 적용하고 자동 언어 감지와 같은 언어 숨김을 켭니다. 다른 프로필 설정과 용어 사전은 유지합니다.
+- 한국어 설정에서 한국어, 영어 설정에서 영어처럼 같은 언어가 감지되면 텍스트 해독·번역·화면 표시·대화 기록을 건너뜁니다. 늦은 번역이 숨긴 자막을 되살리지 않게 처리합니다. 언어 판별은 여전히 필요하며 모델은 첫 외국어 자막 속도를 위해 준비해 둡니다.
+- 앱에서도 언어를 바로 바꿀 수 있습니다. 실제 자막·닉네임·사이트 이름과 사용자가 입력한 값은 UI 번역으로 바꾸지 않습니다. 원문 자막을 원하면 같은 언어 숨김을 끌 수 있습니다.
+- 한국어 원문 UI와 영어 주요 화면을 검토했습니다. 다른 언어와 일부 보조 문구는 기계 번역이며, 모국어 사용자의 검수나 모든 언어의 음성 정확도를 보장하지 않습니다.
+- 100개 회귀 검사, 설치 창 25개 언어 선택, 실제 EXE 설치, Qt 화면, 한국어·영어 실시간 입력을 검증했습니다. 짧거나 겹치는 말에서는 언어를 잘못 판정할 수 있습니다.
+
+[0.9.0 사용·검증 안내](docs/validation-v090.md) · [English quick start](docs/quickstart-en.md)
 
 ## 0.8.2에서 바뀐 점
 
@@ -41,7 +52,7 @@ Windows PC에서 Discord 등의 출력 소리를 받아 자막으로 보여 주�
 
 [0.8 사용법·측정 결과·모델 비교와 남은 한계](docs/validation-v080.md)
 
-For English listeners: choose your playback device, select English under Speech, choose a caption language, and press Start. Setup includes a shared offline translation model. The translation model is for noncommercial use. Most settings are still written in Korean.
+For English listeners: select your language under **Language**, choose your playback device, and press **Start**. Speech in your caption language is hidden by default. Turn off **Hide speech in my caption language** if you want native-language transcripts. Setup includes a shared local translation model for noncommercial use.
 
 [English quick start and Korean label guide](docs/quickstart-en.md)
 
@@ -75,7 +86,7 @@ For English listeners: choose your playback device, select English under Speech,
 
 ## 정확도를 높이는 설정
 
-주로 한 언어로 대화한다면 자동 감지 대신 해당 **음성 언어**를 선택하세요. 매우 짧은 말의 언어 오인식을 줄이고 매번 언어를 추정하는 비용을 줄일 수 있습니다. 정확한 실제 이름과 용어만 등록하세요. 어려운 발음은 더 큰 `large-v3` 모델을 선택해 비교할 수 있지만 처리량과 메모리 사용이 늘고 첫 선택 시 추가 다운로드가 필요합니다.
+같은 언어 숨김을 켜면 음성 언어는 자동 감지로 동작합니다. 매우 짧은 말에서는 언어를 잘못 알아볼 수 있습니다. 한 외국어만 듣고 인식 언어를 고정하려면 같은 언어 숨김을 먼저 끄고 **음성 언어**를 고르세요. 정확한 실제 이름과 용어만 등록하세요. 어려운 발음은 더 큰 `large-v3` 모델을 선택해 비교할 수 있지만 처리량과 메모리 사용이 늘고 첫 선택 시 추가 다운로드가 필요합니다.
 
 NLLB 번역에도 오역이 남아 있습니다. 음성 인식 정확도와 번역 품질은 별개입니다. 선택 기능인 ChatGPT 문장 보정은 별도 로그인과 계정 이용 조건이 적용되며 실시간 기본 자막에 필수적이지 않습니다.
 

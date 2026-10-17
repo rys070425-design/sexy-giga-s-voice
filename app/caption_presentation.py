@@ -29,9 +29,15 @@ class ReadableCaptions:
         self.changed_at=self.previous_at=float('-inf')
         self.pending_at=0.
         self.repeats=0
+        self.suppressed_revisions={}
+
+    def is_suppressed(self,update):
+        return update.revision<=self.suppressed_revisions.get(update.sequence,-1)
 
     def offer(self, update, label, now=None):
         now=time.monotonic() if now is None else now
+        if update.suppressed:return self.suppress(update)
+        if self.is_suppressed(update):return False
         # Never alternate between a foreign draft and its translation.
         text=update.translated or (update.original if update.language==update.target_language else '')
         if not text.strip():return False
@@ -53,6 +59,15 @@ class ReadableCaptions:
             self.repeats=1
         self.pending=card
         return self.advance(now)
+
+    def suppress(self,update):
+        self.suppressed_revisions[update.sequence]=max(update.revision,self.suppressed_revisions.get(update.sequence,-1))
+        if len(self.suppressed_revisions)>128:
+            del self.suppressed_revisions[min(self.suppressed_revisions)]
+        if not self.order.accept(update):return False
+        changed=bool(self.current or self.previous or self.pending)
+        self.current=self.previous=self.pending=None
+        return changed
 
     def advance(self, now=None):
         now=time.monotonic() if now is None else now

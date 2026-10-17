@@ -4,6 +4,7 @@ import json
 from collections import Counter
 from PySide6.QtCore import QTimer, QUrl, Qt, Signal
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QGroupBox, QCheckBox
+from localized_widgets import QLabel,QLineEdit,QPushButton,QGroupBox,QCheckBox
 from speaker_labels import validate_widget_url, widget_connection_status
 
 CONNECTION_SCRIPT = r"""(() => {

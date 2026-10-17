@@ -14,6 +14,7 @@ parser.add_argument('report',type=Path)
 parser.add_argument('--device',choices=('cpu','cuda'),default='cuda')
 parser.add_argument('--model',default='large-v3-turbo')
 parser.add_argument('--model-dir',type=Path)
+parser.add_argument('--hide-native',action='store_true')
 args=parser.parse_args()
 runtime,fixtures,report=(path.resolve() for path in (args.runtime,args.fixtures,args.report))
 device=args.device
@@ -44,9 +45,11 @@ model=WhisperModel(str(args.model_dir or runtime/'models'/args.model),device=dev
 segments,_=model.transcribe(np.zeros(16000,np.float32),language='en',beam_size=1)
 list(segments)
 results=[]
-for language,mode,target,kind in [('en','en','ko','normal'),('en','auto','ko','normal'),
+cases=[('en','en','ko','normal'),('en','auto','ko','normal'),
         ('ko','ko','ko','normal'),('ko','auto','ko','normal'),
-        ('en','en','ko','fast'),('en','en','ko','noisy'),('en','en','en','normal')]:
+        ('en','en','ko','fast'),('en','en','ko','noisy'),('en','en','en','normal')]
+if args.hide_native:cases=[('en','auto','ko','normal'),('ko','auto','en','normal'),('ko','auto','ko','normal'),('en','auto','en','normal'),('en','auto','ko','fast'),('en','auto','ko','noisy')]
+for language,mode,target,kind in cases:
     audio=decode_audio(str(fixtures/f'speech-{language}.wav'))[:48000]
     if kind=='fast':audio=resample_poly(audio,4,5).astype(np.float32)
     if kind=='noisy':
@@ -61,9 +64,10 @@ for language,mode,target,kind in [('en','en','ko','normal'),('en','auto','ko','n
     def load(self):self.resolved_device=device;return model
     service._load_model=types.MethodType(load,service)
     def update(event):
-        now=time.monotonic();events.append(dict(seconds=round(now-origin[0],3),text=event.translated,final=event.final,complete=event.complete))
+        now=time.monotonic();events.append(dict(seconds=round(now-origin[0],3),text=event.translated,final=event.final,complete=event.complete,suppressed=event.suppressed,detected=event.language))
         if presentation.offer(event,'YouTube',now):
-            render()
+            if presentation.current:render()
+            else:overlay.hide()
     service.live_caption.connect(update);service.error.connect(errors.append)
     def capture(self,stop):
         try:
@@ -84,7 +88,7 @@ for language,mode,target,kind in [('en','en','ko','normal'),('en','auto','ko','n
         finally:self._worker_finished(stop)
     service._capture=types.MethodType(capture,service)
     service.start(dict(model=args.model,device=device,language=mode,target_language=target,
-                       beam_size=5,translation_context='general'),{})
+                       beam_size=5,translation_context='general',hide_native=args.hide_native),{})
     deadline=time.monotonic()+(120 if device=='cpu' else 45)
     while service.running and time.monotonic()<deadline:
         app.processEvents()
@@ -95,7 +99,10 @@ for language,mode,target,kind in [('en','en','ko','normal'),('en','auto','ko','n
     for thread in service.threads:
         thread.join(2)
         assert not thread.is_alive(),thread.name
-    assert visible and any(event['final'] and event['complete'] for event in events),events
+    if args.hide_native and language==target:
+        assert not visible and events and all(event['suppressed'] and not event['text'] for event in events),events
+    else:
+        assert visible and any(event['final'] and event['complete'] for event in events),events
     gaps=[round(b['seconds']-a['seconds'],3) for a,b in zip(visible,visible[1:])]
     # Late corrections to the retained line do not change current text and are
     # not present in this single-utterance fixture.
@@ -103,7 +110,7 @@ for language,mode,target,kind in [('en','en','ko','normal'),('en','auto','ko','n
     # Cold paint can take longer than later paints. Completion timestamps
     # therefore differ slightly from the guaranteed display-decision pacing.
     assert all(gap>=.79 for gap in decisions),decisions
-    row=dict(model=args.model,device=device,language=language,mode=mode,target=target,kind=kind,first_visible=visible[0]['seconds'],
+    row=dict(model=args.model,device=device,language=language,mode=mode,target=target,kind=kind,hide_native=args.hide_native,first_visible=visible[0]['seconds'] if visible else None,
              visible_updates=len(visible),minimum_update_gap=min(gaps) if gaps else None,
              minimum_decision_gap=min(decisions) if decisions else None,
              visible=visible,events=events)

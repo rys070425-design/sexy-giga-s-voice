@@ -23,6 +23,11 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFormLayout,
     QMessageBox, QPushButton, QPlainTextEdit, QSpinBox, QTabWidget, QFileDialog,
     QVBoxLayout, QWidget, QInputDialog, QListWidget, QFrame, QScrollArea, QStyle, QTextEdit, QSlider, QDialog, QGraphicsDropShadowEffect)
 from PySide6.QtGui import QTextCursor
+from PySide6.QtWidgets import QLabel as CaptionLabel
+from localized_widgets import (QLabel,QPushButton,QCheckBox,QGroupBox,QLineEdit,QDialog,
+    QMainWindow,QComboBox,QListWidget,QTabWidget,QFormLayout,QMessageBox,QFileDialog,QInputDialog,QTextEdit,QPlainTextEdit)
+from ui_i18n import set_language,translate as ui
+from language_preferences import language_choices,valid_language,same_language,normalize_language
 
 from core import (HOME, DEFAULT_PROFILES, init_files, merge_glossary,
                   remember_phrase, read_phrase_memory,
@@ -38,7 +43,7 @@ from language_packs import (LANGUAGES as PACK_LANGUAGES, read_pack, create_manif
                             save_terms_without_overwrite, install_translation_models,
                             installed_for_language)
 
-LANGUAGES = {"자동 감지 · 여러 언어": "auto"} | {name: code for code, (name, _) in PACK_LANGUAGES.items()}
+LANGUAGES = {"자동 감지 · 여러 언어": "auto"} | dict(language_choices())
 
 
 def row(*items):
@@ -103,24 +108,24 @@ class SubtitleOverlay(QWidget):
         caption_layout = QVBoxLayout(surface)
         caption_layout.setContentsMargins(22, 14, 22, 16)
         caption_layout.setSpacing(7)
-        self.speaker_label = QLabel('')
+        self.speaker_label = CaptionLabel('')
         self.speaker_label.setTextFormat(Qt.PlainText)
         self.speaker_label.setFont(QFont('Malgun Gothic', 12, QFont.DemiBold))
         self.speaker_label.setStyleSheet('color: #8ce8cb; font-size: 12pt;')
         self.speaker_label.setAlignment(Qt.AlignCenter)
         caption_layout.addWidget(self.speaker_label)
-        self.previous_label = QLabel('')
+        self.previous_label = CaptionLabel('')
         self.previous_label.setTextFormat(Qt.PlainText)
         self.previous_label.setAlignment(Qt.AlignCenter)
         self.previous_label.setStyleSheet('color: #c5d1df;')
         caption_layout.addWidget(self.previous_label)
-        self.label = QLabel("")
+        self.label = CaptionLabel("")
         self.label.setTextFormat(Qt.PlainText)
         self.label.setWordWrap(False)
         self.label.setAlignment(Qt.AlignCenter)
         self.label.setStyleSheet('color: #f4f6fc;')
         caption_layout.addWidget(self.label)
-        self.original_label = QLabel('')
+        self.original_label = CaptionLabel('')
         self.original_label.setTextFormat(Qt.PlainText)
         self.original_label.setWordWrap(True)
         self.original_label.setFont(QFont('Malgun Gothic', 12))
@@ -210,8 +215,12 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.cfg, self.terms = init_files()
+        set_language(valid_language(self.cfg.get('ui_language')))
         if not self.cfg.get("profiles"):
             self.cfg["profiles"] = copy.deepcopy(DEFAULT_PROFILES)
+        for profile in self.cfg['profiles']:
+            profile.setdefault('hide_native',True)
+            profile.setdefault('target_language',self.cfg.get('default_caption_language','en'))
         self.profile_idx = min(max(int(self.cfg.get("active_profile", 0)), 0), len(self.cfg["profiles"])-1)
         self.service = VoiceService()
         self.service.live_caption.connect(self.on_live_caption)
@@ -248,7 +257,7 @@ class MainWindow(QMainWindow):
         self.reviewed_translation = ""
         self.review_pin = False  # do not overwrite the phrase under review
         self.plan_result.connect(self.on_plan_result)
-        self.setWindowTitle("Universal Voice KR v0.8.2 · 읽기 편한 실시간 자막")
+        self.setWindowTitle("Universal Voice KR v0.9.0 · 읽기 편한 실시간 자막")
         self.setMinimumSize(960,620)
         screen=QApplication.primaryScreen()
         available=screen.availableGeometry() if screen else None
@@ -293,14 +302,19 @@ class MainWindow(QMainWindow):
         self.navigation = QListWidget()
         self.navigation.setObjectName('navigation')
         self.navigation.setSpacing(5)
+        self.navigation.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         labels = ['실시간 자막', '프로필과 자막', 'Discord 연결', '용어 사전',
                   '번역 언어', 'ChatGPT 보정', '장치 진단']
         self.navigation.addItems(labels)
         side.addWidget(self.navigation, 1)
         local_note = QLabel('내 PC에서 음성 처리\n대화는 자동 저장되지 않아요')
         local_note.setObjectName('sideNote')
+        local_note.setWordWrap(True)
         side.addWidget(local_note)
-        version = QLabel('VERSION 0.8.2')
+        license_note=CaptionLabel('NLLB: CC-BY-NC-4.0')
+        license_note.setObjectName('version')
+        side.addWidget(license_note)
+        version = QLabel('VERSION 0.9.0')
         version.setObjectName('version')
         side.addWidget(version)
         outer.addWidget(sidebar)
@@ -318,6 +332,13 @@ class MainWindow(QMainWindow):
         title_box.addWidget(self.page_title)
         title_box.addWidget(self.page_description)
         header.addLayout(title_box, 1)
+        language_box=QVBoxLayout()
+        language_box.addWidget(CaptionLabel('Language'))
+        self.ui_language=combo(language_choices(),valid_language(self.cfg.get('ui_language')))
+        self.ui_language.setMaximumWidth(240)
+        self.ui_language.currentIndexChanged.connect(self.change_ui_language)
+        language_box.addWidget(self.ui_language)
+        header.addLayout(language_box)
         self.connection_badge = QLabel('●  준비됨')
         self.connection_badge.setObjectName('badge')
         header.addWidget(self.connection_badge)
@@ -417,12 +438,14 @@ class MainWindow(QMainWindow):
         self.live_language.setToolTip('짧은 말의 정확도와 속도를 높이려면 주로 말하는 언어를 선택하세요. 변경은 다음 자막 시작부터 적용됩니다.')
         profiles.addWidget(self.live_language, 1)
         l.addLayout(profiles)
-        self.target_language=combo([('한국어','ko'),('English','en'),('Español','es'),
-                                   ('Français','fr'),('Deutsch','de'),('日本語','ja'),
-                                   ('中文','zh'),('Português','pt')])
+        self.target_language=combo(language_choices())
         self.target_language.setToolTip('Output language / 표시 언어. 다른 언어로 번역하려면 [번역 언어]에서 해당 방향의 모델을 한 번 설치하세요. 변경은 다음 시작부터 적용됩니다.')
         self.target_language.currentIndexChanged.connect(self.show_pack_state)
         l.addLayout(row(QLabel('표시 언어 / Captions'),self.target_language))
+        self.hide_native=QCheckBox('표시 언어와 같은 말은 자막·기록에서 제외')
+        self.hide_native.setToolTip('언어는 자동으로 판별합니다. 같은 언어는 텍스트 인식과 번역을 건너뜁니다. 소리의 언어를 판별하는 자원은 필요합니다.')
+        self.hide_native.toggled.connect(self.update_native_filter)
+        l.addWidget(self.hide_native)
         self.btn_start = self._button("자막 시작 / Start", self.start_service)
         self.btn_start.setObjectName('primaryButton')
         self.btn_start.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
@@ -444,7 +467,7 @@ class MainWindow(QMainWindow):
         link.setObjectName('textButton')
         caption_header.addWidget(link)
         l.addLayout(caption_header)
-        self.live_text = QLabel('')
+        self.live_text = CaptionLabel('')
         self.live_text.setTextFormat(Qt.PlainText)
         self.live_text.setWordWrap(True)
         self.live_text.setStyleSheet('color:#c3ded7;background:#1b2a2a;border-radius:8px;padding:12px;')
@@ -538,7 +561,7 @@ class MainWindow(QMainWindow):
 
     def _build_terms(self):
         l = QVBoxLayout(self.tab_terms)
-        l.addWidget(paragraph("영어 줄임말을 풀어 음성 인식 문장을 한국어 번역 전에 교정합니다. 오역이 있으면 직접 수정할 수 있어요."))
+        l.addWidget(paragraph("영어 줄임말을 풀어 번역 전에 음성 인식 문장을 교정합니다. 오역이 있으면 직접 수정할 수 있어요."))
         self.group = QComboBox()
         self.group.currentIndexChanged.connect(self._refresh_terms_text)
         l.addLayout(row(QLabel("적용 사전:"), self.group,
@@ -569,7 +592,7 @@ class MainWindow(QMainWindow):
         lay.addWidget(paragraph("지원하는 언어는 추가 다운로드 없이 번역합니다. 아래에서 음성 언어 → 표시 언어 준비 상태를 확인하세요."))
         g = QGroupBox("언어 선택 · 여러 나라가 같은 언어를 사용하면 모델은 한 번만 설치")
         form = QFormLayout(g)
-        self.pack_lang = combo([(f"{name} ({code}) — {countries}", code) for code, (name, countries) in PACK_LANGUAGES.items()])
+        self.pack_lang = combo([(f'{name} ({code})',code) for name,code in language_choices()])
         form.addRow("언어 / 해당 지역 예시", self.pack_lang)
         self.pack_state = QLabel("선택 언어팩의 설치 여부를 확인할 수 있어요.")
         form.addRow("현재 설치 상태", self.pack_state)
@@ -580,7 +603,7 @@ class MainWindow(QMainWindow):
         lay.addWidget(self.btn_install_pack)
         lay.addWidget(self.btn_import_pack)
         lay.addWidget(self._button("설치 상태 확인", self.show_pack_state))
-        lay.addWidget(paragraph("설치 설명팩(.uvkrpack)에는 대용량 모델이 들어 있지 않습니다. 파일을 가져오면 공식 Argos 목록에서 모델을 받습니다."))
+        lay.addWidget(paragraph("언어팩(.uvkrpack)은 언어와 용어 설정을 담습니다. 번역은 공용 NLLB 모델을 사용하며, 처음 준비할 때 인터넷 연결이 필요합니다."))
         lay.addWidget(paragraph("자동 감지 시에도 해당 방향의 번역 모델이 필요합니다. 음성과 표시 언어가 같으면 추가 번역 모델은 필요하지 않습니다."))
         lay.addWidget(paragraph("미지원 언어팩은 실패를 알리며 설치 완료로 표시하지 않습니다."))
         lay.addStretch()
@@ -778,7 +801,7 @@ class MainWindow(QMainWindow):
         p = self.cfg["profiles"][self.profile_idx]
         self.profile_name.setText(p.get("name", "프로필"))
         self.source_label.setText(p.get('source_label',''))
-        self.target_language.setCurrentIndex(max(0,self.target_language.findData(p.get('target_language','ko'))))
+        self.target_language.setCurrentIndex(max(0,self.target_language.findData(p.get('target_language',self.cfg.get('default_caption_language','en')))))
         self.background_opacity.blockSignals(True)
         self.background_opacity.setValue(int(p.get('background_opacity',42)))
         self.opacity_value.setText(str(self.background_opacity.value())+'%')
@@ -798,6 +821,8 @@ class MainWindow(QMainWindow):
         self.cb_overlay.setChecked(bool(p.get("overlay", True)))
         self.cb_original.setChecked(bool(p.get("show_original", False)))
         self.cb_live.setChecked(bool(p.get('live_preview', True)))
+        self.hide_native.setChecked(bool(p.get('hide_native',True)))
+        self.update_native_filter(self.hide_native.isChecked())
         self.exe_names.setText(", ".join(p.get("game_exes", [])))
         idx = self.profile_terms.findData(p.get("glossary_group", "global"))
         self.profile_terms.setCurrentIndex(max(0, idx))
@@ -821,6 +846,7 @@ class MainWindow(QMainWindow):
                   "source_label":self.source_label.text().strip(),
                   "background_opacity":self.background_opacity.value(),
                   "target_language":self.target_language.currentData(),
+                  "hide_native":self.hide_native.isChecked(),
                   "game_exes": [x.strip() for x in self.exe_names.text().split(",") if x.strip()],
                   "audio_id": self.source.currentData() or "",
                   "glossary_group": self.profile_terms.currentData() or "global"})
@@ -844,10 +870,32 @@ class MainWindow(QMainWindow):
             self.pending_restart = True
             self.stop_service(manual=False)
 
+    def update_native_filter(self,enabled):
+        if not hasattr(self,'language'):return
+        if enabled:self.live_language.setCurrentIndex(max(0,self.live_language.findData('auto')))
+        self.live_language.setEnabled(not enabled)
+        self.language.setEnabled(not enabled)
+
+    def change_ui_language(self,index):
+        if index<0 or not hasattr(self,'target_language'):return
+        self.save_profile(quiet=True)
+        code=valid_language(self.ui_language.currentData())
+        self.cfg['ui_language']=code
+        self.cfg['default_caption_language']=code
+        self.target_language.setCurrentIndex(max(0,self.target_language.findData(code)))
+        set_language(code)
+        self.save_profile(quiet=True)
+        if self.service.running:
+            self.pending_restart=True
+            self.presentation=ReadableCaptions()
+            self.overlay.hide();self.live_text.hide()
+            self.stop_service(manual=False)
+
     def add_profile(self):
         self.save_profile(quiet=True)
         obj = copy.deepcopy(DEFAULT_PROFILES[0])
-        obj["name"] = "새 게임 프로필"
+        obj["name"] = ui("새 게임 프로필")
+        obj['target_language']=self.cfg.get('default_caption_language','en')
         self.cfg["profiles"].append(obj)
         self.profile_idx = len(self.cfg["profiles"])-1
         self._refresh_profiles(); self._load_profile(); self.save_profile(quiet=True)
@@ -855,7 +903,7 @@ class MainWindow(QMainWindow):
     def clone_profile(self):
         self.save_profile(quiet=True)
         obj = copy.deepcopy(self.cfg["profiles"][self.profile_idx])
-        obj["name"] += " 복사본"
+        obj["name"] += ui(" 복사본")
         self.cfg["profiles"].append(obj)
         self.profile_idx = len(self.cfg["profiles"])-1
         self._refresh_profiles(); self._load_profile(); self.save_profile(quiet=True)
@@ -899,7 +947,7 @@ class MainWindow(QMainWindow):
         self.live_text.hide()
         dic = merge_glossary(self.terms, p.get("glossary_group", "global"))
         self.service.start(p, dic)
-        self.overlay.show_caption('', '음성 모델을 준비하고 있어요…', p, '실시간 자막')
+        self.overlay.show_caption('', ui('음성 모델을 준비하고 있어요…'), p, ui('실시간 자막'))
         self.overlay.timer.stop()
         self.btn_start.setEnabled(False)
         self.btn_stop.setEnabled(True)
@@ -938,19 +986,28 @@ class MainWindow(QMainWindow):
         if self.service.running:
             self.connection_badge.setText('●  처리 중')
             if message.startswith('출력 소리 수집 중:'):
-                self.overlay.show_caption('', '듣는 중…', self.cfg['profiles'][self.profile_idx], '실시간 자막')
+                self.overlay.show_caption('', ui('듣는 중…'), self.cfg['profiles'][self.profile_idx], ui('실시간 자막'))
                 self.overlay.timer.stop()
 
     def on_error(self, message):
         self.last_error = message
         self.state.setText("오류: " + message)
-        self.history.appendPlainText("[오류] " + message)
+        self.history.appendPlainText(ui("오류: ") + ui(message))
         self.statusBar().showMessage(message)
         self.connection_badge.setText('●  확인 필요')
 
     def on_live_caption(self, update):
+        if self.pending_restart or self.closing:return
         profile=self.cfg['profiles'][self.profile_idx]
+        if update.suppressed or (profile.get('hide_native',True) and same_language(update.language,profile.get('target_language','en'))):
+            from dataclasses import replace
+            self.presentation.suppress(replace(update,original='',translated='',suppressed=True))
+            if self.presentation.current is None:
+                self.overlay.hide();self.live_text.hide();self.caption_timer.stop()
+            return
         label=clean_caption_label(update.speaker,update.source,profile.get('source_label',''))
+        if self.presentation.is_suppressed(update):return
+        if label=='오디오' and not (update.source or profile.get('source_label') or update.speaker not in ('','화자 미확인')):label=ui('오디오')
         if self.presentation.offer(update,label):self.render_captions()
         if not self.closing:self.caption_timer.start()
         if update.final and update.complete:
@@ -1023,9 +1080,10 @@ class MainWindow(QMainWindow):
 
     def preview(self):
         self.save_profile(quiet=True)
+        profile=self.cfg['profiles'][self.profile_idx]
         self.overlay.show_caption("They're pushing our base!",
-                                  "적들이 우리 기지로 밀고 들어오고 있어!",
-                                  self.cfg["profiles"][self.profile_idx])
+                                  ui("적들이 우리 기지로 밀고 들어오고 있어!",profile.get('target_language','en')),
+                                  profile,ui('미리보기 / Preview'))
 
     def auto_switch(self):
         if not self.cfg.get("auto_switch"):
@@ -1175,7 +1233,7 @@ class MainWindow(QMainWindow):
         if not hasattr(self, "pack_state"):
             return
         lang = self.pack_lang.currentData()
-        target=self.target_language.currentData()
+        target=normalize_language(self.target_language.currentData())
         if not lang or self.pack_busy:
             return
         try:
@@ -1193,7 +1251,7 @@ class MainWindow(QMainWindow):
             self.on_status("다른 언어팩이 설치 중입니다")
             return
         if not isinstance(manifest, dict):
-            manifest = create_manifest(self.pack_lang.currentData(),self.target_language.currentData())
+            manifest = create_manifest(self.pack_lang.currentData(),normalize_language(self.target_language.currentData()))
         code = manifest["code"]
         target=manifest['translation_target']
         if code == target or (code=='pb' and target=='pt'):

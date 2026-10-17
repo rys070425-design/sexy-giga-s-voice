@@ -52,6 +52,8 @@ main.init_files=lambda:core.init_files(testhome)
 main.MainWindow.update_plan_state=lambda self:None
 main.MainWindow._refresh_sources=lambda self:self.source.addItem('시험 출력 장치','')
 window=main.MainWindow()
+window.ui_language.setCurrentIndex(window.ui_language.findData('ko'))
+window.hide_native.setChecked(False)  # Legacy presentation tests also show native captions.
 window.tab_discord.auto_follow.setChecked(False)
 window.show();app.processEvents()
 assert window.tabs.count()==7

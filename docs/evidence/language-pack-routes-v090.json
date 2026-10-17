@@ -1,0 +1,205 @@
+{
+  "result": "ALL_25_PACK_CHOICES_TRANSLATION_SMOKE_VERIFIED",
+  "cases": [
+    {
+      "choice": "ko",
+      "source": "en",
+      "target": "ko",
+      "nonempty": true,
+      "characters": 15,
+      "seconds": 1.172
+    },
+    {
+      "choice": "en",
+      "source": "ko",
+      "target": "en",
+      "nonempty": true,
+      "characters": 33,
+      "seconds": 0.297
+    },
+    {
+      "choice": "es",
+      "source": "en",
+      "target": "es",
+      "nonempty": true,
+      "characters": 30,
+      "seconds": 0.25
+    },
+    {
+      "choice": "pt",
+      "source": "en",
+      "target": "pt",
+      "nonempty": true,
+      "characters": 30,
+      "seconds": 0.234
+    },
+    {
+      "choice": "pb",
+      "source": "en",
+      "target": "pt",
+      "nonempty": true,
+      "characters": 30,
+      "seconds": 0.219
+    },
+    {
+      "choice": "ru",
+      "source": "en",
+      "target": "ru",
+      "nonempty": true,
+      "characters": 31,
+      "seconds": 0.312
+    },
+    {
+      "choice": "pl",
+      "source": "en",
+      "target": "pl",
+      "nonempty": true,
+      "characters": 29,
+      "seconds": 0.282
+    },
+    {
+      "choice": "tr",
+      "source": "en",
+      "target": "tr",
+      "nonempty": true,
+      "characters": 30,
+      "seconds": 0.312
+    },
+    {
+      "choice": "de",
+      "source": "en",
+      "target": "de",
+      "nonempty": true,
+      "characters": 37,
+      "seconds": 0.328
+    },
+    {
+      "choice": "fr",
+      "source": "en",
+      "target": "fr",
+      "nonempty": true,
+      "characters": 32,
+      "seconds": 0.328
+    },
+    {
+      "choice": "zh",
+      "source": "en",
+      "target": "zh",
+      "nonempty": true,
+      "characters": 11,
+      "seconds": 0.391
+    },
+    {
+      "choice": "ja",
+      "source": "en",
+      "target": "ja",
+      "nonempty": true,
+      "characters": 10,
+      "seconds": 0.297
+    },
+    {
+      "choice": "it",
+      "source": "en",
+      "target": "it",
+      "nonempty": true,
+      "characters": 32,
+      "seconds": 0.297
+    },
+    {
+      "choice": "ar",
+      "source": "en",
+      "target": "ar",
+      "nonempty": true,
+      "characters": 23,
+      "seconds": 0.281
+    },
+    {
+      "choice": "uk",
+      "source": "en",
+      "target": "uk",
+      "nonempty": true,
+      "characters": 31,
+      "seconds": 0.328
+    },
+    {
+      "choice": "nl",
+      "source": "en",
+      "target": "nl",
+      "nonempty": true,
+      "characters": 32,
+      "seconds": 0.281
+    },
+    {
+      "choice": "id",
+      "source": "en",
+      "target": "id",
+      "nonempty": true,
+      "characters": 37,
+      "seconds": 0.266
+    },
+    {
+      "choice": "hi",
+      "source": "en",
+      "target": "hi",
+      "nonempty": true,
+      "characters": 27,
+      "seconds": 0.297
+    },
+    {
+      "choice": "cs",
+      "source": "en",
+      "target": "cs",
+      "nonempty": true,
+      "characters": 27,
+      "seconds": 0.39
+    },
+    {
+      "choice": "sv",
+      "source": "en",
+      "target": "sv",
+      "nonempty": true,
+      "characters": 33,
+      "seconds": 0.282
+    },
+    {
+      "choice": "vi",
+      "source": "en",
+      "target": "vi",
+      "nonempty": true,
+      "characters": 28,
+      "seconds": 0.265
+    },
+    {
+      "choice": "th",
+      "source": "en",
+      "target": "th",
+      "nonempty": true,
+      "characters": 20,
+      "seconds": 0.235
+    },
+    {
+      "choice": "tl",
+      "source": "en",
+      "target": "tl",
+      "nonempty": true,
+      "characters": 37,
+      "seconds": 0.343
+    },
+    {
+      "choice": "ro",
+      "source": "en",
+      "target": "ro",
+      "nonempty": true,
+      "characters": 32,
+      "seconds": 0.407
+    },
+    {
+      "choice": "fa",
+      "source": "en",
+      "target": "fa",
+      "nonempty": true,
+      "characters": 29,
+      "seconds": 0.25
+    }
+  ]
+}

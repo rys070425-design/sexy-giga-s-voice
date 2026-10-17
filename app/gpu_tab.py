@@ -7,6 +7,8 @@ from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QLabel, QPushButton,
                                QPlainTextEdit, QMessageBox)
 from cuda_runtime import gpu_report, cuda_packages
+from localized_widgets import QLabel,QPushButton,QMessageBox
+from ui_i18n import translate as ui
 
 
 class GpuSetupTab(QWidget):
@@ -30,7 +32,7 @@ class GpuSetupTab(QWidget):
         self.log = QPlainTextEdit()
         self.log.setReadOnly(True)
         layout.addWidget(self.log, 1)
-        self.line.connect(self.log.appendPlainText)
+        self.line.connect(lambda text:self.log.appendPlainText(ui(text)))
         self.finished.connect(self.on_finished)
 
     def _set_busy(self, value):

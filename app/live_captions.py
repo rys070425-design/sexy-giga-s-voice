@@ -31,6 +31,7 @@ class CaptionUpdate:
     source: str = ''
     target_language: str = 'ko'
     part: int = 0
+    suppressed: bool = False
 
 
 class DisplayOrder:
@@ -39,7 +40,7 @@ class DisplayOrder:
         self.key = (-1, -1, -1)
 
     def accept(self, update):
-        key = (update.sequence, update.revision, int(bool(update.translated)))
+        key = (update.sequence, update.revision, 2 if update.suppressed else int(bool(update.translated)))
         if key < self.key:
             return False
         self.key = key

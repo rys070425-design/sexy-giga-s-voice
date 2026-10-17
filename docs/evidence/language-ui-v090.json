@@ -1,0 +1,33 @@
+{
+  "result": "LANGUAGE_UI_VERIFIED",
+  "ui_languages": [
+    "ko",
+    "en",
+    "es",
+    "pt",
+    "pb",
+    "ru",
+    "pl",
+    "tr",
+    "de",
+    "fr",
+    "zh",
+    "ja",
+    "it",
+    "ar",
+    "uk",
+    "nl",
+    "id",
+    "hi",
+    "cs",
+    "sv",
+    "vi",
+    "th",
+    "tl",
+    "ro",
+    "fa"
+  ],
+  "same_language_hidden": true,
+  "history_filtered": true,
+  "real_caption_text_preserved": true
+}

@@ -8,7 +8,7 @@ import time
 from pathlib import Path
 
 APP_NAME = "UniversalVoiceKR"
-HOME = Path(os.getenv("LOCALAPPDATA", str(Path.home()))) / APP_NAME
+HOME = Path(os.environ['UVKR_DATA_DIR']) if os.environ.get('UVKR_DATA_DIR') else Path(os.getenv("LOCALAPPDATA", str(Path.home()))) / APP_NAME
 
 DEFAULT_PROFILES = [
     {"name": "디스코드 · 게임", "model": "large-v3-turbo", "device": "auto", "language": "auto",
@@ -34,12 +34,15 @@ DEFAULT_TERMS = {
                       "heals": "healing"}}
 }
 DEFAULT_SETTINGS = {
+    "ui_language":"en","default_caption_language":"en",
     "profiles": DEFAULT_PROFILES,
     "active_profile": 0,
     "auto_switch": False,
     "glossary_group": "global",
     "update": {"schedule": "weekly", "url": "", "last_checked": 0},
 }
+for _default_profile in DEFAULT_PROFILES:
+    _default_profile.update(target_language='en',hide_native=True)
 
 
 def select_output_loopback(devices, requested_id: str = "", default_speaker=None):

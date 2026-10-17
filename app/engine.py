@@ -13,6 +13,7 @@ from speech_quality import SAMPLE_RATE, FRAME, Segmenter, AudioClip, decoder_opt
 from speaker_labels import SpeakerTimeline, group_words
 from live_captions import LatestSlot, CaptionUpdate
 from audio_sources import SourceTracker
+from language_preferences import same_language,normalize_language
 
 
 class VoiceService(QObject):
@@ -172,6 +173,9 @@ class VoiceService(QObject):
                     if clip is None or clip.sequence <= self.finalized_sequence:
                         continue
                 options = decoder_options(self.profile)
+                hide_native=self.profile.get('hide_native',False)
+                target_language=normalize_language(self.profile.get('target_language','ko'))
+                if hide_native:options.pop('language',None)
                 if not clip.final:
                     # Fast, replaceable drafts; the full utterance still uses
                     # the selected beam and precise word/speaker alignment.
@@ -179,6 +183,13 @@ class VoiceService(QObject):
                     options['max_new_tokens'] = max(24, min(160, int(len(clip.audio) / SAMPLE_RATE * 24)))
                     options.pop('vad_parameters', None)
                 segments, info = model.transcribe(clip.audio, **options)
+                # transcribe returns detection metadata before its lazy decoder.
+                # Own-language audio needs neither text decoding nor translation.
+                if hide_native and same_language(info.language,target_language):
+                    if clip.final:self.finalized_sequence=clip.sequence
+                    self.live_caption.emit(CaptionUpdate(clip.sequence,clip.revision,'','',
+                        info.language,'',clip.final,True,target_language=target_language,suppressed=True))
+                    continue
                 if not clip.final:
                     segments = [s for s in segments if s.avg_logprob >= -1.0 and s.no_speech_prob < 0.6]
                 parts = list(transcript_parts(segments, clip.overlap))
@@ -192,10 +203,10 @@ class VoiceService(QObject):
                     groups = [(label, text)] if text else []
                 for index, (label, text) in enumerate(groups):
                     update = CaptionUpdate(clip.sequence, clip.revision + index, text,
-                                           text if info.language == self.profile.get('target_language','ko') else '',
+                                           text if same_language(info.language,target_language) else '',
                                            info.language, label, clip.final, False,
                                            self.sources.resolve(clip.start+clip.overlap,clip.start+len(clip.audio)/SAMPLE_RATE),
-                                           self.profile.get('target_language','ko'),part=index)
+                                           target_language,part=index)
                     self.live_caption.emit(update)
                     if clip.final:
                         self._enqueue(self.text_q, update, '번역')
@@ -236,8 +247,9 @@ class VoiceService(QObject):
             translator = LocalTranslator()
             self.status.emit('번역 모델: '+getattr(translator,'model_label','로컬 번역'))
             language = self.profile.get('language', 'auto')
-            target_language=self.profile.get('target_language','ko')
+            target_language=normalize_language(self.profile.get('target_language','ko'))
             source = 'en' if language == 'auto' else ('pt' if language == 'pb' else language)
+            if language=='auto' and target_language=='en':source='ko'
             can_translate=getattr(translator,'supports',lambda a,b:(a,b) in translator.packages)
             if source != target_language and can_translate(source,target_language):
                 # Load the native translator in parallel with Whisper startup,
@@ -255,6 +267,9 @@ class VoiceService(QObject):
                     if update is None or update.sequence <= self.finalized_sequence:
                         continue
                 transcript, source_lang, label = update.original, update.language, update.speaker
+                if self.profile.get('hide_native',False) and same_language(source_lang,target_language):
+                    self.live_caption.emit(replace(update,original='',translated='',complete=True,suppressed=True))
+                    continue
                 lang = self.profile.get('language', 'auto')
                 if source_lang == 'pt' and (lang == 'pb' or (lang == 'auto' and
                         installed_for_language('pb') and not installed_for_language('pt'))):

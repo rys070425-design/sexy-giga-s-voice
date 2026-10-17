@@ -37,6 +37,17 @@ device='cuda' if ctranslate2.get_cuda_device_count() else 'cpu'
 model=WhisperModel(str(target),device=device,compute_type='int8_float16' if device=='cuda' else 'int8',cpu_threads=4)
 segments,_=model.transcribe(np.zeros(16000,np.float32),language='en',beam_size=1)
 list(segments)
-report=dict(version='0.8.2',python=sys.executable,device=device,model='large-v3-turbo',translator='NLLB-200 distilled 600M int8',translation_ready=True,verified=True)
+preferences=root/'install_preferences.json'
+if preferences.is_file():
+    if preferences.stat().st_size>4096:raise ValueError('Installation language preferences are too large')
+    selection=json.loads(preferences.read_text(encoding='utf-8'))
+    from language_preferences import apply_install_language,valid_language
+    chosen=selection.get('ui_language')
+    if selection.get('schema')!=1 or valid_language(chosen,default=None) is None:
+        raise ValueError('Unsupported installation language')
+    config=read_json(settings_file,DEFAULT_SETTINGS)
+    apply_install_language(config,chosen)
+    write_json(settings_file,config)
+report=dict(version='0.9.0',python=sys.executable,device=device,model='large-v3-turbo',translator='NLLB-200 distilled 600M int8',translation_ready=True,verified=True)
 (root/'INSTALL_SUCCESS.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
 print('RUNTIME_VERIFIED',flush=True)

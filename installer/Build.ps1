@@ -8,11 +8,11 @@ try {
     # Explicit file selection prevents local model caches or credentials from
     # entering a rebuilt installer.
     $files=@(Get-ChildItem -LiteralPath $sourcePath -File -Filter '*.py')
-    $files+=Get-Item -LiteralPath (Join-Path $sourcePath 'voice.ico'),(Join-Path $sourcePath 'requirements-install.txt'),(Join-Path $sourcePath 'packs'),(Join-Path $sourcePath 'browser_source_extension')
+    $files+=Get-Item -LiteralPath (Join-Path $sourcePath 'voice.ico'),(Join-Path $sourcePath 'requirements-install.txt'),(Join-Path $sourcePath 'packs'),(Join-Path $sourcePath 'browser_source_extension'),(Join-Path $sourcePath 'ui_locales.json')
     Compress-Archive -LiteralPath $files.FullName -DestinationPath $archivePath -Force
-    $output=Join-Path $outputPath 'UniversalVoiceKR_Setup_v082.exe'
-    & "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe" /nologo /target:winexe /platform:x64 /optimize+ /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /win32icon:voice.ico /resource:payload.zip,payload.zip /resource:bootstrap.ps1,bootstrap.ps1 ("/out:"+$output) Setup.cs
+    $output=Join-Path $outputPath 'UniversalVoiceKR_Setup_v090.exe'
+    & "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe" /nologo /target:winexe /platform:x64 /optimize+ /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /r:System.Web.Extensions.dll /win32icon:voice.ico /resource:payload.zip,payload.zip /resource:bootstrap.ps1,bootstrap.ps1 /resource:..\app\ui_locales.json,ui_locales.json ("/out:"+$output) Setup.cs
     if($LASTEXITCODE -ne 0){throw 'Installer build failed'}
     $hash=(Get-FileHash -LiteralPath $output -Algorithm SHA256).Hash.ToLower()
-    Set-Content -LiteralPath (Join-Path $outputPath 'UniversalVoiceKR_Setup_v082.sha256') -Value ($hash+'  UniversalVoiceKR_Setup_v082.exe') -Encoding ascii
+    Set-Content -LiteralPath (Join-Path $outputPath 'UniversalVoiceKR_Setup_v090.sha256') -Value ($hash+'  UniversalVoiceKR_Setup_v090.exe') -Encoding ascii
 } finally {Pop-Location}

@@ -84,7 +84,8 @@ class PresentationTests(unittest.TestCase):
         self.assertEqual(clean_caption_label('민수','YouTube'),'YouTube')
         self.assertEqual(clean_caption_label('민수','여러 소리 · Discord + YouTube'),
                          '여러 소리 · Discord + YouTube')
-        self.assertEqual(clean_caption_label('화자 미확인'),'오디오')
+        self.assertEqual(clean_caption_label('화자 미확인'),'')
+        self.assertEqual(clean_caption_label('민수'),'')
         self.assertEqual(clean_caption_label('민수','Discord','example.com'),'example.com')
     def test_wrap_does_not_elide_content(self):
         lines=wrap_measured('가나다라마바사아자차',4,len)

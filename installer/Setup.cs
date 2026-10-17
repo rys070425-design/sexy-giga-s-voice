@@ -12,8 +12,8 @@ using System.Web.Script.Serialization;
 
 [assembly: AssemblyTitle("Universal Voice KR Setup")]
 [assembly: AssemblyDescription("Universal Voice KR 0.9 multilingual readable subtitles")]
-[assembly: AssemblyVersion("0.9.0.0")]
-[assembly: AssemblyFileVersion("0.9.0.0")]
+[assembly: AssemblyVersion("0.9.1.0")]
+[assembly: AssemblyFileVersion("0.9.1.0")]
 
 static class Setup {
     public static string DefaultRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "UniversalVoiceKR_05");
@@ -161,7 +161,7 @@ class SetupForm : Form {
         Icon=Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
         Font=new Font("Malgun Gothic",10f); AutoScaleMode=AutoScaleMode.Dpi;
         Label brand=LabelAt("voice",32,22,500,56,31f,mint); brand.Font=new Font("Segoe UI",31f,FontStyle.Bold);
-        LabelAt("UNIVERSAL KR  /  0.9.0",35,82,500,24,9f,Color.FromArgb(150,166,185));
+        LabelAt("UNIVERSAL KR  /  0.9.1",35,82,500,24,9f,Color.FromArgb(150,166,185));
         LabelAt("NLLB: CC-BY-NC-4.0",35,105,500,18,8f,Color.FromArgb(150,166,185));
         LabelAt("Language",34,128,150,30,10f,ForeColor);
         language=new ComboBox{Left=196,Top=124,Width=448,DropDownStyle=ComboBoxStyle.DropDownList,BackColor=panel,ForeColor=ForeColor,FlatStyle=FlatStyle.Flat};

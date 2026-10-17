@@ -64,12 +64,22 @@ assert window.history.toPlainText()==history
 window.on_live_caption(CaptionUpdate(6,100,'도움이 필요해요.','I need help.','ko','Name',True,True,'YouTube',target_language='en'))
 app.processEvents()
 assert window.overlay.label.text()=='I need help.'
+window.on_live_caption(CaptionUpdate(7,100,'안녕하세요.','Hello.','ko','Test Discord nickname',True,True,'',target_language='en'))
+window.presentation.changed_at-=1;window.advance_captions();app.processEvents()
+assert not window.overlay.speaker_label.isVisible(),'Unknown source retained a guessed source header'
+assert window.overlay.speaker_label.text()==''
+assert 'Discord nickname' not in window.history.toPlainText()
+window.overlay.grab().save(str(report.parent/'source-caption-unidentified.png'))
+window.on_live_caption(CaptionUpdate(8,100,'다음 문장.','Next sentence.','ko','',True,True,'VLC',target_language='en'))
+window.presentation.changed_at-=1;window.advance_captions();app.processEvents()
+assert window.overlay.speaker_label.isVisible() and window.overlay.speaker_label.text()=='VLC'
+window.overlay.grab().save(str(report.parent/'source-caption-confirmed.png'))
 window.hide_native.setChecked(False);assert window.language.isEnabled()
 window.hide_native.setChecked(True);assert not window.language.isEnabled()
 window.add_profile()
 assert window.cfg['profiles'][window.profile_idx]['target_language']=='en'
 window.cfg['ui_language']='ko';core.write_json(core.HOME/'settings.json',window.cfg)
 window.close();app.processEvents()
-result={'result':'LANGUAGE_UI_VERIFIED','ui_languages':expected,'same_language_hidden':True,'history_filtered':True,'real_caption_text_preserved':True}
+result={'result':'LANGUAGE_UI_VERIFIED','ui_languages':expected,'same_language_hidden':True,'history_filtered':True,'real_caption_text_preserved':True,'uncertain_source_header_hidden':True,'confirmed_source_header_restored':True}
 report.write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
 print(json.dumps(result),flush=True)

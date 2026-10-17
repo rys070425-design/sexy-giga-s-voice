@@ -92,7 +92,7 @@ def clean_caption_label(speaker, source='', override=''):
     known=speaker and speaker!='화자 미확인'
     if source:
         return source+' · '+speaker if known and source=='Discord' else source
-    return 'Discord · '+speaker if known else '오디오'
+    return ''
 
 
 def wrap_measured(text, width, measure):

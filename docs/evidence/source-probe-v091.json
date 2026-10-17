@@ -1,0 +1,18 @@
+{
+  "result": "REAL_WINDOWS_SOURCE_PROBE_AND_LOOPBACK_VERIFIED",
+  "scan_count": 8,
+  "own_render_session_seen": true,
+  "filtered_candidate_counts": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "no_audio_saved_or_played": true,
+  "no_runtime_or_app_list_label": true,
+  "scope": "COM/loopback smoke test; deterministic simultaneous-source cases are unit tests"
+}

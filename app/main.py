@@ -164,6 +164,7 @@ class SubtitleOverlay(QWidget):
         if screen:self.setFixedWidth(min(1000,int(screen.availableGeometry().width()*.80)))
         header_metrics=QFontMetrics(self.speaker_label.font())
         self.speaker_label.setText(header_metrics.elidedText(card.label,Qt.ElideRight,max(80,self.width()-80)))
+        self.speaker_label.setVisible(bool(card.label.strip()))
         metrics=QFontMetrics(self.label.font())
         lines=wrap_measured(card.text,max(80,self.width()-80),metrics.horizontalAdvance)
         if len(lines)>=2:
@@ -257,7 +258,7 @@ class MainWindow(QMainWindow):
         self.reviewed_translation = ""
         self.review_pin = False  # do not overwrite the phrase under review
         self.plan_result.connect(self.on_plan_result)
-        self.setWindowTitle("Universal Voice KR v0.9.0 · 읽기 편한 실시간 자막")
+        self.setWindowTitle("Universal Voice KR v0.9.1 · 읽기 편한 실시간 자막")
         self.setMinimumSize(960,620)
         screen=QApplication.primaryScreen()
         available=screen.availableGeometry() if screen else None
@@ -314,7 +315,7 @@ class MainWindow(QMainWindow):
         license_note=CaptionLabel('NLLB: CC-BY-NC-4.0')
         license_note.setObjectName('version')
         side.addWidget(license_note)
-        version = QLabel('VERSION 0.9.0')
+        version = QLabel('VERSION 0.9.1')
         version.setObjectName('version')
         side.addWidget(version)
         outer.addWidget(sidebar)
@@ -1007,7 +1008,6 @@ class MainWindow(QMainWindow):
             return
         label=clean_caption_label(update.speaker,update.source,profile.get('source_label',''))
         if self.presentation.is_suppressed(update):return
-        if label=='오디오' and not (update.source or profile.get('source_label') or update.speaker not in ('','화자 미확인')):label=ui('오디오')
         if self.presentation.offer(update,label):self.render_captions()
         if not self.closing:self.caption_timer.start()
         if update.final and update.complete:
@@ -1029,7 +1029,7 @@ class MainWindow(QMainWindow):
     def render_captions(self):
         current,previous=self.presentation.current,self.presentation.previous
         if current is None:return
-        lines=[current.label]
+        lines=[current.label] if current.label else []
         if previous:lines.append(previous.text)
         lines.append(current.text)
         self.live_text.setText('\n'.join(lines));self.live_text.show()

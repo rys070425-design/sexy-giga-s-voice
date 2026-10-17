@@ -163,22 +163,26 @@ class SubtitleOverlay(QWidget):
         screen = QApplication.primaryScreen()
         if screen:self.setFixedWidth(min(1000,int(screen.availableGeometry().width()*.80)))
         header_metrics=QFontMetrics(self.speaker_label.font())
-        self.speaker_label.setText(header_metrics.elidedText(card.label,Qt.ElideRight,max(80,self.width()-80)))
-        self.speaker_label.setVisible(bool(card.label.strip()))
+        header='' if card.speaker else card.label
+        self.speaker_label.setText(header_metrics.elidedText(header,Qt.ElideRight,max(80,self.width()-80)))
+        self.speaker_label.setVisible(bool(header.strip()))
         metrics=QFontMetrics(self.label.font())
-        lines=wrap_measured(card.text,max(80,self.width()-80),metrics.horizontalAdvance)
+        width=max(80,self.width()-80)
+        prefix=(metrics.elidedText(card.speaker,Qt.ElideRight,max(40,int(width*.33)))+': ') if card.speaker else ''
+        lines=wrap_measured(card.text,max(40,width-metrics.horizontalAdvance(prefix)),metrics.horizontalAdvance)
         if len(lines)>=2:
             older,current=lines[-2:]
+            older=prefix+older
         else:
-            current=lines[0] if lines else ''
+            current=prefix+(lines[0] if lines else '')
             old_lines=wrap_measured(previous.text,max(80,self.width()-80),metrics.horizontalAdvance) if previous else []
             older=old_lines[-1] if old_lines else ''
-            if previous and previous.label!=card.label:
-                previous_name=previous.label
+            if previous and (previous.speaker or previous.label!=card.label):
+                previous_name=previous.speaker or previous.label
                 if card.label.startswith('Discord · '):previous_name=previous_name.removeprefix('Discord · ')
-                prefix=metrics.elidedText(previous_name,Qt.ElideRight,max(40,int((self.width()-80)*.3)))+' · '
-                old_lines=wrap_measured(previous.text,max(40,self.width()-80-metrics.horizontalAdvance(prefix)),metrics.horizontalAdvance)
-                older=prefix+(old_lines[-1] if old_lines else '')
+                old_prefix=metrics.elidedText(previous_name,Qt.ElideRight,max(40,int(width*.33)))+(': ' if previous.speaker else ' · ')
+                old_lines=wrap_measured(previous.text,max(40,width-metrics.horizontalAdvance(old_prefix)),metrics.horizontalAdvance)
+                older=old_prefix+(old_lines[-1] if old_lines else '')
         self.previous_label.setText(older)
         self.previous_label.setFixedHeight(metrics.height()+4)
         self.label.setText(current)
@@ -258,7 +262,7 @@ class MainWindow(QMainWindow):
         self.reviewed_translation = ""
         self.review_pin = False  # do not overwrite the phrase under review
         self.plan_result.connect(self.on_plan_result)
-        self.setWindowTitle("Universal Voice KR v0.9.1 · 읽기 편한 실시간 자막")
+        self.setWindowTitle("Universal Voice KR v0.9.2 · 읽기 편한 실시간 자막")
         self.setMinimumSize(960,620)
         screen=QApplication.primaryScreen()
         available=screen.availableGeometry() if screen else None
@@ -315,7 +319,7 @@ class MainWindow(QMainWindow):
         license_note=CaptionLabel('NLLB: CC-BY-NC-4.0')
         license_note.setObjectName('version')
         side.addWidget(license_note)
-        version = QLabel('VERSION 0.9.1')
+        version = QLabel('VERSION 0.9.2')
         version.setObjectName('version')
         side.addWidget(version)
         outer.addWidget(sidebar)
@@ -1029,9 +1033,9 @@ class MainWindow(QMainWindow):
     def render_captions(self):
         current,previous=self.presentation.current,self.presentation.previous
         if current is None:return
-        lines=[current.label] if current.label else []
-        if previous:lines.append(previous.text)
-        lines.append(current.text)
+        lines=[current.label] if current.label and not current.speaker else []
+        if previous:lines.append(previous.display_text)
+        lines.append(current.display_text)
         self.live_text.setText('\n'.join(lines));self.live_text.show()
         self.overlay.show_readable(current,previous,self.cfg['profiles'][self.profile_idx])
         if self.service.running:self.overlay.timer.stop()

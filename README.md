@@ -1,13 +1,13 @@
-# Universal Voice KR 0.9.1
+# Universal Voice KR 0.9.2
 
 Windows PC에서 Discord 등의 출력 소리를 받아 자막으로 보여 주는 앱입니다.
 기본 음성 인식과 번역은 PC에서 처리하며 유료 API가 필요하지 않습니다. 기본 번역 모델은 무료 개인·비상업용(CC-BY-NC-4.0)입니다.
 
 ## 설치
 
-[Windows 설치 파일 받기](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_Setup_v091.exe)
+[Windows 설치 파일 받기](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_Setup_v092.exe)
 
-[공유용 설치 ZIP 받기](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_v091_Windows_Installer.zip)
+[공유용 설치 ZIP 받기](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_v092_Windows_Installer.zip)
 
 메신저에서 EXE 파일을 첨부할 수 없다면 설치 파일과 안내만 들어 있는 ZIP을 이용하거나 이 저장소 링크를 공유하세요. ZIP은 Windows PC에서 압축을 모두 풀고 안의 EXE를 실행합니다. 소스 ZIP과는 다릅니다. 휴대폰용 앱은 아닙니다. ZIP 내부 설치 파일의 무결성은 확인했지만 카카오톡 전송 성공을 직접 시험한 것은 아닙니다.
 
@@ -16,6 +16,15 @@ Windows PC에서 Discord 등의 출력 소리를 받아 자막으로 보여 주�
 3. 설치 후 같은 언어가 앱 UI와 자막 언어에 적용됩니다. 재생 출력 장치를 선택하고 **자막 시작**을 누릅니다. 기본적으로 설정한 언어의 말은 자막과 기록에서 제외합니다.
 
 최초 설치에는 인터넷 연결과 수 GB의 여유 공간이 필요합니다. Whisper large-v3-turbo와 NLLB-200 distilled 600M 번역 모델을 내려받는 온라인 설치 파일입니다. 번역 자료는 약 582MB이며 SHA-256을 확인합니다. 관리자 권한이나 시스템 PATH 변경 없이 사용자 계정에 설치합니다. NVIDIA GPU가 있으면 음성 인식에 GPU를 우선 사용하며 CPU도 선택할 수 있습니다.
+
+## 0.9.2에서 바뀐 점
+
+- Discord에서 말하는 사람 표시를 자막의 발언 시각에 대응하여 **닉네임: 내용**으로 표시합니다. 이전 줄과 새 줄의 이름도 각각 유지합니다.
+- 짧은 표시 겹침 때문에 ‘동시 발화’로 바꾸던 동작을 줄였습니다. 전후에 같은 사람만 말한 증거가 있을 때만 그 사람으로 이어서 처리합니다.
+- 실제로 표시가 계속 겹치면 `민수 / 철수: 내용`처럼 이름을 함께 표시합니다. 섞인 음성을 각 사람의 독립적인 문장으로 분리했다고 주장하지 않습니다.
+- 112개 회귀 검사, 실제 설치·음성 모델·번역·Qt 화면 및 제어된 발언 표시 4조건을 확인했습니다. 실제 사용자 Discord 다중 통화의 완전한 검증은 아닙니다.
+
+[닉네임 표시·검증 안내](docs/validation-v092.md)
 
 ## 0.9.1에서 바뀐 점
 

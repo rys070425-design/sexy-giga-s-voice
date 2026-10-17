@@ -1,10 +1,10 @@
-# Universal Voice KR 0.9.1
+# Universal Voice KR 0.9.2
 
 Translate audio playing on your Windows PC, including Discord and YouTube. Your microphone is not captured. The default models run locally without a paid API. NLLB translation is licensed **CC-BY-NC-4.0 for noncommercial use**.
 
 ## Install and choose your language
 
-1. Download [Windows setup](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_Setup_v091.exe). Close the old app and installer first.
+1. Download [Windows setup](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_Setup_v092.exe). Close the old app and installer first.
 2. Setup starts in English. Use **Language** to choose from the language-pack catalog. Instructions change immediately. Brazilian Portuguese shares the Portuguese model and interface.
 3. Use the same installation folder to reuse existing models. Initial setup needs internet and several GB of free space. This EXE is an online installer.
 4. The selected language is applied to the interface and captions in all saved profiles. Other profile settings and your glossary are preserved.
@@ -26,7 +26,7 @@ For English videos with English transcripts, turn off **Hide speech in my captio
 
 ## Speaker and site names
 
-For Discord names, approve the official Streamkit connection once under **Discord connection**. Current-channel following depends on the official query being available; saved/manual links are the fallback. This is separate from audio captions. Mixed playback cannot reliably separate overlapping speakers.
+For Discord names, approve the official Streamkit connection once under **Discord connection**. Current-channel following depends on the official query being available; saved/manual links are the fallback. This is separate from audio captions. Confirmed Discord speakers appear as **Name: captions**. Brief indicator overlap is smoothed only with the same exclusive speaker on both sides. Sustained overlap shows **Alice / Bob: captions**, without the overlap status phrase. This names the active participants; it does not separate their mixed voices into independent transcripts. See [speaker changes and limits](validation-v092.md).
 
 A playback application name is shown only when one source is consistently identified. Silent, muted, and own capture sessions are excluded. Mixed or unknown sources have no source header; technical process names are not listed. Exact Chrome/Edge website names require the optional extension opened through **Website names**. Load the provided unpacked extension, then copy the pairing code into its settings. It reports audible, unmuted, non-incognito tab hostnames to this PC, not page text or full URLs. You can also type a source label directly.
 

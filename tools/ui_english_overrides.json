@@ -230,5 +230,6 @@
   "새 사전 단어 {0}개 추가됨": "Added {0} new glossary entries",
   "{0} 모델 설치 중…": "Preparing the {0} model…",
   "미지원 코드: {0}": "Unsupported code: {0}",
-  " (코드 {0})": " (code {0})"
+  " (코드 {0})": " (code {0})",
+  "말하는 사람 표시를 자막 시각에 맞춰 닉네임: 내용으로 표시합니다. 계속 겹치면 닉네임을 함께 표시합니다.\n자동 연결을 켜면 통화방 이동을 따라갑니다. 첫 연결 승인은 직접 완료해 주세요.": "Use Discord speaking indicators to show Name: captions. If voices keep overlapping, show the names together.\nAutomatic connection follows channel changes. Complete the first connection approval yourself."
 }

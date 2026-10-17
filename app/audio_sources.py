@@ -22,6 +22,7 @@ def site_label(host):
     if len(host)>253 or not re.fullmatch(r'[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?',host):return ''
     if host=='youtube.com' or host.endswith('.youtube.com') or host=='youtu.be':return 'YouTube'
     if host=='twitch.tv' or host.endswith('.twitch.tv'):return 'Twitch'
+    if host in ('discord.com','discordapp.com') or host.endswith(('.discord.com','.discordapp.com')):return 'Discord'
     return host.removeprefix('www.')
 
 class SourceTracker:

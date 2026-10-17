@@ -88,7 +88,34 @@ class SpeakerTests(unittest.TestCase):
         self.assertEqual(self.timeline(['민수']).resolve(.3,1.2),'민수')
 
     def test_never_assign_overlap_to_one_person(self):
-        self.assertIn('동시 발화',self.timeline(['민수','Alice']).resolve(.3,1.2))
+        self.assertEqual(self.timeline(['민수','Alice']).resolve(.3,1.2),'Alice / 민수')
+
+    def test_one_short_ring_overlap_does_not_relabel_whole_utterance(self):
+        timeline=self.timeline(['Alice'])
+        timeline.clear()
+        for i in range(21):timeline.record(['Alice','Bob'] if i==5 else ['Alice'],i*.1)
+        self.assertEqual(timeline.resolve(.1,1.1),'Alice')
+        self.assertEqual(timeline.resolve(.52,.57),'Alice')
+        self.assertEqual(timeline.resolve(.45,.8),'Alice')
+
+    def test_short_overlap_at_real_turn_boundary_does_not_guess_one_name(self):
+        timeline=SpeakerTimeline()
+        for i in range(21):timeline.record(['Alice'] if i<5 else (['Alice','Bob'] if i==5 else ['Bob']),i*.1)
+        self.assertEqual(timeline.resolve(.52,.57),'Alice / Bob')
+
+    def test_sustained_overlap_in_short_word_stays_shared(self):
+        self.assertEqual(self.timeline(['Alice','Bob']).resolve(.52,.57),'Alice / Bob')
+
+    def test_brief_overlap_does_not_break_same_speaker_word_group(self):
+        timeline=SpeakerTimeline()
+        for i in range(21):timeline.record(['Alice','Bob'] if i==5 else ['Alice'],i*.1)
+        self.assertEqual(group_words([(' I',.2,.3),(' need',.52,.57),(' help.',.7,.8)],timeline,0),[('Alice','I need help.')])
+
+    def test_longer_first_turn_does_not_own_second_speakers_words(self):
+        timeline=SpeakerTimeline()
+        for i in range(21):timeline.record(['Alice'] if i<8 else ['Bob'],i*.1)
+        self.assertEqual(timeline.resolve(0,1.1),UNKNOWN)
+        self.assertEqual(timeline.resolve(.9,1.1),'Bob')
 
     def test_frozen_widget_expires(self):
         self.assertEqual(self.timeline(['민수']).resolve(3,4),UNKNOWN)

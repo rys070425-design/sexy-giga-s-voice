@@ -74,12 +74,35 @@ window.on_live_caption(CaptionUpdate(8,100,'다음 문장.','Next sentence.','ko
 window.presentation.changed_at-=1;window.advance_captions();app.processEvents()
 assert window.overlay.speaker_label.isVisible() and window.overlay.speaker_label.text()=='VLC'
 window.overlay.grab().save(str(report.parent/'source-caption-confirmed.png'))
+language_control.setCurrentIndex(language_control.findData('ko'));app.processEvents()
+window.on_live_caption(CaptionUpdate(9,100,'Wait here.','여기서 기다려 주세요.','en','민수',True,True,'Discord'))
+window.presentation.changed_at-=1;window.advance_captions();app.processEvents()
+assert window.overlay.label.text()=='민수: 여기서 기다려 주세요.'
+assert not window.overlay.speaker_label.isVisible()
+assert '민수: 여기서 기다려 주세요.' in window.live_text.text()
+window.presentation.previous_at-=3
+window.on_live_caption(CaptionUpdate(10,100,'I will be there.','제가 갈게요.','en','철수',True,True,'Discord'))
+window.presentation.changed_at-=1;window.advance_captions();app.processEvents()
+assert window.overlay.label.text()=='철수: 제가 갈게요.'
+assert window.overlay.previous_label.text()=='민수: 여기서 기다려 주세요.'
+window.overlay.grab().save(str(report.parent/'discord-caption-speakers.png'))
+window.on_live_caption(CaptionUpdate(11,100,'Wait together.','함께 기다려 주세요.','en','민수 / 철수',True,True,'Discord'))
+window.presentation.changed_at-=1;window.advance_captions();app.processEvents()
+assert window.overlay.label.text().endswith(': 함께 기다려 주세요.')
+assert '동시 발화' not in window.overlay.label.text()
+window.overlay.grab().save(str(report.parent/'discord-caption-shared.png'))
+# Long captions and nicknames still keep a visible speaker prefix.
+window.on_live_caption(CaptionUpdate(12,100,'long words','아주 긴 자막 문장을 읽고 있는 동안에도 이름을 확인할 수 있어야 합니다. '*8,'en','긴닉네임'*15,True,True,'Discord'))
+window.presentation.changed_at-=1;window.advance_captions();app.processEvents()
+assert ': ' in window.overlay.previous_label.text()
+assert len(window.overlay.previous_label.text())<len('긴닉네임'*15)+50
+language_control.setCurrentIndex(language_control.findData('en'));app.processEvents()
 window.hide_native.setChecked(False);assert window.language.isEnabled()
 window.hide_native.setChecked(True);assert not window.language.isEnabled()
 window.add_profile()
 assert window.cfg['profiles'][window.profile_idx]['target_language']=='en'
 window.cfg['ui_language']='ko';core.write_json(core.HOME/'settings.json',window.cfg)
 window.close();app.processEvents()
-result={'result':'LANGUAGE_UI_VERIFIED','ui_languages':expected,'same_language_hidden':True,'history_filtered':True,'real_caption_text_preserved':True,'uncertain_source_header_hidden':True,'confirmed_source_header_restored':True}
+result={'result':'LANGUAGE_UI_VERIFIED','ui_languages':expected,'same_language_hidden':True,'history_filtered':True,'real_caption_text_preserved':True,'uncertain_source_header_hidden':True,'confirmed_source_header_restored':True,'inline_discord_nicknames':True,'no_overlap_status_text':True,'long_name_and_caption_checked':True}
 report.write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
 print(json.dumps(result),flush=True)

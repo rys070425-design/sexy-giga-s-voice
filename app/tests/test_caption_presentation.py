@@ -7,6 +7,14 @@ def update(seq,rev,text,final=False,language='ko'):
     return CaptionUpdate(seq,rev,text,text if language=='ko' else '',language,'화자 미확인',final,final)
 
 class PresentationTests(unittest.TestCase):
+    def test_discord_speaker_is_inline_without_assigning_other_apps(self):
+        model=ReadableCaptions(interval=0)
+        event=CaptionUpdate(1,100,'Hello','안녕하세요.','en','민수',True,True,'Discord')
+        model.offer(event,'Discord · 민수',0)
+        self.assertEqual(model.current.display_text,'민수: 안녕하세요.')
+        model.offer(replace(event,sequence=2,source='YouTube'),'YouTube',1)
+        self.assertEqual(model.current.speaker,'')
+        self.assertEqual(model.current.display_text,'안녕하세요.')
     def test_english_captions_can_show_without_korean_translation(self):
         model=ReadableCaptions()
         event=CaptionUpdate(0,25,'Hello there','','en','화자 미확인',target_language='en')

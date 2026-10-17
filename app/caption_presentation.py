@@ -14,6 +14,11 @@ class CaptionCard:
     final: bool
     revision: int = 0
     part: int = 0
+    speaker: str = ''
+
+    @property
+    def display_text(self):
+        return self.speaker+': '+self.text if self.speaker else self.text
 
     @property
     def identity(self):
@@ -42,7 +47,8 @@ class ReadableCaptions:
         text=update.translated or (update.original if update.language==update.target_language else '')
         if not text.strip():return False
         card=CaptionCard(update.sequence,text.strip(),update.original,label,
-                         update.final and update.complete,update.revision,update.part)
+                         update.final and update.complete,update.revision,update.part,
+                         update.speaker if update.source=='Discord' and label=='Discord · '+update.speaker else '')
         # A late final may correct the retained line without rewinding the
         # current sentence or extending the old line's reading time.
         if (self.previous and self.current and card.identity==self.previous.identity

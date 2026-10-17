@@ -178,7 +178,7 @@ class DiscordSpeakerTab(QWidget):
         self.browser_layout.addWidget(self.placeholder)
         preview_layout.addLayout(self.browser_layout, 1)
         layout.addWidget(preview, 1)
-        limits = QLabel('닉네임은 발언 시각으로 추정합니다. 겹친 목소리는 동시 발화로 표시합니다.\n'
+        limits = QLabel('말하는 사람 표시를 자막 시각에 맞춰 닉네임: 내용으로 표시합니다. 계속 겹치면 닉네임을 함께 표시합니다.\n'
                         '자동 연결을 켜면 통화방 이동을 따라갑니다. 첫 연결 승인은 직접 완료해 주세요.')
         limits.setObjectName('muted')
         limits.setWordWrap(True)

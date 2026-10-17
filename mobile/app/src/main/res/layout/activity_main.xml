@@ -1,0 +1,45 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:paddingHorizontal="22dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:paddingTop="20dp" android:paddingBottom="20dp">
+        <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/brand" android:textColor="@color/primary" android:textSize="32sp" android:fontFamily="sans-serif-medium" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/tagline" android:textColor="@color/muted" android:textSize="13sp" android:layout_marginTop="3dp" />
+        </LinearLayout>
+        <ImageButton android:id="@+id/settings" android:layout_width="48dp" android:layout_height="48dp" android:src="@drawable/ic_settings" android:contentDescription="@string/settings" android:background="?attr/selectableItemBackgroundBorderless" />
+    </LinearLayout>
+    <ScrollView android:id="@+id/scroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingBottom="16dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/source_language" android:textColor="@color/muted" android:textSize="12sp" android:paddingBottom="4dp" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/source" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="60dp" android:textAllCaps="false" android:textSize="17sp" app:cornerRadius="16dp" app:strokeColor="@color/outline" />
+                </LinearLayout>
+                <com.google.android.material.button.MaterialButton android:id="@+id/swap" style="@style/Widget.Material3.Button.TextButton" android:layout_width="48dp" android:layout_height="60dp" android:layout_marginTop="18dp" android:insetLeft="0dp" android:insetRight="0dp" android:minWidth="48dp" android:padding="0dp" android:text="@string/swap_symbol" android:textSize="25sp" android:contentDescription="@string/swap_languages" />
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/target_language" android:textColor="@color/muted" android:textSize="12sp" android:paddingBottom="4dp" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/target" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="60dp" android:textAllCaps="false" android:textSize="17sp" app:cornerRadius="16dp" app:strokeColor="@color/outline" />
+                </LinearLayout>
+            </LinearLayout>
+            <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" app:cardBackgroundColor="@color/surface" app:cardCornerRadius="26dp" app:strokeWidth="1dp" app:strokeColor="@color/outline" app:cardElevation="0dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="22dp">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
+                        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/translation" android:textSize="11sp" android:letterSpacing="0.08" android:textColor="@color/muted" />
+                        <TextView android:id="@+id/mode_badge" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/offline_badge" android:textSize="11sp" android:letterSpacing="0.05" android:textColor="@color/primary" />
+                    </LinearLayout>
+                    <TextView android:id="@+id/previous" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:textColor="@color/muted" android:textSize="19sp" android:maxLines="4" android:ellipsize="end" android:textDirection="firstStrong" android:visibility="gone" />
+                    <TextView android:id="@+id/caption" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="22dp" android:layout_marginBottom="16dp" android:minHeight="120dp" android:text="@string/empty_caption" android:textColor="@color/ink" android:textSize="29sp" android:lineSpacingExtra="6dp" android:fontFamily="sans-serif-medium" android:textDirection="firstStrong" android:accessibilityLiveRegion="none" />
+                    <TextView android:id="@+id/original" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="@string/empty_original" android:textColor="@color/muted" android:textSize="15sp" android:lineSpacingExtra="3dp" android:textDirection="firstStrong" />
+                    <ImageView android:id="@+id/attribution" android:layout_width="152dp" android:layout_height="20dp" android:layout_marginTop="24dp" android:layout_gravity="start" android:src="@drawable/google_translate" android:scaleType="fitCenter" android:contentDescription="@string/google_attribution" android:focusable="true" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingTop="18dp" android:paddingHorizontal="2dp">
+                <TextView android:id="@+id/status" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/ready" android:textColor="@color/muted" android:textSize="13sp" android:lineSpacingExtra="3dp" android:accessibilityLiveRegion="polite" />
+                <ProgressBar android:id="@+id/level" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="4dp" android:layout_marginTop="12dp" android:max="100" android:progressTint="@color/primary" android:progressBackgroundTint="@color/outline" android:visibility="invisible" android:importantForAccessibility="no" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/prepare" style="@style/Widget.Material3.Button.TextButton" android:layout_width="wrap_content" android:layout_height="48dp" android:text="@string/prepare" android:textAllCaps="false" android:layout_gravity="start" android:paddingStart="0dp" android:paddingEnd="0dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+    <com.google.android.material.button.MaterialButton android:id="@+id/listen" android:layout_width="match_parent" android:layout_height="68dp" android:text="@string/google_action" android:textSize="17sp" android:textAllCaps="false" app:cornerRadius="22dp" app:icon="@drawable/ic_mic" app:iconGravity="textStart" app:iconPadding="10dp" />
+    <TextView android:id="@+id/privacy" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center" android:text="@string/privacy_short" android:textColor="@color/muted" android:textSize="11sp" android:background="?attr/selectableItemBackground" android:clickable="true" android:focusable="true" />
+</LinearLayout>

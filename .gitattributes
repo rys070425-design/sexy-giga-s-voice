@@ -6,3 +6,10 @@
 *.exe binary
 *.ico binary
 *.uvkrpack binary
+*.apk binary
+*.png binary
+*.jar binary
+*.java text eol=lf
+*.gradle text eol=lf
+mobile/gradlew text eol=lf
+mobile/gradlew.bat text eol=crlf

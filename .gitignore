@@ -21,3 +21,9 @@ installer/VerifyLogWindow.exe
 *.flac
 .env
 .env.*
+mobile/.gradle/
+mobile/**/build/
+mobile/local.properties
+*.jks
+*.keystore
+*signing.properties

@@ -3,6 +3,10 @@
 Windows PC에서 Discord 등의 출력 소리를 받아 자막으로 보여 주는 앱입니다.
 기본 음성 인식과 번역은 PC에서 처리하며 유료 API가 필요하지 않습니다. 기본 번역 모델은 무료 개인·비상업용(CC-BY-NC-4.0)입니다.
 
+## Android 모바일
+
+휴대폰 마이크로 주변 대화를 듣고 번역하는 별도의 Android 앱을 추가했습니다. [Android APK 받기](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoice_Android_v010.apk) · [설치와 사용 안내](mobile/README.md). PC 연결이나 Python이 필요하지 않습니다. 휴대폰 음성 서비스와 ML Kit 번역을 사용하며 Windows판과 모델·기능이 다릅니다.
+
 ## 설치
 
 [Windows 설치 파일 받기](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_Setup_v093.exe)

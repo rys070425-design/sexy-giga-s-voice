@@ -1,0 +1,79 @@
+{
+  "actual_mlkit_inference": true,
+  "actual_microphone_or_asr_test": false,
+  "environment": "Android 35 x86_64 headless emulator; no host audio",
+  "examples": [
+    {
+      "source": "Could you speak a little more slowly?",
+      "translation": "조금 더 천천히 말할 수 있습니까?",
+      "inference_ms": 147
+    },
+    {
+      "source": "Where is the nearest subway station?",
+      "translation": "가장 가까운 지하철역은 어디에 있습니까?",
+      "inference_ms": 85
+    },
+    {
+      "source": "I do not eat peanuts.",
+      "translation": "나는 땅콩을 먹지 않는다.",
+      "inference_ms": 91
+    },
+    {
+      "source": "Please call me when you arrive.",
+      "translation": "도착하면 전화 해주세요.",
+      "inference_ms": 57
+    },
+    {
+      "source": "This is more expensive than I expected.",
+      "translation": "이것은 내가 예상했던 것보다 더 비싸다.",
+      "inference_ms": 79
+    }
+  ],
+  "reverse_translation": "Please tell me a little slow.",
+  "total_test_ms": 960,
+  "unit_suites": [
+    {
+      "name": "io.github.rys070425design.universalvoicemobile.CaptionPipelineTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "io.github.rys070425design.universalvoicemobile.MainActivityTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "io.github.rys070425design.universalvoicemobile.SpeechLoopTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0"
+    }
+  ],
+  "ui_tests": {
+    "default_411dp_light_en_ko": "passed",
+    "small_360dp_dark_font_130_percent_en_ko": "passed",
+    "captions_in_viewport_and_control_visibility": "passed",
+    "captions_in_ui_screenshots": "developer-authored fixtures, not microphone recognition"
+  },
+  "lint": {
+    "debug": "0 errors, 8 warnings",
+    "release": "0 errors, 8 warnings",
+    "warnings": "Pinned dependency updates plus allowBackup deprecation; extraction exclusion rules present"
+  },
+  "limitations": [
+    "No physical Galaxy microphone test",
+    "No speech accuracy or full microphone-to-caption latency measurement",
+    "Android 35 x86_64 emulator, not ARM physical hardware",
+    "Only six authored model examples; no general accuracy score"
+  ],
+  "release_apk": {
+    "bytes": 68603865,
+    "sha256": "5e1cc59138a96faf60d8780459404b9200420a2576800630aacc785d5e384e28",
+    "signature_v2_verified": true,
+    "clean_install_and_launch": "passed Android35 x86_64",
+    "startup_microphone_permission_granted": false,
+    "crash_log": "no AndroidRuntime crash after launch"
+  }
+}

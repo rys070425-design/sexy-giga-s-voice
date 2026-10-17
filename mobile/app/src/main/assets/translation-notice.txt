@@ -1,0 +1,7 @@
+Google Translate attribution and disclaimer
+https://docs.cloud.google.com/translate/attribution?hl=en
+
+THIS SERVICE MAY CONTAIN TRANSLATIONS POWERED BY GOOGLE. GOOGLE DISCLAIMS ALL WARRANTIES RELATED TO THE TRANSLATIONS, EXPRESS OR IMPLIED, INCLUDING ANY WARRANTIES OF ACCURACY, RELIABILITY, AND ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+Translation: ML Kit on-device translation. Speech: Android device/service selected by the user.
+Universal Voice is an independent app and is not affiliated with Google.

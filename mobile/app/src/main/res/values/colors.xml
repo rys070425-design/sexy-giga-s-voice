@@ -1,0 +1,9 @@
+<resources>
+    <color name="background">#F2F6F5</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="ink">#132B26</color>
+    <color name="muted">#5F746D</color>
+    <color name="primary">#006D56</color>
+    <color name="outline">#DAE5E0</color>
+    <color name="on_primary">#FFFFFF</color>
+</resources>

@@ -55,6 +55,6 @@ if preferences.is_file():
     config=read_json(settings_file,DEFAULT_SETTINGS)
     apply_install_language(config,chosen)
     write_json(settings_file,config)
-report=dict(version='0.9.3',python=sys.executable,device=device,model='large-v3-turbo',translator='NLLB-200 distilled 600M int8',translation_ready=True,speaker_assistance='CAM++ zh-en advanced CPU',speaker_model_verified=True,verified=True)
+report=dict(version='0.9.4',python=sys.executable,device=device,model='large-v3-turbo',translator='NLLB-200 distilled 600M int8',translation_ready=True,speaker_assistance='CAM++ zh-en advanced CPU',speaker_model_verified=True,verified=True)
 (root/'INSTALL_SUCCESS.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
 print('RUNTIME_VERIFIED',flush=True)

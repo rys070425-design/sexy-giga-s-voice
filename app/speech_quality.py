@@ -1,10 +1,63 @@
 """Local speech segmentation and deterministic decoder settings."""
 from __future__ import annotations
 from dataclasses import dataclass
+import re
 import numpy as np
 
 SAMPLE_RATE = 16000
 FRAME = 320
+
+
+class SpeechPresence:
+    """Check actual speech before decoding either drafts or final clips.
+
+    WebRTC remains the cheap capture segmenter. Silero verifies its candidates
+    without trimming their audio or moving word/speaker timestamps.
+    """
+    def __init__(self):
+        from faster_whisper.vad import get_speech_timestamps, VadOptions
+        self.detect = get_speech_timestamps
+        self.options = VadOptions(threshold=.5, min_speech_duration_ms=100,
+                                  min_silence_duration_ms=250, speech_pad_ms=0)
+        self.speech_seconds = 0.
+
+    def warmup(self):
+        self(np.zeros(SAMPLE_RATE // 2, np.float32))
+
+    def __call__(self, audio):
+        spans=self.detect(audio, self.options)
+        self.speech_seconds=sum(span['end']-span['start'] for span in spans)/SAMPLE_RATE
+        return bool(spans)
+
+
+class DraftStability:
+    """Very short fragments wait for their final; longer first drafts do not.
+
+    This is based on text length, not a list of forbidden phrases. A real
+    repeated acknowledgement and real short calls remain valid final speech.
+    """
+    def accept(self, clip, text):
+        normalized = ' '.join(re.findall(r'\w+', text.casefold()))
+        if not normalized:
+            return False
+        if clip.final:
+            return True
+        short = len(normalized.replace(' ', '')) <= 12 and len(normalized.split()) <= 2
+        return not short
+
+
+def ambiguous_fragment(segments, language_probability, speech_seconds):
+    """Reject a weak two-word guess from a tiny acoustic fragment.
+
+    All three independent uncertainties must coincide. Single-word calls,
+    longer speech, and confident short phrases are unaffected. No phrase list.
+    """
+    if speech_seconds>=.3 or language_probability>=.75:return False
+    words=[word for segment in segments for word in (getattr(segment,'words',None) or [])
+           if re.search(r'\w',word.word)]
+    if len(words)!=2:return False
+    content=max(words,key=lambda word:len(re.sub(r'\W','',word.word)))
+    return len(re.sub(r'\W','',content.word))>=3 and content.probability<.5
 
 
 @dataclass

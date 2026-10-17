@@ -68,9 +68,23 @@ class PresentationTests(unittest.TestCase):
         self.assertEqual(model.current.text,'셋째 문장')
     def test_final_is_not_delayed_forever(self):
         model=ReadableCaptions();model.offer(update(0,25,'길게 잘못 들은 문장입니다'),'YouTube',0)
-        model.offer(update(0,45,'완전히 다른 확정 결과',True),'YouTube',.2)
-        self.assertTrue(model.advance(.8))
+        self.assertTrue(model.offer(update(0,45,'완전히 다른 확정 결과',True),'YouTube',.2))
         self.assertTrue(model.current.final)
+    def test_interim_rewording_waits_for_end_of_speech(self):
+        model=ReadableCaptions();model.offer(update(0,25,'읽고 있는 문장'),'YouTube',0)
+        for revision,now in [(45,1),(65,2),(85,3)]:
+            self.assertFalse(model.offer(update(0,revision,'앞부분부터 바뀐 임시 번역'),'YouTube',now))
+        self.assertFalse(model.advance(30))
+        self.assertEqual(model.current.text,'읽고 있는 문장')
+        self.assertTrue(model.offer(update(0,100,'확정된 문장',True),'YouTube',30.1))
+    def test_interim_can_extend_visible_words_without_rewriting_them(self):
+        model=ReadableCaptions();model.offer(update(0,25,'지금 가요.'),'YouTube',0)
+        self.assertTrue(model.offer(update(0,45,'지금 가요. 함께 가요.'),'YouTube',1))
+        self.assertEqual(model.current.text,'지금 가요. 함께 가요.')
+    def test_new_sentence_still_appears_without_waiting_for_final(self):
+        model=ReadableCaptions();model.offer(update(0,25,'첫 문장'),'YouTube',0)
+        self.assertTrue(model.offer(update(1,25,'다음 문장의 초안'),'YouTube',1))
+        self.assertEqual(model.current.text,'다음 문장의 초안')
     def test_old_translation_cannot_rewind(self):
         model=ReadableCaptions();model.offer(update(2,45,'최근'),'YouTube',0)
         self.assertFalse(model.offer(update(1,90,'과거',True),'YouTube',2))

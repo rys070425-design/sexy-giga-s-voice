@@ -1,0 +1,81 @@
+{
+  "release": "0.9.4",
+  "unit_tests_passed": 140,
+  "models_unchanged": {
+    "asr": "Whisper large-v3-turbo GPU int8_float16",
+    "translation": "NLLB-200 distilled 600M CPU int8"
+  },
+  "replay": {
+    "recording_seconds": 359.7,
+    "speech_test_start_seconds": 90,
+    "speech_test_end_seconds": 359.68,
+    "counter_unit": "ASR update, not distinct utterance or rendered frame",
+    "before": {
+      "events": 432,
+      "spoken_updates": 432,
+      "thank_you_updates": 61,
+      "quiet_window_text_updates": 5,
+      "retracted_sequences": 0,
+      "runtime_seconds": 316.86,
+      "final_thank_you_updates": 3
+    },
+    "after": {
+      "events": 320,
+      "spoken_updates": 293,
+      "thank_you_updates": 3,
+      "quiet_window_text_updates": 0,
+      "retracted_sequences": 27,
+      "runtime_seconds": 223.2,
+      "final_thank_you_updates": 0
+    },
+    "raw_recording_or_transcript_published": false
+  },
+  "owned_control_conditions": {
+    "normal_and_attenuated_30db": 18,
+    "all_speech_accepted": true,
+    "genuine_short_thanks_and_calls": 4,
+    "all_short_finals_preserved": true
+  },
+  "ui": {
+    "passed": true,
+    "real_window_code": true,
+    "visible_desktop_windows": false,
+    "late_translation_blocked": true,
+    "real_thanks_preserved": true,
+    "draft_rewrites_held_until_final": true
+  },
+  "installer": {
+    "silent_installer_exit": 0,
+    "installer_version": "0.9.4",
+    "all_installed_python_files_match_payload_source": true,
+    "existing_models_and_test_runtime_reused": true,
+    "python_absent_fresh_pc_test": false,
+    "actual_installed_engine_asr_and_translation": [
+      {
+        "case": "quiet-recording",
+        "passed": true,
+        "translated_captions": 0,
+        "bad_draft_retracted": true
+      },
+      {
+        "case": "owned-genuine-thanks",
+        "passed": true,
+        "translated_captions": 1,
+        "bad_draft_retracted": false
+      }
+    ],
+    "desktop_windows_shown": false
+  },
+  "limitations": [
+    "One real recording, offline sequential replay; real-time queue drops can change update counts",
+    "Three acknowledgement-containing draft updates remain in replay; zero acknowledgement-containing final updates in this recording",
+    "No general accuracy percentage or new microphone-to-caption latency guarantee",
+    "Very short unclear real two-word fragments may also be withheld",
+    "Fresh Python-absent Windows machine not tested"
+  ],
+  "exe": {
+    "bytes": 1927680,
+    "sha256": "fa9f6fe44ece7b9c949733d17dfd9ff7b13635f652aeb3c56415568e1432f7b5",
+    "file_version": "0.9.4.0"
+  }
+}

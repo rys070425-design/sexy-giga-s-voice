@@ -33,6 +33,7 @@ class CaptionUpdate:
     part: int = 0
     suppressed: bool = False
     speaker_epoch: int = -1
+    retracted: bool = False
 
 
 class DisplayOrder:
@@ -41,7 +42,7 @@ class DisplayOrder:
         self.key = (-1, -1, -1)
 
     def accept(self, update):
-        key = (update.sequence, update.revision, 2 if update.suppressed else int(bool(update.translated)))
+        key = (update.sequence, update.revision, 2 if update.suppressed or update.retracted else int(bool(update.translated)))
         if key < self.key:
             return False
         self.key = key

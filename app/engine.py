@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 from scipy.signal import resample_poly
 from PySide6.QtCore import QObject, Signal
-from speech_quality import SAMPLE_RATE, FRAME, Segmenter, AudioClip, decoder_options, transcript_parts, make_segmenter
+from speech_quality import SAMPLE_RATE, FRAME, Segmenter, AudioClip, decoder_options, transcript_parts, make_segmenter, SpeechPresence, DraftStability, ambiguous_fragment
 from speaker_labels import SpeakerTimeline, group_timed_words, UNKNOWN
 from live_captions import LatestSlot, CaptionUpdate
 from audio_sources import SourceTracker
@@ -177,6 +177,9 @@ class VoiceService(QObject):
     def _recognize(self, current_stop):
         try:
             model = self._load_model()
+            presence = SpeechPresence()
+            presence.warmup()
+            drafts = DraftStability()
             self.ready.set()
             while not current_stop.is_set() or self._capture_alive() or not self.audio_q.empty():
                 try:
@@ -187,6 +190,9 @@ class VoiceService(QObject):
                     clip = self.preview_audio.take()
                     if clip is None or clip.sequence <= self.finalized_sequence:
                         continue
+                if not presence(clip.audio):
+                    if clip.final:self._retract_clip(clip)
+                    continue
                 options = decoder_options(self.profile)
                 hide_native=self.profile.get('hide_native',False)
                 target_language=normalize_language(self.profile.get('target_language','ko'))
@@ -207,12 +213,23 @@ class VoiceService(QObject):
                     continue
                 if not clip.final:
                     segments = [s for s in segments if s.avg_logprob >= -1.0 and s.no_speech_prob < 0.6]
+                else:
+                    segments=list(segments)
+                    if ambiguous_fragment(segments,getattr(info,'language_probability',1.),presence.speech_seconds):
+                        self._retract_clip(clip)
+                        continue
                 parts = list(transcript_parts(segments, clip.overlap))
+                text = ''.join(p[0] for p in parts).strip()
+                if not text:
+                    if clip.final:self._retract_clip(clip)
+                    continue
+                if not drafts.accept(clip,text):
+                    if clip.final:self._retract_clip(clip)
+                    continue
                 if clip.final:
                     self.finalized_sequence = clip.sequence
                     groups = group_timed_words(parts, self.timeline, clip.start)
                 else:
-                    text = ''.join(p[0] for p in parts).strip()
                     label = self.timeline.resolve(clip.start + clip.overlap,
                                                   clip.start + len(clip.audio) / SAMPLE_RATE)
                     groups = [(label, text,clip.overlap,len(clip.audio)/SAMPLE_RATE)] if text else []
@@ -238,6 +255,11 @@ class VoiceService(QObject):
         finally:
             self.asr_done.set()
             self._worker_finished(current_stop)
+
+    def _retract_clip(self,clip):
+        self.finalized_sequence=clip.sequence
+        self.live_caption.emit(CaptionUpdate(clip.sequence,clip.revision,'','','','',True,True,
+            target_language=normalize_language(self.profile.get('target_language','ko')),retracted=True))
 
     def _capture_alive(self):
         return bool(self.threads and self.threads[0].is_alive())

@@ -37,7 +37,12 @@ class LanguagePreferencesTests(unittest.TestCase):
             service._load_model=lambda:SimpleNamespace(transcribe=transcribe)
             service.audio_q.put(AudioClip(np.zeros(16000,np.float32),sequence=5,revision=100))
             service.live_caption.connect(events.append);service.error.connect(errors.append)
-            service.stop_event.set();service._recognize(service.stop_event)
+            service.stop_event.set()
+            # This test isolates the native-language decoder bypass, after
+            # audio has already passed the independent speech-presence gate.
+            with patch('engine.SpeechPresence') as presence:
+                presence.return_value.return_value=True
+                service._recognize(service.stop_event)
             self.assertEqual(errors,[])
             self.assertEqual(len(events),1)
             self.assertTrue(events[0].suppressed)

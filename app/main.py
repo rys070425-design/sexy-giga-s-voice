@@ -262,7 +262,7 @@ class MainWindow(QMainWindow):
         self.reviewed_translation = ""
         self.review_pin = False  # do not overwrite the phrase under review
         self.plan_result.connect(self.on_plan_result)
-        self.setWindowTitle("Universal Voice KR v0.9.3 · 읽기 편한 실시간 자막")
+        self.setWindowTitle("Universal Voice KR v0.9.4 · 읽기 편한 실시간 자막")
         self.setMinimumSize(960,620)
         screen=QApplication.primaryScreen()
         available=screen.availableGeometry() if screen else None
@@ -319,7 +319,7 @@ class MainWindow(QMainWindow):
         license_note=CaptionLabel('NLLB: CC-BY-NC-4.0')
         license_note.setObjectName('version')
         side.addWidget(license_note)
-        version = QLabel('VERSION 0.9.3')
+        version = QLabel('VERSION 0.9.4')
         version.setObjectName('version')
         side.addWidget(version)
         outer.addWidget(sidebar)
@@ -1008,6 +1008,11 @@ class MainWindow(QMainWindow):
 
     def on_live_caption(self, update):
         if self.pending_restart or self.closing:return
+        if update.retracted:
+            if self.presentation.retract(update):
+                if self.presentation.current:self.render_captions()
+                else:self.overlay.hide();self.live_text.hide();self.caption_timer.stop()
+            return
         profile=self.cfg['profiles'][self.profile_idx]
         if update.suppressed or (profile.get('hide_native',True) and same_language(update.language,profile.get('target_language','en'))):
             from dataclasses import replace

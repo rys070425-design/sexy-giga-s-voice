@@ -1,6 +1,5 @@
 """Readable display pacing, independent from recognition and translation speed."""
 from dataclasses import dataclass
-from difflib import SequenceMatcher
 import time
 from live_captions import DisplayOrder
 
@@ -32,8 +31,6 @@ class ReadableCaptions:
         self.previous_hold=previous_hold
         self.current=self.previous=self.pending=None
         self.changed_at=self.previous_at=float('-inf')
-        self.pending_at=0.
-        self.repeats=0
         self.suppressed_revisions={}
 
     def is_suppressed(self,update):
@@ -41,6 +38,7 @@ class ReadableCaptions:
 
     def offer(self, update, label, now=None):
         now=time.monotonic() if now is None else now
+        if update.retracted:return self.retract(update)
         if update.suppressed:return self.suppress(update)
         if self.is_suppressed(update):return False
         # Never alternate between a foreign draft and its translation.
@@ -58,13 +56,23 @@ class ReadableCaptions:
             self.previous=card
             return changed
         if not self.order.accept(update):return False
-        if self.pending and (self.pending.identity,self.pending.text)==(card.identity,card.text):
-            self.repeats+=1
-        else:
-            if not self.pending or self.pending.identity!=card.identity:self.pending_at=now
-            self.repeats=1
         self.pending=card
         return self.advance(now)
+
+    def retract(self, update):
+        # Reject delayed translations of this discarded audio, while retaining
+        # unrelated real sentences and allowing a later utterance to repeat it.
+        self.suppressed_revisions[update.sequence]=max(update.revision,self.suppressed_revisions.get(update.sequence,-1))
+        if len(self.suppressed_revisions)>128:
+            del self.suppressed_revisions[min(self.suppressed_revisions)]
+        self.order.accept(update)
+        changed=False
+        if self.pending and self.pending.sequence==update.sequence:self.pending=None
+        if self.previous and self.previous.sequence==update.sequence:
+            self.previous=None;changed=True
+        if self.current and self.current.sequence==update.sequence:
+            self.current,self.previous=self.previous,None;changed=True
+        return changed
 
     def suppress(self,update):
         self.suppressed_revisions[update.sequence]=max(update.revision,self.suppressed_revisions.get(update.sequence,-1))
@@ -83,10 +91,14 @@ class ReadableCaptions:
         if old and (card.identity,card.text,card.label)==(old.identity,old.text,old.label):
             self.current=card;self.pending=None
             return False
-        if old and now-self.changed_at<self.interval:return False
-        if old and old.identity==card.identity and len(old.text)>8 and not card.final:
-            similarity=SequenceMatcher(None,old.text,card.text,autojunk=False).ratio()
-            if similarity<.5 and self.repeats<2 and now-self.pending_at<1.2:return False
+        same_sentence=old and old.identity==card.identity
+        # Correct an existing sentence as soon as its final arrives. During
+        # speech, only append to the visible wording; never repeatedly replace
+        # the beginning as an incremental translation changes its grammar.
+        if old and now-self.changed_at<self.interval and not (same_sentence and card.final):return False
+        if same_sentence and not card.final:
+            stem=old.text.rstrip(' .,!?:;…。，！？：；')
+            if not stem or not card.text.startswith(stem):return False
         if old and old.identity!=card.identity and (self.previous is None or now-self.previous_at>=self.previous_hold):
             self.previous=old;self.previous_at=now
         self.current=card;self.pending=None;self.changed_at=now

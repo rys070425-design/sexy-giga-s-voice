@@ -10,7 +10,7 @@ import numpy as np
 from scipy.signal import resample_poly
 from PySide6.QtCore import QObject, Signal
 from speech_quality import SAMPLE_RATE, FRAME, Segmenter, AudioClip, decoder_options, transcript_parts, make_segmenter
-from speaker_labels import SpeakerTimeline, group_words
+from speaker_labels import SpeakerTimeline, group_timed_words, UNKNOWN
 from live_captions import LatestSlot, CaptionUpdate
 from audio_sources import SourceTracker
 from language_preferences import same_language,normalize_language
@@ -41,6 +41,7 @@ class VoiceService(QObject):
         self.finalized_sequence = -1
         self._finish_lock = threading.Lock()
         self._workers_remaining = 0
+        self.voice_identity = None
 
     def _worker_finished(self, current_stop):
         with self._finish_lock:
@@ -54,7 +55,6 @@ class VoiceService(QObject):
         if self.running:
             return
         self.running = True
-        self._workers_remaining = 4
         self.stop_event = threading.Event()
         self.ready = threading.Event()
         self.translator_ready = threading.Event()
@@ -66,11 +66,14 @@ class VoiceService(QObject):
         self.preview_text = LatestSlot()
         self.finalized_sequence = -1
         self.profile, self.dictionary = dict(profile), dict(dictionary)
+        from voice_identity import VoiceIdentity
+        self.voice_identity=VoiceIdentity(self.timeline) if self.profile.get('voice_identity',True) else None
+        workers=[(self._capture, 'audio-capture'),(self._recognize, 'speech-recognition'),
+                 (self._translate, 'local-translation'),(self._source_monitor, 'audio-source-labels')]
+        if self.voice_identity is not None:workers.append((self._voice_worker,'voice-nickname-assist'))
+        self._workers_remaining=len(workers)
         self.threads = [threading.Thread(target=fn, args=(current_stop,), daemon=True, name=name)
-                        for fn, name in [(self._capture, 'audio-capture'),
-                                         (self._recognize, 'speech-recognition'),
-                                         (self._translate, 'local-translation'),
-                                         (self._source_monitor, 'audio-source-labels')]]
+                        for fn, name in workers]
         for thread in self.threads:
             thread.start()
 
@@ -97,6 +100,9 @@ class VoiceService(QObject):
                     return
             if current_stop.is_set():
                 return
+            while not self.translator_ready.wait(.05):
+                if current_stop.is_set():return
+            if current_stop.is_set():return
             import soundcard as sc
             from core import select_output_loopback
             mic = select_output_loopback(sc.all_microphones(include_loopback=True),
@@ -104,6 +110,7 @@ class VoiceService(QObject):
             self.status.emit(f'출력 소리 수집 중: {mic.name}')
             interval = 0.4 if self.resolved_device == 'cuda' else 1.2
             segmenter = make_segmenter(self.profile, interval)
+            captured_epoch=self.timeline.epoch;sequence_epoch=captured_epoch
             with mic.recorder(samplerate=48000, channels=2, blocksize=2400) as recorder:
                 origin = None
                 while not current_stop.is_set():
@@ -116,17 +123,25 @@ class VoiceService(QObject):
                     if mono.ndim > 1:
                         mono = mono.mean(axis=1)
                     down = resample_poly(np.nan_to_num(mono), 1, 3).astype(np.float32)
+                    epoch=self.timeline.epoch
+                    if epoch!=captured_epoch:
+                        sequence_epoch=-1 if segmenter.speaking else epoch
+                        captured_epoch=epoch
                     for clip in segmenter.push(down):
                         clip.start += origin
+                        clip.speaker_epoch=sequence_epoch
                         self._enqueue(self.audio_q, clip, '음성 인식')
+                        sequence_epoch=captured_epoch
                     if self.profile.get('live_preview', True):
                         clip = segmenter.preview()
                         if clip is not None:
                             clip.start += origin
+                            clip.speaker_epoch=sequence_epoch
                             self.preview_audio.put(clip)
                 if origin is not None:
                     for clip in segmenter.flush():
                         clip.start += origin
+                        clip.speaker_epoch=sequence_epoch
                         self._enqueue(self.audio_q, clip, '음성 인식')
         except Exception as exc:
             self.error.emit('소리 수집 오류: ' + str(exc))
@@ -195,18 +210,23 @@ class VoiceService(QObject):
                 parts = list(transcript_parts(segments, clip.overlap))
                 if clip.final:
                     self.finalized_sequence = clip.sequence
-                    groups = group_words(parts, self.timeline, clip.start)
+                    groups = group_timed_words(parts, self.timeline, clip.start)
                 else:
                     text = ''.join(p[0] for p in parts).strip()
                     label = self.timeline.resolve(clip.start + clip.overlap,
                                                   clip.start + len(clip.audio) / SAMPLE_RATE)
-                    groups = [(label, text)] if text else []
-                for index, (label, text) in enumerate(groups):
+                    groups = [(label, text,clip.overlap,len(clip.audio)/SAMPLE_RATE)] if text else []
+                epoch=clip.speaker_epoch
+                for index, (label, text,begin,end) in enumerate(groups):
+                    source=self.sources.resolve(clip.start+begin,clip.start+end)
                     update = CaptionUpdate(clip.sequence, clip.revision + index, text,
                                            text if same_language(info.language,target_language) else '',
                                            info.language, label, clip.final, False,
-                                           self.sources.resolve(clip.start+clip.overlap,clip.start+len(clip.audio)/SAMPLE_RATE),
-                                           target_language,part=index)
+                                           source,target_language,part=index,speaker_epoch=epoch)
+                    if clip.final and self.voice_identity is not None and epoch==self.timeline.epoch:
+                        self.voice_identity.submit((clip.sequence,index,epoch),
+                            clip.audio[max(0,int(begin*SAMPLE_RATE)):int(end*SAMPLE_RATE)],
+                            clip.start+begin,clip.start+end,source,epoch=epoch)
                     self.live_caption.emit(update)
                     if clip.final:
                         self._enqueue(self.text_q, update, '번역')
@@ -221,6 +241,13 @@ class VoiceService(QObject):
 
     def _capture_alive(self):
         return bool(self.threads and self.threads[0].is_alive())
+
+    def _voice_worker(self,current_stop):
+        try:self.voice_identity.run(current_stop,self.asr_done)
+        except Exception:
+            # Speaker assistance is optional; it must never stop captions.
+            self.status.emit('목소리 보조 확인을 사용할 수 없어 Discord 말하기 표시를 사용합니다.')
+        finally:self._worker_finished(current_stop)
 
     def _source_monitor(self,current_stop):
         probe=None
@@ -254,7 +281,9 @@ class VoiceService(QObject):
             if source != target_language and can_translate(source,target_language):
                 # Load the native translator in parallel with Whisper startup,
                 # rather than delaying the first actual foreign sentence.
-                translator.translate('', source, target_language)
+                # A nonempty, language-neutral probe initializes native CPU
+                # kernels too. Empty input only loads weights in NLLB.
+                translator.translate('1', source, target_language)
             self.translator_ready.set()
             phrase_memory = read_phrase_memory(HOME / 'phrase_memory.json')
             terms = {}
@@ -303,6 +332,10 @@ class VoiceService(QObject):
                         self.status.emit('번역 실패 (' + source_lang + '→'+target_language+'): ' + str(exc)[:180])
                 # Draft work is bounded to one latest item. A completed old
                 # draft must never overwrite its final sentence.
+                if (update.final and label==UNKNOWN and update.source=='Discord'
+                        and self.voice_identity is not None and update.speaker_epoch==self.timeline.epoch):
+                    match=self.voice_identity.result((update.sequence,update.part,update.speaker_epoch))
+                    if match:label=match;update=replace(update,speaker=match)
                 if update.final or update.sequence > self.finalized_sequence:
                     self.live_caption.emit(replace(update, translated=translated, language=source_lang, complete=True))
                 if update.final:

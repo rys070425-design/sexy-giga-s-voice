@@ -1,13 +1,13 @@
-# Universal Voice KR 0.9.2
+# Universal Voice KR 0.9.3
 
 Windows PC에서 Discord 등의 출력 소리를 받아 자막으로 보여 주는 앱입니다.
 기본 음성 인식과 번역은 PC에서 처리하며 유료 API가 필요하지 않습니다. 기본 번역 모델은 무료 개인·비상업용(CC-BY-NC-4.0)입니다.
 
 ## 설치
 
-[Windows 설치 파일 받기](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_Setup_v092.exe)
+[Windows 설치 파일 받기](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_Setup_v093.exe)
 
-[공유용 설치 ZIP 받기](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_v092_Windows_Installer.zip)
+[공유용 설치 ZIP 받기](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_v093_Windows_Installer.zip)
 
 메신저에서 EXE 파일을 첨부할 수 없다면 설치 파일과 안내만 들어 있는 ZIP을 이용하거나 이 저장소 링크를 공유하세요. ZIP은 Windows PC에서 압축을 모두 풀고 안의 EXE를 실행합니다. 소스 ZIP과는 다릅니다. 휴대폰용 앱은 아닙니다. ZIP 내부 설치 파일의 무결성은 확인했지만 카카오톡 전송 성공을 직접 시험한 것은 아닙니다.
 
@@ -15,7 +15,16 @@ Windows PC에서 Discord 등의 출력 소리를 받아 자막으로 보여 주�
 2. 영어로 시작하는 설치 창의 **Language**에서 언어를 고릅니다. 한국어를 고르면 안내가 즉시 한국어로 바뀝니다. 기존 설치와 같은 위치를 선택하면 받은 모델과 구성요소를 재사용합니다.
 3. 설치 후 같은 언어가 앱 UI와 자막 언어에 적용됩니다. 재생 출력 장치를 선택하고 **자막 시작**을 누릅니다. 기본적으로 설정한 언어의 말은 자막과 기록에서 제외합니다.
 
-최초 설치에는 인터넷 연결과 수 GB의 여유 공간이 필요합니다. Whisper large-v3-turbo와 NLLB-200 distilled 600M 번역 모델을 내려받는 온라인 설치 파일입니다. 번역 자료는 약 582MB이며 SHA-256을 확인합니다. 관리자 권한이나 시스템 PATH 변경 없이 사용자 계정에 설치합니다. NVIDIA GPU가 있으면 음성 인식에 GPU를 우선 사용하며 CPU도 선택할 수 있습니다.
+최초 설치에는 인터넷 연결과 수 GB의 여유 공간이 필요합니다. Whisper large-v3-turbo, NLLB-200 distilled 600M 번역 모델, 약 28MB의 CAM++ 화자 보조 모델을 내려받는 온라인 설치 파일입니다. 번역 자료는 약 582MB이며 SHA-256을 확인합니다. 관리자 권한이나 시스템 PATH 변경 없이 사용자 계정에 설치합니다. NVIDIA GPU가 있으면 음성 인식에 GPU를 우선 사용하며 CPU도 선택할 수 있습니다.
+
+## 0.9.3에서 바뀐 점
+
+- 일반 대화의 첫 초안 시점을 유지하고 최종 인식 문맥을 8초에서 10초로 늘렸습니다. 실제 억양 녹음 한 개의 단어 오류율은 10.14%에서 8.70%로 줄었고, 다른 한 개는 4.35%를 유지했습니다. 두 읽기 녹음의 제한된 비교입니다.
+- 뜻이 명확한 일부 영어 축약형을 번역 전에 풀어 미래·비교 표현의 일부 의미 오류를 줄입니다. 인식 원문은 유지합니다.
+- 약 28 MB의 **CAM++ 목소리 보조 모델**을 추가했습니다. Discord의 확실한 단독 발언으로 현재 통화방의 닉네임을 연결한 뒤, 충분한 증거가 있을 때만 불확실한 이름을 보완합니다. 이름 확인 때문에 자막을 기다리게 하지 않습니다.
+- 목소리 정보는 메모리에만 두고 통화방 변경·중지 시 폐기합니다. 겹친 음성을 사람별로 분리하거나 처음 듣는 목소리의 실명을 알아내는 기능은 아닙니다.
+
+[정확도·화자 보조·속도 검증과 제외한 후보](docs/validation-v093.md)
 
 ## 0.9.2에서 바뀐 점
 

@@ -1,0 +1,727 @@
+[
+  {
+    "model": "large-v3-turbo",
+    "device": "cuda",
+    "language": "en",
+    "mode": "auto",
+    "target": "ko",
+    "kind": "normal",
+    "hide_native": true,
+    "full_utterance": false,
+    "first_visible": 1.156,
+    "visible_updates": 4,
+    "minimum_update_gap": 0.812,
+    "minimum_decision_gap": 0.812,
+    "visible": [
+      {
+        "seconds": 1.156,
+        "decision_seconds": 1.156,
+        "text": "그들은"
+      },
+      {
+        "seconds": 1.969,
+        "decision_seconds": 1.969,
+        "text": "그들은 우리의"
+      },
+      {
+        "seconds": 2.781,
+        "decision_seconds": 2.781,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다."
+      },
+      {
+        "seconds": 4.344,
+        "decision_seconds": 4.344,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다. 오른쪽 쪽을 조심하세요."
+      }
+    ],
+    "events": [
+      {
+        "seconds": 1.047,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 1.156,
+        "text": "그들은",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 1.594,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 1.75,
+        "text": "그들은 우리의",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 2.172,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 2.391,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 2.75,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 2.766,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 3.344,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 3.594,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 3.938,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 4.344,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다. 오른쪽 쪽을 조심하세요.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 4.688,
+        "text": "",
+        "final": true,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 4.922,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": true,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      }
+    ]
+  },
+  {
+    "model": "large-v3-turbo",
+    "device": "cuda",
+    "language": "ko",
+    "mode": "auto",
+    "target": "en",
+    "kind": "normal",
+    "hide_native": true,
+    "full_utterance": false,
+    "first_visible": 1.39,
+    "visible_updates": 4,
+    "minimum_update_gap": 0.812,
+    "minimum_decision_gap": 0.812,
+    "visible": [
+      {
+        "seconds": 1.39,
+        "decision_seconds": 1.39,
+        "text": "The enemy."
+      },
+      {
+        "seconds": 2.203,
+        "decision_seconds": 2.203,
+        "text": "The enemy is our enemy."
+      },
+      {
+        "seconds": 3.015,
+        "decision_seconds": 3.015,
+        "text": "The enemy is pushing us to our base."
+      },
+      {
+        "seconds": 3.828,
+        "decision_seconds": 3.828,
+        "text": "The enemy is pushing us into our base."
+      }
+    ],
+    "events": [
+      {
+        "seconds": 1.234,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "ko"
+      },
+      {
+        "seconds": 1.39,
+        "text": "The enemy.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "ko"
+      },
+      {
+        "seconds": 1.796,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "ko"
+      },
+      {
+        "seconds": 1.968,
+        "text": "The enemy is our enemy.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "ko"
+      },
+      {
+        "seconds": 2.375,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "ko"
+      },
+      {
+        "seconds": 2.64,
+        "text": "The enemy is pushing us to our base.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "ko"
+      },
+      {
+        "seconds": 2.953,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "ko"
+      },
+      {
+        "seconds": 3.265,
+        "text": "The enemy is pushing us into our base.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "ko"
+      },
+      {
+        "seconds": 3.562,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "ko"
+      },
+      {
+        "seconds": 3.843,
+        "text": "The enemy is pushing us into our base.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "ko"
+      },
+      {
+        "seconds": 4.187,
+        "text": "",
+        "final": true,
+        "complete": false,
+        "suppressed": false,
+        "detected": "ko"
+      },
+      {
+        "seconds": 4.187,
+        "text": "The enemy is pushing us into our base.",
+        "final": true,
+        "complete": true,
+        "suppressed": false,
+        "detected": "ko"
+      }
+    ]
+  },
+  {
+    "model": "large-v3-turbo",
+    "device": "cuda",
+    "language": "ko",
+    "mode": "auto",
+    "target": "ko",
+    "kind": "normal",
+    "hide_native": true,
+    "full_utterance": false,
+    "first_visible": null,
+    "visible_updates": 0,
+    "minimum_update_gap": null,
+    "minimum_decision_gap": null,
+    "visible": [],
+    "events": [
+      {
+        "seconds": 0.797,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "ko"
+      },
+      {
+        "seconds": 1.172,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "ko"
+      },
+      {
+        "seconds": 1.579,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "ko"
+      },
+      {
+        "seconds": 1.969,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "ko"
+      },
+      {
+        "seconds": 2.36,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "ko"
+      },
+      {
+        "seconds": 2.797,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "ko"
+      },
+      {
+        "seconds": 3.172,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "ko"
+      },
+      {
+        "seconds": 3.516,
+        "text": "",
+        "final": true,
+        "complete": true,
+        "suppressed": true,
+        "detected": "ko"
+      }
+    ]
+  },
+  {
+    "model": "large-v3-turbo",
+    "device": "cuda",
+    "language": "en",
+    "mode": "auto",
+    "target": "en",
+    "kind": "normal",
+    "hide_native": true,
+    "full_utterance": false,
+    "first_visible": null,
+    "visible_updates": 0,
+    "minimum_update_gap": null,
+    "minimum_decision_gap": null,
+    "visible": [],
+    "events": [
+      {
+        "seconds": 1.016,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "en"
+      },
+      {
+        "seconds": 1.344,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "en"
+      },
+      {
+        "seconds": 1.641,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "en"
+      },
+      {
+        "seconds": 1.984,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "en"
+      },
+      {
+        "seconds": 2.609,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "en"
+      },
+      {
+        "seconds": 3.047,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "en"
+      },
+      {
+        "seconds": 3.438,
+        "text": "",
+        "final": false,
+        "complete": true,
+        "suppressed": true,
+        "detected": "en"
+      },
+      {
+        "seconds": 3.859,
+        "text": "",
+        "final": true,
+        "complete": true,
+        "suppressed": true,
+        "detected": "en"
+      }
+    ]
+  },
+  {
+    "model": "large-v3-turbo",
+    "device": "cuda",
+    "language": "en",
+    "mode": "auto",
+    "target": "ko",
+    "kind": "fast",
+    "hide_native": true,
+    "full_utterance": false,
+    "first_visible": 1.172,
+    "visible_updates": 3,
+    "minimum_update_gap": 0.812,
+    "minimum_decision_gap": 0.812,
+    "visible": [
+      {
+        "seconds": 1.172,
+        "decision_seconds": 1.172,
+        "text": "밀고 있어요"
+      },
+      {
+        "seconds": 1.984,
+        "decision_seconds": 1.984,
+        "text": "그들은 우리의 아..."
+      },
+      {
+        "seconds": 2.797,
+        "decision_seconds": 2.797,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다."
+      }
+    ],
+    "events": [
+      {
+        "seconds": 1.031,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 1.172,
+        "text": "밀고 있어요",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 1.594,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 1.75,
+        "text": "그들은 우리의 아...",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 2.172,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 2.422,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 2.765,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 2.765,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 3.359,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 3.609,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 3.969,
+        "text": "",
+        "final": true,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 3.969,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": true,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      }
+    ]
+  },
+  {
+    "model": "large-v3-turbo",
+    "device": "cuda",
+    "language": "en",
+    "mode": "auto",
+    "target": "ko",
+    "kind": "noisy",
+    "hide_native": true,
+    "full_utterance": false,
+    "first_visible": 1.157,
+    "visible_updates": 4,
+    "minimum_update_gap": 0.812,
+    "minimum_decision_gap": 0.812,
+    "visible": [
+      {
+        "seconds": 1.157,
+        "decision_seconds": 1.157,
+        "text": "그들은..."
+      },
+      {
+        "seconds": 1.969,
+        "decision_seconds": 1.969,
+        "text": "그들은 계속 추진하고 있습니다."
+      },
+      {
+        "seconds": 2.782,
+        "decision_seconds": 2.782,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다."
+      },
+      {
+        "seconds": 4.313,
+        "decision_seconds": 4.313,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다. 오른쪽 쪽을 조심하세요."
+      }
+    ],
+    "events": [
+      {
+        "seconds": 1.032,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 1.157,
+        "text": "그들은...",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 1.594,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 1.782,
+        "text": "그들은 계속 추진하고 있습니다.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 2.157,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 2.407,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 2.75,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 2.766,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 3.344,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 3.36,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 3.953,
+        "text": "",
+        "final": false,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 4.313,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다. 오른쪽 쪽을 조심하세요.",
+        "final": false,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 4.547,
+        "text": "",
+        "final": true,
+        "complete": false,
+        "suppressed": false,
+        "detected": "en"
+      },
+      {
+        "seconds": 4.766,
+        "text": "그들은 우리의 기지를 밀어내고 있습니다.",
+        "final": true,
+        "complete": true,
+        "suppressed": false,
+        "detected": "en"
+      }
+    ]
+  }
+]

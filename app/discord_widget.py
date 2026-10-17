@@ -266,7 +266,8 @@ class DiscordSpeakerTab(QWidget):
         self._generation += 1
         self._pending = False
         self.timer.stop()
-        # Keep past snapshots for ASR already in flight, append an empty state.
+        # A new channel/approval must never reuse old voice/name enrolments.
+        self.timeline.clear()
         self.timeline.record([])
         if self.browser is not None:
             self.browser.stop()

@@ -9,6 +9,12 @@ from local_translation import translation_route, game_phrase_translation
 
 
 class SpeechQualityTests(unittest.TestCase):
+    def test_general_context_keeps_first_preview_and_ten_second_final(self):
+        seg=Segmenter(1,preserve_context=True);seg.vad.is_speech=lambda pcm,rate:True
+        self.assertEqual(seg.push(np.full(25*320,.2,np.float32)),[])
+        self.assertIsNotNone(seg.preview())
+        self.assertEqual(seg.push(np.full(475*320,.2,np.float32))[0].audio.size,160000)
+
     def test_game_calls_are_exact_and_language_scoped(self):
         self.assertEqual(game_phrase_translation('Wait a second, I am healing.', 'en'),'잠깐만, 회복 중이야.')
         self.assertIsNone(game_phrase_translation('I am not healing.', 'en'))

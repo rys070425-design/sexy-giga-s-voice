@@ -15,6 +15,7 @@ parser.add_argument('--device',choices=('cpu','cuda'),default='cuda')
 parser.add_argument('--model',default='large-v3-turbo')
 parser.add_argument('--model-dir',type=Path)
 parser.add_argument('--hide-native',action='store_true')
+parser.add_argument('--full-utterance',action='store_true')
 args=parser.parse_args()
 runtime,fixtures,report=(path.resolve() for path in (args.runtime,args.fixtures,args.report))
 device=args.device
@@ -50,7 +51,8 @@ cases=[('en','en','ko','normal'),('en','auto','ko','normal'),
         ('en','en','ko','fast'),('en','en','ko','noisy'),('en','en','en','normal')]
 if args.hide_native:cases=[('en','auto','ko','normal'),('ko','auto','en','normal'),('ko','auto','ko','normal'),('en','auto','en','normal'),('en','auto','ko','fast'),('en','auto','ko','noisy')]
 for language,mode,target,kind in cases:
-    audio=decode_audio(str(fixtures/f'speech-{language}.wav'))[:48000]
+    audio=decode_audio(str(fixtures/f'speech-{language}.wav'))
+    if not args.full_utterance:audio=audio[:48000]
     if kind=='fast':audio=resample_poly(audio,4,5).astype(np.float32)
     if kind=='noisy':
         rng=np.random.default_rng(20261017)
@@ -110,7 +112,7 @@ for language,mode,target,kind in cases:
     # Cold paint can take longer than later paints. Completion timestamps
     # therefore differ slightly from the guaranteed display-decision pacing.
     assert all(gap>=.79 for gap in decisions),decisions
-    row=dict(model=args.model,device=device,language=language,mode=mode,target=target,kind=kind,hide_native=args.hide_native,first_visible=visible[0]['seconds'] if visible else None,
+    row=dict(model=args.model,device=device,language=language,mode=mode,target=target,kind=kind,hide_native=args.hide_native,full_utterance=args.full_utterance,first_visible=visible[0]['seconds'] if visible else None,
              visible_updates=len(visible),minimum_update_gap=min(gaps) if gaps else None,
              minimum_decision_gap=min(decisions) if decisions else None,
              visible=visible,events=events)

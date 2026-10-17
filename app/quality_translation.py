@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import re
+from translation_input import prepare_translation_text
 from functools import lru_cache
 
 MODEL_DIR=Path(__file__).resolve().parent/'models'/'nllb600m-int8'
@@ -49,7 +50,8 @@ class QualityTranslator:
                                             inter_threads=1,intra_threads=4)
             self.tokenizer=sentencepiece.SentencePieceProcessor(model_file=str(self.directory/'sentencepiece.bpe.model'))
         if not text.strip():return ''
-        tokens=[LANGUAGE_CODES[source],*self.tokenizer.encode(text,out_type=str),'</s>']
+        prepared=prepare_translation_text(text,source)
+        tokens=[LANGUAGE_CODES[source],*self.tokenizer.encode(prepared,out_type=str),'</s>']
         result=self.model.translate_batch([tokens],target_prefix=[[LANGUAGE_CODES[target]]],
                                           beam_size=4,max_decoding_length=192)[0]
         pieces=[token for token in result.hypotheses[0]

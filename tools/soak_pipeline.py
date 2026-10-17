@@ -7,6 +7,7 @@ from scipy.signal import resample_poly
 import psutil
 runtime,fixtures,report=map(lambda value:Path(value).resolve(),sys.argv[1:4])
 seconds=int(sys.argv[4]) if len(sys.argv)>4 else 120
+exercise_voice='--speaker-assist' in sys.argv[5:]
 sys.path.insert(0,str(runtime))
 from runtime_config import configure
 configure()
@@ -25,6 +26,7 @@ for cycle in range(3):
     service=VoiceService();presentation=ReadableCaptions()
     errors=[];overloads=[];recent=deque(maxlen=10);samples=[];counts={'complete':0,'preview':0,'redraw':0}
     origin=[];last_sample=0
+    counts['speaker_embeddings']=0
     service.error.connect(errors.append)
     service.status.connect(lambda text:overloads.append(text) if '대기열 초과' in text or '건너뜁니다' in text else None)
     def caption(event):
@@ -59,6 +61,27 @@ for cycle in range(3):
         except Exception as exc:errors.append(str(exc));stop.set()
         finally:self._worker_finished(stop)
     service._capture=types.MethodType(capture,service)
+    if exercise_voice:
+        # Controlled playback-source observations, no real Discord account.
+        def sources(self,stop):
+            try:
+                while not stop.is_set():
+                    self.sources.record(['discord.exe']);stop.wait(.1)
+            finally:self._worker_finished(stop)
+        service._source_monitor=types.MethodType(sources,service)
+        original_worker=service._voice_worker
+        def voice_worker(self,stop):
+            original=self.voice_identity._embedding
+            def counted(*args,**kwargs):
+                counts['speaker_embeddings']+=1;return original(*args,**kwargs)
+            self.voice_identity._embedding=counted
+            original_worker(stop)
+        service._voice_worker=types.MethodType(voice_worker,service)
+        original_enqueue=service._enqueue
+        def enqueue(self,target,item,kind):
+            if target is self.audio_q:item.speaker_epoch=self.timeline.epoch
+            original_enqueue(target,item,kind)
+        service._enqueue=types.MethodType(enqueue,service)
     started=time.monotonic()
     service.start(dict(model='large-v3-turbo',device='cuda',language='en',target_language='ko',
                        beam_size=5,translation_context='general'),{})
@@ -84,9 +107,13 @@ for cycle in range(3):
             faulthandler.dump_traceback(file=output)
     assert not service.running and all(not thread.is_alive() for thread in service.threads),'Workers did not finish'
     assert not errors and not overloads,(errors,overloads)
-    assert counts['complete']>=10,counts
+    assert counts['complete']>=max(1,seconds//12),counts
+    if exercise_voice:
+        assert counts['speaker_embeddings']>0,counts
+        assert not service.voice_identity.profiles.entries
     gc.collect()
     row=dict(cycle=cycle+1,elapsed=round(time.monotonic()-started,1),counts=counts,
+             voice_assistance_exercised=exercise_voice,actual_discord_call=False,
              post_stop_rss_mb=round(process.memory_info().rss/1048576,1),samples=samples,recent=list(recent))
     summaries.append(row)
     report.write_text(json.dumps(summaries,ensure_ascii=False,indent=2),encoding='utf-8')

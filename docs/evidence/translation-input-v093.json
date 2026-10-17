@@ -1,0 +1,359 @@
+{
+  "model": "NLLB-200 distilled 600M int8",
+  "changed_model": false,
+  "original_asr_text_modified": false,
+  "examples": [
+    {
+      "source": "I didn't say he stole it.",
+      "prepared": "I didn't say he stole it.",
+      "baseline": "내가 훔쳤다고 말하지 않았어",
+      "translation": "내가 훔쳤다고 말하지 않았어",
+      "seconds": 0.2086,
+      "held_out": false
+    },
+    {
+      "source": "You don't have to come.",
+      "prepared": "You don't have to come.",
+      "baseline": "와야 할 필요 없어",
+      "translation": "와야 할 필요 없어",
+      "seconds": 0.1511,
+      "held_out": false
+    },
+    {
+      "source": "I can barely hear you.",
+      "prepared": "I can barely hear you.",
+      "baseline": "거의 들리지 않아요",
+      "translation": "거의 들리지 않아요",
+      "seconds": 0.1575,
+      "held_out": false
+    },
+    {
+      "source": "I'm not saying it's impossible.",
+      "prepared": "I am not saying it's impossible.",
+      "baseline": "불가능하다고 말하는 게 아닙니다.",
+      "translation": "불가능하다고 말하는 게 아닙니다.",
+      "seconds": 0.1753,
+      "held_out": false
+    },
+    {
+      "source": "He used to live here.",
+      "prepared": "He used to live here.",
+      "baseline": "여기 살았어요",
+      "translation": "여기 살았어요",
+      "seconds": 0.1344,
+      "held_out": false
+    },
+    {
+      "source": "He is used to living here.",
+      "prepared": "He is used to living here.",
+      "baseline": "여기 사는 것에 익숙해져 있어요.",
+      "translation": "여기 사는 것에 익숙해져 있어요.",
+      "seconds": 0.231,
+      "held_out": false
+    },
+    {
+      "source": "I thought you'd already left.",
+      "prepared": "I thought you'd already left.",
+      "baseline": "이미 떠난 줄 알았어",
+      "translation": "이미 떠난 줄 알았어",
+      "seconds": 0.1845,
+      "held_out": false
+    },
+    {
+      "source": "Can you give me a hand?",
+      "prepared": "Can you give me a hand?",
+      "baseline": "도와줄래?",
+      "translation": "도와줄래?",
+      "seconds": 0.1463,
+      "held_out": false
+    },
+    {
+      "source": "Don't shoot. He's on our team.",
+      "prepared": "Don't shoot. He's on our team.",
+      "baseline": "쏘지 마, 우리 팀 중이야",
+      "translation": "쏘지 마, 우리 팀 중이야",
+      "seconds": 0.2857,
+      "held_out": false
+    },
+    {
+      "source": "I would've told you if I'd known.",
+      "prepared": "I would've told you if I'd known.",
+      "baseline": "내가 알았다면 말해줬을 거야",
+      "translation": "내가 알았다면 말해줬을 거야",
+      "seconds": 0.2048,
+      "held_out": false
+    },
+    {
+      "source": "We need thirteen, not thirty.",
+      "prepared": "We need thirteen, not thirty.",
+      "baseline": "30이 아니라 13이 필요해요",
+      "translation": "30이 아니라 13이 필요해요",
+      "seconds": 0.3313,
+      "held_out": false
+    },
+    {
+      "source": "I'm down for that.",
+      "prepared": "I am down for that.",
+      "baseline": "- 그래요",
+      "translation": "난 그렇게 하겠다.",
+      "seconds": 0.2531,
+      "held_out": false
+    },
+    {
+      "source": "I didn't tell her to leave.",
+      "prepared": "I didn't tell her to leave.",
+      "baseline": "내가 그녀에게 떠나라고 말하지 않았어",
+      "translation": "내가 그녀에게 떠나라고 말하지 않았어",
+      "seconds": 0.3155,
+      "held_out": false
+    },
+    {
+      "source": "She said he didn't take the money.",
+      "prepared": "She said he didn't take the money.",
+      "baseline": "그녀는 그가 돈을 안 받았다고 했어요.",
+      "translation": "그녀는 그가 돈을 안 받았다고 했어요.",
+      "seconds": 0.3829,
+      "held_out": false
+    },
+    {
+      "source": "Not everyone agreed with me.",
+      "prepared": "Not everyone agreed with me.",
+      "baseline": "모든 사람이 저와 동의하지는 않았습니다.",
+      "translation": "모든 사람이 저와 동의하지는 않았습니다.",
+      "seconds": 0.3247,
+      "held_out": false
+    },
+    {
+      "source": "I've been waiting since three.",
+      "prepared": "I have been waiting since three.",
+      "baseline": "3시부터 기다렸어요",
+      "translation": "3시부터 기다렸어요",
+      "seconds": 0.324,
+      "held_out": false
+    },
+    {
+      "source": "We ran out of time before we could finish.",
+      "prepared": "We ran out of time before we could finish.",
+      "baseline": "우리가 끝내기 전에 시간이 부족했습니다.",
+      "translation": "우리가 끝내기 전에 시간이 부족했습니다.",
+      "seconds": 0.3916,
+      "held_out": false
+    },
+    {
+      "source": "I missed what you said because your mic cut out.",
+      "prepared": "I missed what you said because your mic cut out.",
+      "baseline": "마이크가 꺼졌기 때문에 네가 말한 걸 놓쳤어",
+      "translation": "마이크가 꺼졌기 때문에 네가 말한 걸 놓쳤어",
+      "seconds": 0.5771,
+      "held_out": false
+    },
+    {
+      "source": "He could have called, but he didn't.",
+      "prepared": "He could have called, but he didn't.",
+      "baseline": "전화할 수 있었지만 전화하지 않았습니다.",
+      "translation": "전화할 수 있었지만 전화하지 않았습니다.",
+      "seconds": 0.3846,
+      "held_out": false
+    },
+    {
+      "source": "Don't forget to mute your microphone.",
+      "prepared": "Don't forget to mute your microphone.",
+      "baseline": "마이크를 끄는 것을 잊지 마세요.",
+      "translation": "마이크를 끄는 것을 잊지 마세요.",
+      "seconds": 0.3694,
+      "held_out": false
+    },
+    {
+      "source": "It's fifteen dollars, not fifty.",
+      "prepared": "It's fifteen dollars, not fifty.",
+      "baseline": "15달러, 50달러가 아닙니다.",
+      "translation": "15달러, 50달러가 아닙니다.",
+      "seconds": 0.3525,
+      "held_out": false
+    },
+    {
+      "source": "The less you worry about it, the better you'll sleep.",
+      "prepared": "The less you worry about it, the better you will sleep.",
+      "baseline": "걱정할수록 더 잘 자게 될 겁니다.",
+      "translation": "걱정이 줄어들수록 더 잘 잠을 잘 수 있습니다.",
+      "seconds": 0.4998,
+      "held_out": false
+    },
+    {
+      "source": "I'll be right back. Can you wait here?",
+      "prepared": "I will be right back. Can you wait here?",
+      "baseline": "곧 돌아올게요 여기서 기다려 주시겠어요?",
+      "translation": "곧 돌아올게요 여기서 기다려 주시겠어요?",
+      "seconds": 0.3625,
+      "held_out": false
+    },
+    {
+      "source": "I can't tell whether she's joking.",
+      "prepared": "I can't tell whether she's joking.",
+      "baseline": "농담인지 모르겠어요",
+      "translation": "농담인지 모르겠어요",
+      "seconds": 0.3742,
+      "held_out": false
+    },
+    {
+      "source": "I'll call you when I get there.",
+      "prepared": "I will call you when I get there.",
+      "baseline": "도착하면 전화해",
+      "translation": "내가 도착하면 전화해줄게",
+      "seconds": 0.3549,
+      "held_out": true
+    },
+    {
+      "source": "You'll need to restart it.",
+      "prepared": "You will need to restart it.",
+      "baseline": "다시 시작해야 합니다.",
+      "translation": "다시 시작해야 합니다.",
+      "seconds": 0.2827,
+      "held_out": true
+    },
+    {
+      "source": "She'll be back in ten minutes.",
+      "prepared": "She will be back in ten minutes.",
+      "baseline": "10분 후에 돌아올 거야",
+      "translation": "그녀는 10분 후에 돌아올 것입니다.",
+      "seconds": 0.3479,
+      "held_out": true
+    },
+    {
+      "source": "We've never met before.",
+      "prepared": "We have never met before.",
+      "baseline": "우린 아직 만나본 적 없어",
+      "translation": "우린 아직 만나본 적 없어",
+      "seconds": 0.2901,
+      "held_out": true
+    },
+    {
+      "source": "They've already paid.",
+      "prepared": "They have already paid.",
+      "baseline": "그들은 이미 지불했습니다.",
+      "translation": "그들은 이미 지불했습니다.",
+      "seconds": 0.2786,
+      "held_out": true
+    },
+    {
+      "source": "I'm not asking you to leave.",
+      "prepared": "I am not asking you to leave.",
+      "baseline": "떠나라고 부탁하는 게 아니야",
+      "translation": "떠나라고 부탁하지 않아요.",
+      "seconds": 0.3003,
+      "held_out": true
+    },
+    {
+      "source": "We're not allowed to go inside.",
+      "prepared": "We are not allowed to go inside.",
+      "baseline": "우린 안으로 들어가지 못해요",
+      "translation": "우리는 안으로 들어갈 수 없습니다.",
+      "seconds": 0.2965,
+      "held_out": true
+    },
+    {
+      "source": "You're not supposed to turn it off.",
+      "prepared": "You are not supposed to turn it off.",
+      "baseline": "꺼내서는 안 돼",
+      "translation": "꺼내서는 안 돼",
+      "seconds": 0.2979,
+      "held_out": true
+    },
+    {
+      "source": "They're looking after their neighbor's dog.",
+      "prepared": "They are looking after their neighbor's dog.",
+      "baseline": "그들은 이웃의 개를 돌보고 있습니다.",
+      "translation": "그들은 이웃의 개를 돌보고 있습니다.",
+      "seconds": 0.4088,
+      "held_out": true
+    },
+    {
+      "source": "I should've listened to you.",
+      "prepared": "I should've listened to you.",
+      "baseline": "네 말을 들어야 했지",
+      "translation": "네 말을 들어야 했지",
+      "seconds": 0.317,
+      "held_out": true
+    },
+    {
+      "source": "You could've asked me first.",
+      "prepared": "You could've asked me first.",
+      "baseline": "먼저 내게 물어볼 수 있었다.",
+      "translation": "먼저 내게 물어볼 수 있었다.",
+      "seconds": 0.3451,
+      "held_out": true
+    },
+    {
+      "source": "That must've been difficult.",
+      "prepared": "That must've been difficult.",
+      "baseline": "힘들었을 거야",
+      "translation": "힘들었을 거야",
+      "seconds": 0.202,
+      "held_out": true
+    },
+    {
+      "source": "She might've misunderstood what I said.",
+      "prepared": "She might've misunderstood what I said.",
+      "baseline": "그녀가 내가 말한 것을 잘못 이해했을 수도 있습니다.",
+      "translation": "그녀가 내가 말한 것을 잘못 이해했을 수도 있습니다.",
+      "seconds": 0.4643,
+      "held_out": true
+    },
+    {
+      "source": "I would've gone if I'd known.",
+      "prepared": "I would've gone if I'd known.",
+      "baseline": "내가 알았다면 떠나고 있었을 거야",
+      "translation": "내가 알았다면 떠나고 있었을 거야",
+      "seconds": 0.322,
+      "held_out": true
+    },
+    {
+      "source": "I'll never let that happen again.",
+      "prepared": "I will never let that happen again.",
+      "baseline": "다시는 그런 일이 일어나지 못하게 해",
+      "translation": "다시는 그런 일이 일어나지 못하게 해",
+      "seconds": 0.351,
+      "held_out": true
+    },
+    {
+      "source": "You're the one who called me.",
+      "prepared": "You are the one who called me.",
+      "baseline": "전화한 건 너야",
+      "translation": "전화한 건 너야",
+      "seconds": 0.2376,
+      "held_out": true
+    },
+    {
+      "source": "We'll see whether it works.",
+      "prepared": "We will see whether it works.",
+      "baseline": "그럼 효과가 있는지 보자.",
+      "translation": "그것이 효과가 있는지 보자.",
+      "seconds": 0.2894,
+      "held_out": true
+    },
+    {
+      "source": "If we've missed it, we'll try tomorrow.",
+      "prepared": "If we have missed it, we will try tomorrow.",
+      "baseline": "만약 우리가 놓쳤다면, 우리는 내일 시도할 것입니다.",
+      "translation": "만약 우리가 놓쳤다면, 우리는 내일 시도할 것입니다.",
+      "seconds": 0.5649,
+      "held_out": true
+    },
+    {
+      "source": "The more you practice, the easier it'll get.",
+      "prepared": "The more you practice, the easier it will get.",
+      "baseline": "연습할수록 더 쉬워질 거야",
+      "translation": "연습할수록 더 쉬워질 겁니다.",
+      "seconds": 0.4391,
+      "held_out": true
+    },
+    {
+      "source": "You'll hear a beep when it's ready.",
+      "prepared": "You will hear a beep when it's ready.",
+      "baseline": "준비되면 삐삐 소리가 들릴 거야",
+      "translation": "준비되면 삐삐 소리가 들릴 겁니다.",
+      "seconds": 0.4782,
+      "held_out": true
+    }
+  ]
+}

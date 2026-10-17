@@ -231,5 +231,8 @@
   "{0} 모델 설치 중…": "Preparing the {0} model…",
   "미지원 코드: {0}": "Unsupported code: {0}",
   " (코드 {0})": " (code {0})",
-  "말하는 사람 표시를 자막 시각에 맞춰 닉네임: 내용으로 표시합니다. 계속 겹치면 닉네임을 함께 표시합니다.\n자동 연결을 켜면 통화방 이동을 따라갑니다. 첫 연결 승인은 직접 완료해 주세요.": "Use Discord speaking indicators to show Name: captions. If voices keep overlapping, show the names together.\nAutomatic connection follows channel changes. Complete the first connection approval yourself."
+  "말하는 사람 표시를 자막 시각에 맞춰 닉네임: 내용으로 표시합니다. 계속 겹치면 닉네임을 함께 표시합니다.\n자동 연결을 켜면 통화방 이동을 따라갑니다. 첫 연결 승인은 직접 완료해 주세요.": "Use Discord speaking indicators to show Name: captions. If voices keep overlapping, show the names together.\nAutomatic connection follows channel changes. Complete the first connection approval yourself.",
+  "목소리로 Discord 닉네임 보조 확인": "Use voices to help confirm Discord nicknames",
+  "혼자 말한 구간에서 목소리와 닉네임을 연결합니다. 확실할 때만 이름을 보완하며, 통화방 변경·중지 시 지웁니다. 음성과 목소리 특징은 저장하지 않습니다.": "Learns a nickname from solo speech in Discord and fills in a name only when confident. Cleared on channel change or stop. Audio and voice features are not saved.",
+  "목소리 보조 확인을 사용할 수 없어 Discord 말하기 표시를 사용합니다.": "Voice assistance is unavailable. Using Discord speaking indicators."
 }

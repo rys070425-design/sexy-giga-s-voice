@@ -1,0 +1,16 @@
+{
+  "result": "FINAL_V093_INSTALLED_SOURCE_AND_PAYLOAD_VERIFIED",
+  "version": "0.9.3",
+  "unit_tests_passed": 126,
+  "installed_app_files_match": 30,
+  "cuda_available": true,
+  "speaker_model_verified": true,
+  "installer_language_choices": 25,
+  "installer_language_test_passed": true,
+  "installer_log_window_30_cycles_passed": true,
+  "installer_exit_code": 0,
+  "python_free_new_pc_tested": false,
+  "actual_discord_call_tested": false,
+  "audio_in_installer": false,
+  "installer_sha256": "9da0528a608998ec5a7dbc85277c98edf72e99711335580c62141147d34b044c"
+}

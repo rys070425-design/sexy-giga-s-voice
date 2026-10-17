@@ -1,0 +1,19 @@
+CAM++ speaker embedding assistance
+
+Original authors: 3D-Speaker / Alibaba Tongyi Lab (ModelScope iic).
+Project: https://github.com/modelscope/3D-Speaker
+Model: https://modelscope.cn/models/iic/speech_campplus_sv_zh_en_16k-common_advanced
+Model license: Apache License 2.0; see CAMplusplus_APACHE_LICENSE.txt.
+
+ONNX conversion distributed by the sherpa-onnx project:
+https://github.com/k2-fsa/sherpa-onnx/releases/tag/speaker-recongition-models
+Artifact: 3dspeaker_speech_campplus_sv_zh_en_16k-common_advanced.onnx
+SHA-256: aa3cfc16963a10586a9393f5035d6d6b57e98d358b347f80c2a30bf4f00ceba2
+No training or fine-tuning of these weights was performed by Universal Voice KR.
+The application uses conservative session-only enrollment and matching.
+
+Inference: sherpa-onnx 1.13.8, Apache-2.0,
+https://github.com/k2-fsa/sherpa-onnx
+
+This does not change the separate NLLB translation model's CC-BY-NC-4.0
+noncommercial limitation. No audio or voice profile is uploaded by this feature.

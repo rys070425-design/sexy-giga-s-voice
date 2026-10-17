@@ -1,0 +1,10 @@
+{
+  "result": "REAL_CAMPLUS_NLLB_QT_CAPTION_VERIFIED",
+  "speaker": "Bob",
+  "blocking_wait_for_speaker": false,
+  "translation_and_name_seconds": 0.2892,
+  "actual_discord_call": false,
+  "owned_caption_text": true,
+  "audio_uploaded": false,
+  "profiles_cleared": true
+}

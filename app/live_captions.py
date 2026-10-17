@@ -32,6 +32,7 @@ class CaptionUpdate:
     target_language: str = 'ko'
     part: int = 0
     suppressed: bool = False
+    speaker_epoch: int = -1
 
 
 class DisplayOrder:

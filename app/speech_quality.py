@@ -15,6 +15,7 @@ class AudioClip:
     sequence: int = 0
     revision: int = 0
     final: bool = True
+    speaker_epoch: int = -1
 
 
 class Segmenter:
@@ -32,6 +33,7 @@ class Segmenter:
         self.preview_interval = int(preview_interval * SAMPLE_RATE / FRAME)
         self.last_preview = 0
         self.pause_frames,self.long_pause_frames=(40,20) if preserve_context else (24,8)
+        self.max_frames=500 if preserve_context else 400
 
     def _complete(self, forced=False):
         result = None
@@ -76,9 +78,10 @@ class Segmenter:
                 self.voiced_frames += int(voiced)
                 self.silence = 0 if voiced else self.silence + 1
             # A preview keeps continuous speech visible without cutting its
-            # context. Only commit on a real pause or the original 8 s limit.
+            # context. General conversation retains up to 10 s; game calls
+            # keep their 8 s limit. Draft cadence and pause rules are unchanged.
             pause = self.silence >= self.pause_frames or (len(self.clip) >= 150 and self.silence >= self.long_pause_frames)
-            forced = len(self.clip) >= 400 and not pause
+            forced = len(self.clip) >= self.max_frames and not pause
             if pause or forced:
                 clip = self._complete(forced)
                 if clip is not None:

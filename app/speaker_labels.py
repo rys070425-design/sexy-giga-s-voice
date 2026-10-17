@@ -62,10 +62,29 @@ class SpeakerTimeline:
     def __init__(self):
         self._samples = deque()
         self._lock = RLock()
+        self._epoch = 0
 
     def clear(self):
         with self._lock:
             self._samples.clear()
+            self._epoch += 1
+
+    @property
+    def epoch(self):
+        with self._lock:return self._epoch
+
+    def exclusive(self,start,end):
+        """Strict training evidence, unlike the tolerant display resolver."""
+        with self._lock:coverage,covered=self._coverage(list(self._samples),start,end)
+        if end<=start or covered<(end-start)*.95:return ''
+        singles=[names[0] for names,duration in coverage.items() if len(names)==1 and duration>0]
+        if len(set(singles))!=1 or any(len(names)>1 and duration>0 for names,duration in coverage.items()):return ''
+        name=singles[0]
+        return name if coverage.get((name,),0)>=(end-start)*.95 else ''
+
+    def has_overlap(self,start,end):
+        with self._lock:coverage,_=self._coverage(list(self._samples),start,end)
+        return any(len(names)>1 and duration>.02 for names,duration in coverage.items())
 
     def record(self, people, timestamp=None):
         now = time.monotonic() if timestamp is None else timestamp
@@ -132,11 +151,16 @@ class SpeakerTimeline:
 
 
 def group_words(parts, timeline, clip_start):
+    return [(label,text) for label,text,_,_ in group_timed_words(parts,timeline,clip_start)]
+
+
+def group_timed_words(parts,timeline,clip_start):
     groups = []
     for text, start, end in parts:
         label = timeline.resolve(clip_start + start, clip_start + end)
         if groups and groups[-1][0] == label:
             groups[-1][1] += text
+            groups[-1][3] = end
         else:
-            groups.append([label, text])
-    return [(label, text.strip()) for label, text in groups if text.strip()]
+            groups.append([label, text,start,end])
+    return [(label,text.strip(),start,end) for label,text,start,end in groups if text.strip()]

@@ -10,7 +10,7 @@ os.environ['QTWEBENGINE_CHROMIUM_FLAGS']='--disable-gpu'
 sys.path.insert(0,str(root))
 from runtime_config import configure
 configure()
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication,QScrollArea
 from PySide6.QtGui import QFontDatabase
 import main,core
 from language_preferences import language_choices
@@ -22,6 +22,7 @@ app.setStyleSheet(main.STYLESHEET)
 main.MainWindow.update_plan_state=lambda self:None
 main.MainWindow._refresh_sources=lambda self:self.source.addItem('Test playback','')
 window=main.MainWindow()
+assert window.cb_voice_identity.isChecked()
 window.tab_discord.auto_follow.setChecked(False)
 window.show();app.processEvents()
 assert window.cfg['ui_language']=='en'
@@ -101,8 +102,17 @@ window.hide_native.setChecked(False);assert window.language.isEnabled()
 window.hide_native.setChecked(True);assert not window.language.isEnabled()
 window.add_profile()
 assert window.cfg['profiles'][window.profile_idx]['target_language']=='en'
+window.cb_voice_identity.setChecked(False);window.save_profile(quiet=True);window._load_profile()
+assert not window.cb_voice_identity.isChecked()
+window.cb_voice_identity.setChecked(True);window.save_profile(quiet=True)
+for code in ('en','ko'):
+    language_control.setCurrentIndex(language_control.findData(code));window.navigation.setCurrentRow(1);app.processEvents()
+    assert window.cb_voice_identity.text()==('목소리로 Discord 닉네임 보조 확인' if code=='ko' else 'Use voices to help confirm Discord nicknames')
+    for scroll in window.findChildren(QScrollArea):
+        if scroll.isAncestorOf(window.cb_voice_identity):scroll.ensureWidgetVisible(window.cb_voice_identity)
+    app.processEvents();window.grab().save(str(report.parent/('voice-profile-'+code+'.png')))
 window.cfg['ui_language']='ko';core.write_json(core.HOME/'settings.json',window.cfg)
 window.close();app.processEvents()
-result={'result':'LANGUAGE_UI_VERIFIED','ui_languages':expected,'same_language_hidden':True,'history_filtered':True,'real_caption_text_preserved':True,'uncertain_source_header_hidden':True,'confirmed_source_header_restored':True,'inline_discord_nicknames':True,'no_overlap_status_text':True,'long_name_and_caption_checked':True}
+result={'result':'LANGUAGE_UI_VERIFIED','ui_languages':expected,'same_language_hidden':True,'history_filtered':True,'real_caption_text_preserved':True,'uncertain_source_header_hidden':True,'confirmed_source_header_restored':True,'inline_discord_nicknames':True,'no_overlap_status_text':True,'long_name_and_caption_checked':True,'voice_assistance_default_on':True,'voice_assistance_preference_saved':True,'voice_control_localized':True}
 report.write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
 print(json.dumps(result),flush=True)

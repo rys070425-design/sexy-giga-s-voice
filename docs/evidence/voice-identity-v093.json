@@ -1,0 +1,80 @@
+{
+  "model": "3dspeaker_speech_campplus_sv_zh_en_16k-common_advanced.onnx",
+  "real_recorded_speakers": 2,
+  "unregistered_synthetic_voices": 2,
+  "enrolment_seconds_each": 8,
+  "conditions": [
+    {
+      "speaker": "Alice",
+      "offset": 18,
+      "condition": "clean",
+      "match": "",
+      "cpu_seconds": 0.1094
+    },
+    {
+      "speaker": "Alice",
+      "offset": 18,
+      "condition": "noisy15dB",
+      "match": "",
+      "cpu_seconds": 0.1065
+    },
+    {
+      "speaker": "Alice",
+      "offset": 24,
+      "condition": "clean",
+      "match": "Alice",
+      "cpu_seconds": 0.1065
+    },
+    {
+      "speaker": "Alice",
+      "offset": 24,
+      "condition": "noisy15dB",
+      "match": "",
+      "cpu_seconds": 0.1085
+    },
+    {
+      "speaker": "Bob",
+      "offset": 18,
+      "condition": "clean",
+      "match": "Bob",
+      "cpu_seconds": 0.1087
+    },
+    {
+      "speaker": "Bob",
+      "offset": 18,
+      "condition": "noisy15dB",
+      "match": "Bob",
+      "cpu_seconds": 0.1142
+    },
+    {
+      "speaker": "Bob",
+      "offset": 24,
+      "condition": "clean",
+      "match": "Bob",
+      "cpu_seconds": 0.1094
+    },
+    {
+      "speaker": "Bob",
+      "offset": 24,
+      "condition": "noisy15dB",
+      "match": "Bob",
+      "cpu_seconds": 0.1152
+    },
+    {
+      "speaker": "unregistered-TTS-en",
+      "condition": "clean",
+      "match": ""
+    },
+    {
+      "speaker": "unregistered-TTS-ko",
+      "condition": "clean",
+      "match": ""
+    }
+  ],
+  "wrong_names": 0,
+  "correct_names": 5,
+  "abstentions": 5,
+  "actual_discord_call_test": false,
+  "audio_uploaded": false,
+  "session_clear_verified": true
+}

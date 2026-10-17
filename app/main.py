@@ -262,7 +262,7 @@ class MainWindow(QMainWindow):
         self.reviewed_translation = ""
         self.review_pin = False  # do not overwrite the phrase under review
         self.plan_result.connect(self.on_plan_result)
-        self.setWindowTitle("Universal Voice KR v0.9.2 · 읽기 편한 실시간 자막")
+        self.setWindowTitle("Universal Voice KR v0.9.3 · 읽기 편한 실시간 자막")
         self.setMinimumSize(960,620)
         screen=QApplication.primaryScreen()
         available=screen.availableGeometry() if screen else None
@@ -319,7 +319,7 @@ class MainWindow(QMainWindow):
         license_note=CaptionLabel('NLLB: CC-BY-NC-4.0')
         license_note.setObjectName('version')
         side.addWidget(license_note)
-        version = QLabel('VERSION 0.9.2')
+        version = QLabel('VERSION 0.9.3')
         version.setObjectName('version')
         side.addWidget(version)
         outer.addWidget(sidebar)
@@ -535,6 +535,8 @@ class MainWindow(QMainWindow):
         self.cb_overlay = QCheckBox("게임 화면 위 자막 표시 (전체 화면 창 모드 권장)")
         self.cb_original = QCheckBox("원문도 함께 표시")
         self.cb_live = QCheckBox("말하는 중에도 자막 표시 · 문장이 끝나면 자동 수정")
+        self.cb_voice_identity=QCheckBox('목소리로 Discord 닉네임 보조 확인')
+        self.cb_voice_identity.setToolTip('혼자 말한 구간에서 목소리와 닉네임을 연결합니다. 확실할 때만 이름을 보완하며, 통화방 변경·중지 시 지웁니다. 음성과 목소리 특징은 저장하지 않습니다.')
         self.cb_auto = QCheckBox("등록한 게임 실행 파일을 감지하면 자동 프로필 전환")
         self.cb_auto.setChecked(bool(self.cfg.get("auto_switch", False)))
         self.exe_names = QLineEdit()
@@ -557,6 +559,7 @@ class MainWindow(QMainWindow):
         form.addRow(self.cb_overlay)
         form.addRow(self.cb_original)
         form.addRow(self.cb_live)
+        form.addRow(self.cb_voice_identity)
         form.addRow(self.cb_auto)
         form.addRow("프로필 전용 용어 사전", self.profile_terms)
         form.addRow("프로필 적용 게임(.exe)", self.exe_names)
@@ -826,6 +829,7 @@ class MainWindow(QMainWindow):
         self.cb_overlay.setChecked(bool(p.get("overlay", True)))
         self.cb_original.setChecked(bool(p.get("show_original", False)))
         self.cb_live.setChecked(bool(p.get('live_preview', True)))
+        self.cb_voice_identity.setChecked(bool(p.get('voice_identity',True)))
         self.hide_native.setChecked(bool(p.get('hide_native',True)))
         self.update_native_filter(self.hide_native.isChecked())
         self.exe_names.setText(", ".join(p.get("game_exes", [])))
@@ -847,6 +851,7 @@ class MainWindow(QMainWindow):
                   "font": self.font_size.value(), "position": self.position.currentData(),
                   "overlay": self.cb_overlay.isChecked(), "show_original": self.cb_original.isChecked(),
                   "live_preview": self.cb_live.isChecked(),
+                  "voice_identity": self.cb_voice_identity.isChecked(),
                   "asr_hotwords": self.asr_hotwords.text().strip(),
                   "source_label":self.source_label.text().strip(),
                   "background_opacity":self.background_opacity.value(),

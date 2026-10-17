@@ -80,7 +80,7 @@ class LanguagePreferencesTests(unittest.TestCase):
         service.text_q.put(CaptionUpdate(1,100,'English native','','en','',True,target_language='en'))
         with tempfile.TemporaryDirectory() as directory,patch('core.HOME',Path(directory)),patch('local_translation.LocalTranslator',return_value=translator):
             service._translate(service.stop_event)
-        translator.translate.assert_called_once_with('','ko','en')
+        translator.translate.assert_called_once_with('1','ko','en')
 
     def test_localization_preserves_native_names_placeholders_and_user_data(self):
         from ui_i18n import translate,catalog

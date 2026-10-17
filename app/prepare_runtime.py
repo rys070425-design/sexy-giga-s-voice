@@ -28,6 +28,8 @@ target=root/'models'/'large-v3-turbo'
 download_model('large-v3-turbo',output_dir=str(target))
 print('STAGE:5:NLLB 공용 번역 모델 준비 · 비상업용 모델',flush=True)
 install_quality_model(root,lambda line:print(line,flush=True))
+from speaker_assets import install_speaker_model
+speaker_path=install_speaker_model(root,lambda line:print(line,flush=True))
 print('STAGE:6:새 설치 환경 확인',flush=True)
 translator=LocalTranslator()
 translation=translator.translate('I disagree with that idea.','en')
@@ -37,6 +39,11 @@ device='cuda' if ctranslate2.get_cuda_device_count() else 'cpu'
 model=WhisperModel(str(target),device=device,compute_type='int8_float16' if device=='cuda' else 'int8',cpu_threads=4)
 segments,_=model.transcribe(np.zeros(16000,np.float32),language='en',beam_size=1)
 list(segments)
+import sherpa_onnx
+speaker_config=sherpa_onnx.SpeakerEmbeddingExtractorConfig(model=str(speaker_path),num_threads=1,provider='cpu',debug=False)
+if not speaker_config.validate():raise RuntimeError('Speaker model configuration failed')
+speaker_model=sherpa_onnx.SpeakerEmbeddingExtractor(speaker_config)
+if speaker_model.dim!=192:raise RuntimeError('Unexpected speaker embedding dimension')
 preferences=root/'install_preferences.json'
 if preferences.is_file():
     if preferences.stat().st_size>4096:raise ValueError('Installation language preferences are too large')
@@ -48,6 +55,6 @@ if preferences.is_file():
     config=read_json(settings_file,DEFAULT_SETTINGS)
     apply_install_language(config,chosen)
     write_json(settings_file,config)
-report=dict(version='0.9.2',python=sys.executable,device=device,model='large-v3-turbo',translator='NLLB-200 distilled 600M int8',translation_ready=True,verified=True)
+report=dict(version='0.9.3',python=sys.executable,device=device,model='large-v3-turbo',translator='NLLB-200 distilled 600M int8',translation_ready=True,speaker_assistance='CAM++ zh-en advanced CPU',speaker_model_verified=True,verified=True)
 (root/'INSTALL_SUCCESS.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
 print('RUNTIME_VERIFIED',flush=True)

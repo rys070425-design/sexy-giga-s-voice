@@ -1,10 +1,10 @@
-# Universal Voice KR 0.9.2
+# Universal Voice KR 0.9.3
 
 Translate audio playing on your Windows PC, including Discord and YouTube. Your microphone is not captured. The default models run locally without a paid API. NLLB translation is licensed **CC-BY-NC-4.0 for noncommercial use**.
 
 ## Install and choose your language
 
-1. Download [Windows setup](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_Setup_v092.exe). Close the old app and installer first.
+1. Download [Windows setup](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_Setup_v093.exe). Close the old app and installer first.
 2. Setup starts in English. Use **Language** to choose from the language-pack catalog. Instructions change immediately. Brazilian Portuguese shares the Portuguese model and interface.
 3. Use the same installation folder to reuse existing models. Initial setup needs internet and several GB of free space. This EXE is an online installer.
 4. The selected language is applied to the interface and captions in all saved profiles. Other profile settings and your glossary are preserved.
@@ -31,6 +31,10 @@ For Discord names, approve the official Streamkit connection once under **Discor
 A playback application name is shown only when one source is consistently identified. Silent, muted, and own capture sessions are excluded. Mixed or unknown sources have no source header; technical process names are not listed. Exact Chrome/Edge website names require the optional extension opened through **Website names**. Load the provided unpacked extension, then copy the pairing code into its settings. It reports audible, unmuted, non-incognito tab hostnames to this PC, not page text or full URLs. You can also type a source label directly.
 
 ## Models and limits
+
+In 0.9.3, general conversation retains up to 10 seconds of context for final recognition while preserving the first-draft cadence. Game context keeps its 8-second limit. Some unambiguous English contractions are expanded only for translation; original transcripts remain intact. The models were not retrained, and meaning errors remain.
+
+**Use voices to help confirm Discord nicknames** under **Profiles & captions** enables the local CAM++ CPU model (about 28 MB, Apache-2.0). It learns session-only nicknames from clean solo-speaking indicator intervals. At least two people need independent enrollment intervals. It fills an unknown name only when the whole span and both halves agree with a clear margin. It never waits for speaker inference before displaying captions. Channel changes and stopping clear the session data. It cannot find a new person's real name or separate overlapping voices. See [tests and remaining limitations](validation-v093.md).
 
 Speech recognition uses **Whisper large-v3-turbo / faster-whisper**. Translation uses **NLLB-200 distilled 600M, CPU int8**. These models were not retrained. Both can still be wrong.
 

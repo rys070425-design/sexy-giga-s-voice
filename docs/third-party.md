@@ -9,6 +9,8 @@
 | CTranslate2 | https://github.com/OpenNMT/CTranslate2 | MIT |
 | NLLB-200 distilled 600M | https://huggingface.co/facebook/nllb-200-distilled-600M | 모델 CC-BY-NC-4.0 · 비상업용. NLLB Team / Meta AI, 2022. 재학습 없이 int8 양자화 |
 | SentencePiece | https://github.com/google/sentencepiece | Apache-2.0 |
+| CAM++ zh/en advanced speaker embeddings | https://modelscope.cn/models/iic/speech_campplus_sv_zh_en_16k-common_advanced | Apache-2.0, 3D-Speaker / Alibaba Tongyi Lab; sherpa-onnx ONNX conversion, no retraining |
+| sherpa-onnx | https://github.com/k2-fsa/sherpa-onnx | Apache-2.0; 1.13.8 CPU runtime |
 | Argos Translate 및 번역 패키지 (이전 설치의 선택 호환, 0.8.1 기본 설치 제외) | https://github.com/argosopentech/argos-translate | 코드 MIT/CC0, 모델은 각 배포 패키지 참조 |
 | PySide6 / Qt | https://doc.qt.io/qtforpython-6/ | LGPLv3/GPLv3 또는 상용, 모듈별 조건 참조 |
 | Python | https://www.python.org/ | PSF License |

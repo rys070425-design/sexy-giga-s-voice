@@ -1,0 +1,44 @@
+{
+  "result": "REAL_ASR_TRANSLATION_WITH_CONTROLLED_SPEAKER_TIMELINE_VERIFIED",
+  "device": "cuda",
+  "real_discord_call": false,
+  "scenarios": [
+    {
+      "scenario": "single",
+      "speaker_labels": [
+        "Alice"
+      ],
+      "final_parts": 1,
+      "all_translated": true,
+      "source": "Discord"
+    },
+    {
+      "scenario": "brief-ring-overlap",
+      "speaker_labels": [
+        "Alice"
+      ],
+      "final_parts": 1,
+      "all_translated": true,
+      "source": "Discord"
+    },
+    {
+      "scenario": "speaker-turn",
+      "speaker_labels": [
+        "Alice",
+        "Bob"
+      ],
+      "final_parts": 2,
+      "all_translated": true,
+      "source": "Discord"
+    },
+    {
+      "scenario": "sustained-overlap",
+      "speaker_labels": [
+        "Alice / Bob"
+      ],
+      "final_parts": 1,
+      "all_translated": true,
+      "source": "Discord"
+    }
+  ]
+}

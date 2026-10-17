@@ -7,6 +7,36 @@ from live_captions import CaptionUpdate
 
 
 class TranslationStreamTests(unittest.TestCase):
+    def test_native_translation_kernels_warm_before_ready(self):
+        calls=[]
+        class Translator:
+            packages={}
+            def supports(self,a,b):return True
+            def translate(self,text,source,target):calls.append((text,source,target));return ''
+        service=VoiceService();service.profile={'language':'auto','target_language':'en'}
+        service.dictionary={};service._workers_remaining=1;service.asr_done.set()
+        with tempfile.TemporaryDirectory() as directory:
+            with patch('core.HOME',Path(directory)),patch('local_translation.LocalTranslator',return_value=Translator()):service._translate(service.stop_event)
+        self.assertEqual(calls,[('1','ko','en')]);self.assertTrue(service.translator_ready.is_set())
+
+    def test_voice_hint_only_fills_current_unknown_discord_speaker(self):
+        from types import SimpleNamespace
+        class Translator:
+            packages={}
+            def translate(self,text,source,target='ko'):return '번역' if text else ''
+        for source,speaker,epoch,expected in [('Discord','화자 미확인',0,'Alice'),
+                ('YouTube','화자 미확인',0,'화자 미확인'),('Discord','Bob',0,'Bob'),
+                ('Discord','화자 미확인',-1,'화자 미확인')]:
+            service=VoiceService();service.profile={'language':'en','translation_context':'general'}
+            service.dictionary={};service._workers_remaining=1;service.asr_done.set()
+            calls=[];service.voice_identity=SimpleNamespace(result=lambda key:(calls.append(key) or 'Alice'))
+            service.text_q.put(CaptionUpdate(1,100,'Hello.','','en',speaker,True,source=source,speaker_epoch=epoch))
+            events=[];captions=[];service.live_caption.connect(events.append);service.attributed_caption.connect(lambda *p:captions.append(p))
+            with tempfile.TemporaryDirectory() as directory:
+                with patch('core.HOME',Path(directory)),patch('local_translation.LocalTranslator',return_value=Translator()):service._translate(service.stop_event)
+            self.assertEqual(events[-1].speaker,expected);self.assertEqual(captions[-1][-1],expected)
+            self.assertEqual(bool(calls),expected=='Alice')
+
     def test_spanish_output_uses_requested_direction_and_no_korean_phrase(self):
         calls=[]
         class Translator:

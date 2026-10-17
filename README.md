@@ -7,6 +7,10 @@ Windows PC에서 Discord 등의 출력 소리를 받아 자막으로 보여 주�
 
 [Windows 설치 파일 받기](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_Setup_v091.exe)
 
+[공유용 설치 ZIP 받기](https://raw.githubusercontent.com/rys070425-design/sexy-giga-s-voice/main/dist/UniversalVoiceKR_v091_Windows_Installer.zip)
+
+메신저에서 EXE 파일을 첨부할 수 없다면 설치 파일과 안내만 들어 있는 ZIP을 이용하거나 이 저장소 링크를 공유하세요. ZIP은 Windows PC에서 압축을 모두 풀고 안의 EXE를 실행합니다. 소스 ZIP과는 다릅니다. 휴대폰용 앱은 아닙니다. ZIP 내부 설치 파일의 무결성은 확인했지만 카카오톡 전송 성공을 직접 시험한 것은 아닙니다.
+
 1. 기존 앱과 이전 설치 프로그램을 닫고 설치 파일을 실행합니다.
 2. 영어로 시작하는 설치 창의 **Language**에서 언어를 고릅니다. 한국어를 고르면 안내가 즉시 한국어로 바뀝니다. 기존 설치와 같은 위치를 선택하면 받은 모델과 구성요소를 재사용합니다.
 3. 설치 후 같은 언어가 앱 UI와 자막 언어에 적용됩니다. 재생 출력 장치를 선택하고 **자막 시작**을 누릅니다. 기본적으로 설정한 언어의 말은 자막과 기록에서 제외합니다.
